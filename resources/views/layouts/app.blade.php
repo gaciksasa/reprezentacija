@@ -20,6 +20,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('dashboard') }}">Početna</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Glavni tim
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('timovi.show', \App\Models\Tim::glavniTim()->first() ?? 1) }}">Profil glavnog tima</a></li>
+                            <li><a class="dropdown-item" href="{{ route('tim-varijante.index') }}">Istorijski nazivi</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('kalendar') }}">Kalendar utakmica</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('utakmice.index') }}">Utakmice</a>
                     </li>

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UtakmicaEditorController;
 use App\Http\Controllers\TimoviController;
 use App\Http\Controllers\IgraciController;
 use App\Http\Controllers\UtakmiceController;
@@ -13,6 +14,14 @@ use App\Http\Controllers\GoloviController;
 use App\Http\Controllers\IzmeneController;
 use App\Http\Controllers\KartoniController;
 
+
+// Unified Match Editor routes
+Route::get('/utakmice/kreiranje', [UtakmicaEditorController::class, 'create'])->name('utakmice.kreiranje');
+Route::post('/utakmice/sacuvaj', [UtakmicaEditorController::class, 'store'])->name('utakmice.sacuvaj');
+Route::get('/utakmice/{utakmica}/editor', [UtakmicaEditorController::class, 'edit'])->name('utakmice.editor');
+Route::put('/utakmice/{utakmica}/azuriraj', [UtakmicaEditorController::class, 'update'])->name('utakmice.azuriraj');
+Route::get('/utakmice/ucitaj-igrace', [UtakmicaEditorController::class, 'ucitajIgrace'])->name('utakmice.ucitajIgrace');
+
 // Početna stranica i dashboard
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/statistika', [DashboardController::class, 'statistika'])->name('statistika');
@@ -21,6 +30,10 @@ Route::get('/pretraga', [DashboardController::class, 'pretraga'])->name('pretrag
 
 // CRUD rute za timove
 Route::resource('timovi', TimoviController::class);
+
+// Tim varijante routes
+Route::resource('tim-varijante', TimVarijanteController::class)->except(['show']);
+Route::post('tim-varijante/postavi-glavni-tim/{tim}', [TimVarijanteController::class, 'postaviGlavniTim'])->name('tim-varijante.postaviGlavniTim');
 
 // CRUD rute za igrače
 Route::resource('igraci', IgraciController::class);
