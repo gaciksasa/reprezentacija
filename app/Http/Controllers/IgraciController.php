@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Igrac;
 use App\Models\Tim;
+use App\Models\BivsiKlub;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class IgraciController extends Controller
 {
@@ -23,30 +25,56 @@ class IgraciController extends Controller
     public function create()
     {
         $timovi = Tim::orderBy('naziv')->get();
-        return view('igraci.create', compact('timovi'));
+        $pozicije = ['Golman', 'Odbrana', 'Sredina', 'Napad'];
+        return view('igraci.create', compact('timovi', 'pozicije'));
     }
 
     /**
      * Čuvanje novog igrača.
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'ime' => 'required|string|max:255',
-            'prezime' => 'required|string|max:255',
-            'tim_id' => 'required|exists:timovi,id',
-            'broj_dresa' => 'nullable|integer|min:1',
-            'pozicija' => 'nullable|string|max:100',
-            'klub' => 'nullable|string|max:255',
-            'drzava_kluba' => 'nullable|string|max:100',
-            'datum_rodjenja' => 'nullable|date',
-            'nacionalnost' => 'nullable|string|max:100',
-        ]);
+{
+    $validated = $request->validate([
+        'ime' => 'required|string|max:255',
+        'prezime' => 'required|string|max:255',
+        'pozicija' => 'required|in:Golman,Odbrana,Sredina,Napad',
+        'datum_rodjenja' => 'nullable|date',
+        'mesto_rodjenja' => 'nullable|string|max:255',
+        'datum_smrti' => 'nullable|date|after_or_equal:datum_rodjenja',
+        'mesto_smrti' => 'nullable|string|max:255',
+        'biografija' => 'nullable|string',
+        'fotografija' => 'nullable|image|max:2048', // max 2MB
+        'tim_id' => 'required|exists:timovi,id',
+    ]);
 
-        Igrac::create($validated);
+    // Handle file upload if there's a photo
+    if ($request->hasFile('fotografija')) {
+        $path = $request->file('fotografija')->store('igraci', 'public');
+        $validated['fotografija_path'] = $path;
+    }
 
-        return redirect()->route('igraci.index')
-            ->with('success', 'Igrač uspešno kreiran.');
+    // Create player
+    $igrac = Igrac::create($validated);
+
+    // Process bivsi klubovi
+    if ($request->has('bivsi_klubovi')) {
+        foreach ($request->bivsi_klubovi as $klub) {
+            if (!empty($klub['naziv'])) { // Only add if klub name is provided
+                $igrac->bivsiKlubovi()->create([
+                    'naziv' => $klub['naziv'],
+                    'drzava' => $klub['drzava'] ?? null,
+                    'stepen_takmicenja' => $klub['stepen_takmicenja'] ?? null,
+                    'broj_nastupa' => $klub['broj_nastupa'] ?? null,
+                    'broj_golova' => $klub['broj_golova'] ?? null,
+                    'period_od' => $klub['period_od'] ?? null,
+                    'period_do' => $klub['period_do'] ?? null,
+                ]);
+            }
+        }
+    }
+
+    return redirect()->route('igraci.index')
+        ->with('success', 'Igrač uspešno kreiran.');
     }
 
     /**
@@ -54,7 +82,7 @@ class IgraciController extends Controller
      */
     public function show(Igrac $igrac)
     {
-        $igrac->load(['tim', 'golovi.utakmica', 'kartoni.utakmica']);
+        $igrac->load(['tim', 'golovi.utakmica', 'kartoni.utakmica', 'bivsiKlubovi']);
         return view('igraci.show', compact('igrac'));
     }
 
@@ -64,7 +92,9 @@ class IgraciController extends Controller
     public function edit(Igrac $igrac)
     {
         $timovi = Tim::orderBy('naziv')->get();
-        return view('igraci.edit', compact('igrac', 'timovi'));
+        $pozicije = ['Golman', 'Odbrana', 'Sredina', 'Napad'];
+        $igrac->load('bivsiKlubovi');
+        return view('igraci.edit', compact('igrac', 'timovi', 'pozicije'));
     }
 
     /**
@@ -76,15 +106,72 @@ class IgraciController extends Controller
             'ime' => 'required|string|max:255',
             'prezime' => 'required|string|max:255',
             'tim_id' => 'required|exists:timovi,id',
-            'broj_dresa' => 'nullable|integer|min:1',
-            'pozicija' => 'nullable|string|max:100',
-            'klub' => 'nullable|string|max:255',
-            'drzava_kluba' => 'nullable|string|max:100',
+            'pozicija' => 'required|in:Golman,Odbrana,Sredina,Napad',
             'datum_rodjenja' => 'nullable|date',
-            'nacionalnost' => 'nullable|string|max:100',
+            'mesto_rodjenja' => 'nullable|string|max:255',
+            'datum_smrti' => 'nullable|date|after_or_equal:datum_rodjenja',
+            'mesto_smrti' => 'nullable|string|max:255',
+            'biografija' => 'nullable|string',
+            'fotografija' => 'nullable|image|max:2048', // max 2MB
         ]);
 
+        // Handle file upload if there's a new photo
+        if ($request->hasFile('fotografija')) {
+            // Delete old photo if exists
+            if ($igrac->fotografija_path) {
+                Storage::disk('public')->delete($igrac->fotografija_path);
+            }
+            
+            $path = $request->file('fotografija')->store('igraci', 'public');
+            $validated['fotografija_path'] = $path;
+        }
+
         $igrac->update($validated);
+
+        // Handle bivsi klubovi
+        if ($request->has('bivsi_klubovi')) {
+            // Get IDs of existing clubs that should be kept
+            $existingIds = [];
+            
+            foreach ($request->bivsi_klubovi as $index => $klubData) {
+                if (!empty($klubData['naziv'])) {
+                    if (isset($klubData['id'])) {
+                        // Update existing club
+                        $klub = BivsiKlub::find($klubData['id']);
+                        if ($klub && $klub->igrac_id == $igrac->id) {
+                            $klub->update([
+                                'naziv' => $klubData['naziv'],
+                                'drzava' => $klubData['drzava'] ?? null,
+                                'stepen_takmicenja' => $klubData['stepen_takmicenja'] ?? null,
+                                'broj_nastupa' => $klubData['broj_nastupa'] ?? null,
+                                'broj_golova' => $klubData['broj_golova'] ?? null,
+                                'period_od' => $klubData['period_od'] ?? null,
+                                'period_do' => $klubData['period_do'] ?? null,
+                            ]);
+                            $existingIds[] = $klub->id;
+                        }
+                    } else {
+                        // Create new club
+                        $klub = $igrac->bivsiKlubovi()->create([
+                            'naziv' => $klubData['naziv'],
+                            'drzava' => $klubData['drzava'] ?? null,
+                            'stepen_takmicenja' => $klubData['stepen_takmicenja'] ?? null,
+                            'broj_nastupa' => $klubData['broj_nastupa'] ?? null,
+                            'broj_golova' => $klubData['broj_golova'] ?? null,
+                            'period_od' => $klubData['period_od'] ?? null,
+                            'period_do' => $klubData['period_do'] ?? null,
+                        ]);
+                        $existingIds[] = $klub->id;
+                    }
+                }
+            }
+            
+            // Delete clubs that are no longer in the form
+            $igrac->bivsiKlubovi()->whereNotIn('id', $existingIds)->delete();
+        } else {
+            // If no clubs provided, delete all existing
+            $igrac->bivsiKlubovi()->delete();
+        }
 
         return redirect()->route('igraci.index')
             ->with('success', 'Igrač uspešno ažuriran.');
@@ -96,6 +183,11 @@ class IgraciController extends Controller
     public function destroy(Igrac $igrac)
     {
         try {
+            // Delete associated photo if exists
+            if ($igrac->fotografija_path) {
+                Storage::disk('public')->delete($igrac->fotografija_path);
+            }
+            
             $igrac->delete();
             return redirect()->route('igraci.index')
                 ->with('success', 'Igrač uspešno obrisan.');

@@ -27,7 +27,6 @@
                 <tbody>
                     @forelse($igraci as $igrac)
                     <tr>
-                        <td>{{ $igrac->broj_dresa ?? '-' }}</td>
                         <td>
                             <a href="{{ route('igraci.show', $igrac) }}">
                                 {{ $igrac->ime }} {{ $igrac->prezime }}

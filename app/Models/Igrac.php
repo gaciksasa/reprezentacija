@@ -12,18 +12,30 @@ class Igrac extends Model
     protected $table = 'igraci';
     
     protected $fillable = [
-        'ime', 'prezime', 'tim_id', 'broj_dresa', 'pozicija', 
-        'klub', 'drzava_kluba', 'datum_rodjenja', 'nacionalnost'
+        'ime', 'prezime', 'tim_id', 'pozicija', 
+        'datum_rodjenja', 'mesto_rodjenja', 'datum_smrti', 'mesto_smrti',
+        'biografija', 'fotografija_path'
     ];
     
     protected $casts = [
         'datum_rodjenja' => 'date',
+        'detum_smrti' => 'date',
     ];
     
     // Relacije
     public function tim()
     {
         return $this->belongsTo(Tim::class);
+    }
+    
+    public function klubovi()
+    {
+        return $this->hasMany(IgracKlub::class);
+    }
+
+    public function bivsiKlubovi()
+    {
+        return $this->hasMany(BivsiKlub::class);
     }
     
     public function sastavi()
@@ -55,5 +67,45 @@ class Igrac extends Model
     public function getImePrezimeAttribute()
     {
         return $this->ime . ' ' . $this->prezime;
+    }
+    
+    // Metode za statistiku koja se računa dinamički
+    public function getBrojNastupaAttribute()
+    {
+        return $this->sastavi()->where('starter', true)->count();
+    }
+    
+    public function getBrojGolovaAttribute()
+    {
+        return $this->golovi()->where('auto_gol', false)->count();
+    }
+    
+    public function getBrojZutihKartonaAttribute()
+    {
+        return $this->kartoni()->where('tip', 'zuti')->count();
+    }
+    
+    public function getBrojCrvenihKartonaAttribute()
+    {
+        return $this->kartoni()->where('tip', 'crveni')->count();
+    }
+    
+    public function getTrenutniKlubAttribute()
+    {
+        return $this->klubovi()->whereNull('do_datuma')->first();
+    }
+    
+    // Pronalazi klub u kojem je igrač bio u određenom trenutku
+    public function getKlubNaDatum($datum)
+    {
+        return $this->klubovi()
+            ->where(function($query) use ($datum) {
+                $query->where('od_datuma', '<=', $datum)
+                      ->where(function($q) use ($datum) {
+                          $q->where('do_datuma', '>=', $datum)
+                            ->orWhereNull('do_datuma');
+                      });
+            })
+            ->first();
     }
 }

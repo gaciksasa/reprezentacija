@@ -36,7 +36,7 @@ class Tim extends Model
         
         // Ako je relativna putanja, dodaj standardni prefiks
         $filename = basename($value);
-        return '/assets/images/grbovi/' . $filename;
+        return '/reprezentacija/public/assets/images/grbovi/' . $filename;
     }
     
     // Relationships for team aliases

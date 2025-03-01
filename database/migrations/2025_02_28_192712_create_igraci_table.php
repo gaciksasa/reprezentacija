@@ -15,13 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('ime');
             $table->string('prezime');
-            $table->foreignId('tim_id')->constrained('timovi');
-            $table->integer('broj_dresa')->nullable();
             $table->string('pozicija')->nullable();
+            $table->string('fotografija_path')->nullable();
+            $table->string('biografija')->nullable();
             $table->string('klub')->nullable();
             $table->string('drzava_kluba')->nullable();
             $table->date('datum_rodjenja')->nullable();
-            $table->string('nacionalnost')->nullable();
+            $table->string('mesto_rodjenja')->nullable();
+            $table->date('datum_smrti')->nullable();
+            $table->string('mesto_smrti')->nullable();
             $table->timestamps();
         });
     }

@@ -12,7 +12,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('igraci.store') }}" method="POST">
+        <form action="{{ route('igraci.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             <div class="row">
@@ -35,86 +35,187 @@
                 </div>
             </div>
             
-            <div class="mb-3">
-                <label for="tim_id" class="form-label">Tim *</label>
-                <select class="form-select @error('tim_id') is-invalid @enderror" 
-                        id="tim_id" name="tim_id" required>
-                    <option value="">-- Izaberite tim --</option>
-                    @foreach($timovi as $tim)
-                        <option value="{{ $tim->id }}" {{ old('tim_id') == $tim->id ? 'selected' : '' }}>
-                            {{ $tim->naziv }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('tim_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="broj_dresa" class="form-label">Broj dresa</label>
-                    <input type="number" class="form-control @error('broj_dresa') is-invalid @enderror" 
-                           id="broj_dresa" name="broj_dresa" value="{{ old('broj_dresa') }}" min="1">
-                    @error('broj_dresa')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="col-md-6 mb-3">
-                    <label for="pozicija" class="form-label">Pozicija</label>
-                    <input type="text" class="form-control @error('pozicija') is-invalid @enderror" 
-                           id="pozicija" name="pozicija" value="{{ old('pozicija') }}">
+                    <label for="pozicija" class="form-label">Pozicija *</label>
+                    <select class="form-select @error('pozicija') is-invalid @enderror" 
+                        id="pozicija" name="pozicija" required>
+                        <option value="">-- Izaberite poziciju --</option>
+                        @foreach($pozicije as $pozicija)
+                            <option value="{{ $pozicija }}" {{ old('pozicija') == $pozicija ? 'selected' : '' }}>
+                                {{ $pozicija }}
+                            </option>
+                        @endforeach
+                    </select>
                     @error('pozicija')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="klub" class="form-label">Klub</label>
-                    <input type="text" class="form-control @error('klub') is-invalid @enderror" 
-                           id="klub" name="klub" value="{{ old('klub') }}">
-                    @error('klub')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
                 
                 <div class="col-md-6 mb-3">
-                    <label for="drzava_kluba" class="form-label">Država kluba</label>
-                    <input type="text" class="form-control @error('drzava_kluba') is-invalid @enderror" 
-                           id="drzava_kluba" name="drzava_kluba" value="{{ old('drzava_kluba') }}">
-                    @error('drzava_kluba')
+                    <label for="fotografija" class="form-label">Fotografija</label>
+                    <input type="file" class="form-control @error('fotografija') is-invalid @enderror" 
+                           id="fotografija" name="fotografija">
+                    @error('fotografija')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
+            
+            <h4 class="mt-4 mb-3">Lični podaci</h4>
             
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="datum_rodjenja" class="form-label">Datum rođenja</label>
                     <input type="date" class="form-control @error('datum_rodjenja') is-invalid @enderror" 
-                           id="datum_rodjenja" name="datum_rodjenja" value="{{ old('datum_rodjenja') }}">
+                        id="datum_rodjenja" name="datum_rodjenja" value="{{ old('datum_rodjenja') }}">
                     @error('datum_rodjenja')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 
                 <div class="col-md-6 mb-3">
-                    <label for="nacionalnost" class="form-label">Nacionalnost</label>
-                    <input type="text" class="form-control @error('nacionalnost') is-invalid @enderror" 
-                           id="nacionalnost" name="nacionalnost" value="{{ old('nacionalnost') }}">
-                    @error('nacionalnost')
+                    <label for="mesto_rodjenja" class="form-label">Mesto rođenja</label>
+                    <input type="text" class="form-control @error('mesto_rodjenja') is-invalid @enderror" 
+                        id="mesto_rodjenja" name="mesto_rodjenja" value="{{ old('mesto_rodjenja') }}">
+                    @error('mesto_rodjenja')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
             
-            <div class="d-grid">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="datum_smrti" class="form-label">Datum smrti</label>
+                    <input type="date" class="form-control @error('datum_smrti') is-invalid @enderror" 
+                        id="datum_smrti" name="datum_smrti" value="{{ old('datum_smrti') }}">
+                    @error('datum_smrti')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="mesto_smrti" class="form-label">Mesto smrti</label>
+                    <input type="text" class="form-control @error('mesto_smrti') is-invalid @enderror" 
+                        id="mesto_smrti" name="mesto_smrti" value="{{ old('mesto_smrti') }}">
+                    @error('mesto_smrti')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="biografija" class="form-label">Biografija</label>
+                <textarea class="form-control @error('biografija') is-invalid @enderror" 
+                          id="biografija" name="biografija" rows="4">{{ old('biografija') }}</textarea>
+                @error('biografija')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <hr>
+            <h4 class="mb-3">Bivši klubovi</h4>
+            
+            <div id="bivsi-klubovi-container">
+                <div class="bivsi-klub-row mb-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Naziv kluba *</label>
+                            <input type="text" class="form-control" name="bivsi_klubovi[0][naziv]" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Država kluba</label>
+                            <input type="text" class="form-control" name="bivsi_klubovi[0][drzava]">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Stepen takmičenja</label>
+                            <input type="text" class="form-control" name="bivsi_klubovi[0][stepen_takmicenja]">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Broj nastupa</label>
+                            <input type="number" class="form-control" name="bivsi_klubovi[0][broj_nastupa]" min="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Broj golova</label>
+                            <input type="number" class="form-control" name="bivsi_klubovi[0][broj_golova]" min="0">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">Period od</label>
+                            <input type="date" class="form-control" name="bivsi_klubovi[0][period_od]">
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">Period do</label>
+                            <input type="date" class="form-control" name="bivsi_klubovi[0][period_do]">
+                        </div>
+                        <div class="col-md-2 mb-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-klub-btn">Ukloni</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-secondary" id="add-klub-btn">
+                    <i class="fas fa-plus"></i> Dodaj bivši klub
+                </button>
+            </div>
+            
+            <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-primary">Sačuvaj igrača</button>
             </div>
         </form>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('bivsi-klubovi-container');
+        const addButton = document.getElementById('add-klub-btn');
+        let klubCounter = 1;
+        
+        // Add new club row
+        addButton.addEventListener('click', function() {
+            const newRow = document.querySelector('.bivsi-klub-row').cloneNode(true);
+            
+            // Update all input names with new index
+            const inputs = newRow.querySelectorAll('input');
+            inputs.forEach(input => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    input.setAttribute('name', name.replace(/\[0\]/, `[${klubCounter}]`));
+                    input.value = ''; // Clear values
+                }
+            });
+            
+            // Configure remove button
+            const removeBtn = newRow.querySelector('.remove-klub-btn');
+            removeBtn.style.display = 'block';
+            removeBtn.addEventListener('click', function() {
+                newRow.remove();
+            });
+            
+            container.appendChild(newRow);
+            klubCounter++;
+        });
+        
+        // Hide first remove button initially
+        const firstRemoveBtn = document.querySelector('.bivsi-klub-row .remove-klub-btn');
+        if (firstRemoveBtn) {
+            firstRemoveBtn.style.display = 'none';
+        }
+        
+        // Set up event delegation for future remove buttons
+        container.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-klub-btn')) {
+                e.target.closest('.bivsi-klub-row').remove();
+            }
+        });
+    });
+</script>
 @endsection
