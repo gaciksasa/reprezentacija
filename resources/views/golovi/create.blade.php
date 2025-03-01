@@ -1,0 +1,126 @@
+@extends('layouts.app')
+
+@section('title', 'Dodaj gol')
+
+@section('content')
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Dodaj novi gol</h1>
+    <a href="{{ route('golovi.index', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Nazad
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Detalji utakmice</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-md-end">
+                <h5>{{ $utakmica->domacin->naziv }}</h5>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="display-5">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
+                <div class="text-muted">{{ $utakmica->datum->format('d.m.Y') }}</div>
+                <div>{{ $utakmica->takmicenje->naziv }}</div>
+            </div>
+            <div class="col-md-4">
+                <h5>{{ $utakmica->gost->naziv }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{{ route('golovi.store') }}" method="POST">
+            @csrf
+            
+            <input type="hidden" name="utakmica_id" value="{{ $utakmica->id }}">
+            
+            <div class="mb-3">
+                <label for="tim_id" class="form-label">Tim *</label>
+                <select class="form-select @error('tim_id') is-invalid @enderror" 
+                        id="tim_id" name="tim_id" required>
+                    <option value="">-- Izaberite tim --</option>
+                    @foreach($timovi as $tim)
+                        <option value="{{ $tim->id }}" {{ old('tim_id') == $tim->id ? 'selected' : '' }}>
+                            {{ $tim->naziv }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('tim_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="mb-3">
+                <label for="igrac_id" class="form-label">Igrač *</label>
+                <select class="form-select @error('igrac_id') is-invalid @enderror" 
+                        id="igrac_id" name="igrac_id" required>
+                    <option value="">-- Izaberite igrača --</option>
+                    <optgroup label="{{ $utakmica->domacin->naziv }}">
+                        @foreach($igraciDomacina as $igrac)
+                            <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
+                                {{ $igrac->ime }} {{ $igrac->prezime }}
+                            </option>
+                        @endforeach
+                    </optgroup>
+                    <optgroup label="{{ $utakmica->gost->naziv }}">
+                        @foreach($igraciGosta as $igrac)
+                            <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
+                                {{ $igrac->ime }} {{ $igrac->prezime }}
+                            </option>
+                        @endforeach
+                    </optgroup>
+                </select>
+                @error('igrac_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="mb-3">
+                <label for="minut" class="form-label">Minut *</label>
+                <input type="number" class="form-control @error('minut') is-invalid @enderror" 
+                       id="minut" name="minut" value="{{ old('minut') }}" required min="1" max="120">
+                @error('minut')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="penal" name="penal" {{ old('penal') ? 'checked' : '' }}>
+                <label class="form-check-label" for="penal">Gol iz penala</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="auto_gol" name="auto_gol" {{ old('auto_gol') ? 'checked' : '' }}>
+                <label class="form-check-label" for="auto_gol">Autogol</label>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Sačuvaj gol</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    // Dinamički ažurira listu igrača prema izabranom timu
+    document.getElementById('tim_id').addEventListener('change', function() {
+        const timId = this.value;
+        const igracSelect = document.getElementById('igrac_id');
+        
+        // Sakrij sve opcije i zatim prikaži samo one koje pripadaju izabranom timu
+        Array.from(igracSelect.options).forEach(option => {
+            if (option.parentElement.tagName === 'OPTGROUP') {
+                option.style.display = option.parentElement.label === 
+                    (timId == {{ $utakmica->domacin_id }} ? '{{ $utakmica->domacin->naziv }}' : '{{ $utakmica->gost->naziv }}') 
+                    ? '' : 'none';
+            }
+        });
+    });
+</script>
+@endsection

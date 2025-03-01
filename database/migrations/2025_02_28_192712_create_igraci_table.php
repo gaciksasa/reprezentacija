@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up()
+    {
+        Schema::create('igraci', function (Blueprint $table) {
+            $table->id();
+            $table->string('ime');
+            $table->string('prezime');
+            $table->foreignId('tim_id')->constrained('timovi');
+            $table->integer('broj_dresa')->nullable();
+            $table->string('pozicija')->nullable();
+            $table->string('klub')->nullable();
+            $table->string('drzava_kluba')->nullable();
+            $table->date('datum_rodjenja')->nullable();
+            $table->string('nacionalnost')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('igraci');
+    }
+};
