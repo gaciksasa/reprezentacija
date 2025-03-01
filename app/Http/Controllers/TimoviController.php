@@ -37,6 +37,13 @@ class TimoviController extends Controller
             'grb_url' => 'nullable|string|max:255',
         ]);
 
+        if ($request->hasFile('grb')) {
+            $file = $request->file('grb');
+            $filename = strtolower($validated['skraceni_naziv']) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/images/grbovi'), $filename);
+            $validated['grb_url'] = $filename;
+        }
+
         Tim::create($validated);
 
         return redirect()->route('timovi.index')
@@ -72,6 +79,13 @@ class TimoviController extends Controller
             'zastava_url' => 'nullable|string|max:255',
             'grb_url' => 'nullable|string|max:255',
         ]);
+
+        if ($request->hasFile('grb')) {
+            $file = $request->file('grb');
+            $filename = strtolower($validated['skraceni_naziv']) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/images/grbovi'), $filename);
+            $validated['grb_url'] = $filename;
+        }
 
         $tim->update($validated);
 
