@@ -215,7 +215,13 @@ class IgraciController extends Controller
             'do_datuma' => 'nullable|date|after_or_equal:od_datuma',
         ]);
 
-        $igrac->bivsiKlubovi()->create($validated);
+        // Mapiranje polja forme na kolone u bazi
+        $igrac->bivsiKlubovi()->create([
+            'naziv' => $validated['klub'],
+            'drzava' => $validated['drzava_kluba'],
+            'period_od' => $validated['od_datuma'],
+            'period_do' => $validated['do_datuma'],
+        ]);
 
         return redirect()->route('igraci.show', $igrac)
             ->with('success', 'Klub uspešno dodat.');
