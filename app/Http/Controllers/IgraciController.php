@@ -24,9 +24,8 @@ class IgraciController extends Controller
      */
     public function create()
     {
-        $timovi = Tim::orderBy('naziv')->get();
         $pozicije = ['Golman', 'Odbrana', 'Sredina', 'Napad'];
-        return view('igraci.create', compact('timovi', 'pozicije'));
+        return view('igraci.create', compact('pozicije'));
     }
 
     /**
@@ -46,11 +45,11 @@ class IgraciController extends Controller
             'fotografija' => 'nullable|image|max:2048', // max 2MB
         ]);
 
-        // Get the main team
-        $glavniTim = Tim::glavniTim()->first();
+        // Automatski koristi ID glavnog tima
+        $glavniTim = \App\Models\Tim::glavniTim()->first();
         if (!$glavniTim) {
             return redirect()->back()
-                ->with('error', 'Nije definisan glavni tim. Molimo prvo postavite glavni tim.');
+                ->with('error', 'Glavni tim nije definisan. Molimo prvo definišite glavni tim.');
         }
         $validated['tim_id'] = $glavniTim->id;
 
@@ -98,10 +97,9 @@ class IgraciController extends Controller
      */
     public function edit(Igrac $igrac)
     {
-        $timovi = Tim::orderBy('naziv')->get();
         $pozicije = ['Golman', 'Odbrana', 'Sredina', 'Napad'];
         $igrac->load('bivsiKlubovi');
-        return view('igraci.edit', compact('igrac', 'timovi', 'pozicije'));
+        return view('igraci.edit', compact('igrac', 'pozicije'));
     }
 
     /**
@@ -112,7 +110,6 @@ class IgraciController extends Controller
         $validated = $request->validate([
             'ime' => 'required|string|max:255',
             'prezime' => 'required|string|max:255',
-            'tim_id' => 'required|exists:timovi,id',
             'pozicija' => 'required|in:Golman,Odbrana,Sredina,Napad',
             'datum_rodjenja' => 'nullable|date',
             'mesto_rodjenja' => 'nullable|string|max:255',
@@ -121,6 +118,8 @@ class IgraciController extends Controller
             'biografija' => 'nullable|string',
             'fotografija' => 'nullable|image|max:2048', // max 2MB
         ]);
+
+        // Ne menjamo tim_id pri ažuriranju
 
         // Handle file upload if there's a new photo
         if ($request->hasFile('fotografija')) {
