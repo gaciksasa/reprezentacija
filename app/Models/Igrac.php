@@ -27,11 +27,6 @@ class Igrac extends Model
     {
         return $this->belongsTo(Tim::class);
     }
-    
-    public function klubovi()
-    {
-        return $this->hasMany(IgracKlub::class);
-    }
 
     public function bivsiKlubovi()
     {
@@ -48,7 +43,7 @@ class Igrac extends Model
         return $this->hasMany(Gol::class);
     }
     
-    public function izmeneLazne()
+    public function izmeneIzlazne()
     {
         return $this->hasMany(Izmena::class, 'igrac_out_id');
     }
@@ -89,23 +84,5 @@ class Igrac extends Model
     {
         return $this->kartoni()->where('tip', 'crveni')->count();
     }
-    
-    public function getTrenutniKlubAttribute()
-    {
-        return $this->klubovi()->whereNull('do_datuma')->first();
-    }
-    
-    // Pronalazi klub u kojem je igrač bio u određenom trenutku
-    public function getKlubNaDatum($datum)
-    {
-        return $this->klubovi()
-            ->where(function($query) use ($datum) {
-                $query->where('od_datuma', '<=', $datum)
-                      ->where(function($q) use ($datum) {
-                          $q->where('do_datuma', '>=', $datum)
-                            ->orWhereNull('do_datuma');
-                      });
-            })
-            ->first();
-    }
+
 }

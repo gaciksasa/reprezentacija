@@ -16,11 +16,10 @@ return new class extends Migration
             $table->foreignId('igrac_id')->constrained('igraci')->onDelete('cascade');
             $table->string('naziv');
             $table->string('drzava')->nullable();
+            $table->string('sezona')->nullable();
             $table->string('stepen_takmicenja')->nullable();
             $table->integer('broj_nastupa')->nullable();
             $table->integer('broj_golova')->nullable();
-            $table->date('period_od')->nullable();
-            $table->date('period_do')->nullable();
             $table->timestamps();
         });
     }

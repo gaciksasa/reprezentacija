@@ -204,26 +204,30 @@ class IgraciController extends Controller
     }
 
     /**
-     * Dodaje novi klub igraču.
-     */
-    public function updateClub(Request $request, Igrac $igrac)
-    {
-        $validated = $request->validate([
-            'klub' => 'required|string|max:255',
-            'drzava_kluba' => 'nullable|string|max:255',
-            'od_datuma' => 'required|date',
-            'do_datuma' => 'nullable|date|after_or_equal:od_datuma',
-        ]);
+ * Dodaje novi klub igraču.
+ */
+public function updateClub(Request $request, Igrac $igrac)
+{
+    $validated = $request->validate([
+        'klub' => 'required|string|max:255',
+        'drzava_kluba' => 'nullable|string|max:255',
+        'sezona' => 'required|string|max:10',
+        'stepen_takmicenja' => 'nullable|string|max:100',
+        'broj_nastupa' => 'nullable|integer|min:0',
+        'broj_golova' => 'nullable|integer|min:0',
+    ]);
 
-        // Mapiranje polja forme na kolone u bazi
-        $igrac->bivsiKlubovi()->create([
-            'naziv' => $validated['klub'],
-            'drzava' => $validated['drzava_kluba'],
-            'period_od' => $validated['od_datuma'],
-            'period_do' => $validated['do_datuma'],
-        ]);
+    // Mapiranje polja forme na kolone u bazi
+    $igrac->bivsiKlubovi()->create([
+        'naziv' => $validated['klub'],
+        'drzava' => $validated['drzava_kluba'],
+        'sezona' => $validated['sezona'],
+        'stepen_takmicenja' => $validated['stepen_takmicenja'],
+        'broj_nastupa' => $validated['broj_nastupa'],
+        'broj_golova' => $validated['broj_golova'],
+    ]);
 
-        return redirect()->route('igraci.show', $igrac)
-            ->with('success', 'Klub uspešno dodat.');
-    }
+    return redirect()->route('igraci.show', $igrac)
+        ->with('success', 'Klub uspešno dodat.');
+}
 }

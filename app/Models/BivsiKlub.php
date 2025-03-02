@@ -12,13 +12,11 @@ class BivsiKlub extends Model
     protected $table = 'bivsi_klubovi';
     
     protected $fillable = [
-        'igrac_id', 'naziv', 'drzava', 'stepen_takmicenja', 
-        'broj_nastupa', 'broj_golova', 'period_od', 'period_do'
+        'igrac_id', 'naziv', 'drzava', 'sezona', 
+        'stepen_takmicenja', 'broj_nastupa', 'broj_golova'
     ];
     
     protected $casts = [
-        'period_od' => 'date',
-        'period_do' => 'date',
         'broj_nastupa' => 'integer',
         'broj_golova' => 'integer',
     ];

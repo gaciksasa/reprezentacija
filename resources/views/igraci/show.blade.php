@@ -104,41 +104,45 @@
             </button>
         </div>
         <div class="card-body">
-            @if($igrac->bivsiKlubovi->count() > 0)
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Klub</th>
-                            <th>Država</th>
-                            <th>Od</th>
-                            <th>Do</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($igrac->bivsiKlubovi->sortByDesc('period_od') as $klub)
-                        <tr>
-                            <td>{{ $klub->naziv }}</td>
-                            <td>{{ $klub->drzava ?? '-' }}</td>
-                            <td>{{ $klub->period_od ? $klub->period_od->format('d.m.Y') : '-' }}</td>
-                            <td>{{ $klub->period_do ? $klub->period_do->format('d.m.Y') : 'Danas' }}</td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-danger" 
-                                        onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <form id="delete-klub-{{ $klub->id }}" action="{{ route('igraci.deleteClub', $klub) }}" method="POST" class="d-none">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <p class="text-center text-muted">Nema evidentiranih klubova za ovog igrača.</p>
-            @endif
+        @if($igrac->bivsiKlubovi->count() > 0)
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Klub</th>
+                        <th>Država</th>
+                        <th>Sezona</th>
+                        <th>Stepen takmičenja</th>
+                        <th>Nastupi</th>
+                        <th>Golovi</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($igrac->bivsiKlubovi->sortByDesc('id') as $klub)
+                    <tr>
+                        <td>{{ $klub->naziv }}</td>
+                        <td>{{ $klub->drzava ?? '-' }}</td>
+                        <td>{{ $klub->sezona ?? '-' }}</td>
+                        <td>{{ $klub->stepen_takmicenja ?? '-' }}</td>
+                        <td>{{ $klub->broj_nastupa ?? '-' }}</td>
+                        <td>{{ $klub->broj_golova ?? '-' }}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" 
+                                    onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <form id="delete-klub-{{ $klub->id }}" action="{{ route('igraci.deleteClub', $klub) }}" method="POST" class="d-none">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p class="text-center text-muted">Nema evidentiranih klubova za ovog igrača.</p>
+        @endif
         </div>
     </div>
         
@@ -315,13 +319,21 @@
                         <input type="text" class="form-control" id="drzava_kluba" name="drzava_kluba">
                     </div>
                     <div class="mb-3">
-                        <label for="od_datuma" class="form-label">Od datuma *</label>
-                        <input type="date" class="form-control" id="od_datuma" name="od_datuma" required>
+                        <label for="sezona" class="form-label">Sezona *</label>
+                        <input type="text" class="form-control" id="sezona" name="sezona" placeholder="npr. 1989-90" required>
+                        <small class="form-text text-muted">Format: YYYY-YY (npr. 1989-90)</small>
                     </div>
                     <div class="mb-3">
-                        <label for="do_datuma" class="form-label">Do datuma</label>
-                        <input type="date" class="form-control" id="do_datuma" name="do_datuma">
-                        <small class="form-text text-muted">Ostavite prazno za trenutni klub</small>
+                        <label for="stepen_takmicenja" class="form-label">Stepen takmičenja</label>
+                        <input type="text" class="form-control" id="stepen_takmicenja" name="stepen_takmicenja">
+                    </div>
+                    <div class="mb-3">
+                        <label for="broj_nastupa" class="form-label">Broj nastupa</label>
+                        <input type="number" class="form-control" id="broj_nastupa" name="broj_nastupa" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="broj_golova" class="form-label">Broj golova</label>
+                        <input type="number" class="form-control" id="broj_golova" name="broj_golova" min="0">
                     </div>
                 </div>
                 <div class="modal-footer">
