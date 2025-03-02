@@ -23,22 +23,6 @@ class Tim extends Model
         'aktivan_do' => 'datetime',
     ];
 
-    public function getGrbUrlAttribute($value)
-    {
-        if (!$value) {
-            return null;
-        }
-        
-        // Ako je puna putanja, vrati je
-        if (strpos($value, 'http') === 0) {
-            return $value;
-        }
-        
-        // Ako je relativna putanja, dodaj standardni prefiks
-        $filename = basename($value);
-        return '/reprezentacija/public/assets/images/grbovi/' . $filename;
-    }
-    
     // Relationships for team aliases
     public function varijante()
     {
@@ -97,17 +81,6 @@ class Tim extends Model
         $ids = $this->varijante()->pluck('id')->toArray();
         $ids[] = $this->id;
         return $ids;
-    }
-    
-    // Get all matches for this team and its aliases
-    public function sveUtakmice()
-    {
-        $teamIds = $this->getSviIdTimova();
-        
-        return Utakmica::where(function($query) use ($teamIds) {
-            $query->whereIn('domacin_id', $teamIds)
-                  ->orWhereIn('gost_id', $teamIds);
-        });
     }
     
     // Original relationships

@@ -35,6 +35,10 @@ Route::resource('timovi', TimoviController::class);
 Route::resource('tim-varijante', TimVarijanteController::class)->except(['show']);
 Route::post('tim-varijante/postavi-glavni-tim/{tim}', [TimVarijanteController::class, 'postaviGlavniTim'])->name('tim-varijante.postaviGlavniTim');
 
+// Tim varijante routes
+Route::resource('tim-varijante', TimVarijanteController::class)->except(['show']);
+Route::post('tim-varijante/postavi-glavni-tim/{tim}', [TimVarijanteController::class, 'postaviGlavniTim'])->name('tim-varijante.postaviGlavniTim');
+
 // CRUD rute za igrače
 Route::resource('igraci', IgraciController::class);
 

@@ -33,48 +33,55 @@ class IgraciController extends Controller
      * Čuvanje novog igrača.
      */
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'ime' => 'required|string|max:255',
-        'prezime' => 'required|string|max:255',
-        'pozicija' => 'required|in:Golman,Odbrana,Sredina,Napad',
-        'datum_rodjenja' => 'nullable|date',
-        'mesto_rodjenja' => 'nullable|string|max:255',
-        'datum_smrti' => 'nullable|date|after_or_equal:datum_rodjenja',
-        'mesto_smrti' => 'nullable|string|max:255',
-        'biografija' => 'nullable|string',
-        'fotografija' => 'nullable|image|max:2048', // max 2MB
-        'tim_id' => 'required|exists:timovi,id',
-    ]);
+    {
+        $validated = $request->validate([
+            'ime' => 'required|string|max:255',
+            'prezime' => 'required|string|max:255',
+            'pozicija' => 'required|in:Golman,Odbrana,Sredina,Napad',
+            'datum_rodjenja' => 'nullable|date',
+            'mesto_rodjenja' => 'nullable|string|max:255',
+            'datum_smrti' => 'nullable|date|after_or_equal:datum_rodjenja',
+            'mesto_smrti' => 'nullable|string|max:255',
+            'biografija' => 'nullable|string',
+            'fotografija' => 'nullable|image|max:2048', // max 2MB
+        ]);
 
-    // Handle file upload if there's a photo
-    if ($request->hasFile('fotografija')) {
-        $path = $request->file('fotografija')->store('igraci', 'public');
-        $validated['fotografija_path'] = $path;
-    }
+        // Get the main team
+        $glavniTim = Tim::glavniTim()->first();
+        if (!$glavniTim) {
+            return redirect()->back()
+                ->with('error', 'Nije definisan glavni tim. Molimo prvo postavite glavni tim.');
+        }
+        $validated['tim_id'] = $glavniTim->id;
 
-    // Create player
-    $igrac = Igrac::create($validated);
+        // Handle file upload if there's a photo
+        if ($request->hasFile('fotografija')) {
+            $path = $request->file('fotografija')->store('igraci', 'public');
+            $validated['fotografija_path'] = $path;
+        }
 
-    // Process bivsi klubovi
-    if ($request->has('bivsi_klubovi')) {
-        foreach ($request->bivsi_klubovi as $klub) {
-            if (!empty($klub['naziv'])) { // Only add if klub name is provided
-                $igrac->bivsiKlubovi()->create([
-                    'naziv' => $klub['naziv'],
-                    'drzava' => $klub['drzava'] ?? null,
-                    'stepen_takmicenja' => $klub['stepen_takmicenja'] ?? null,
-                    'broj_nastupa' => $klub['broj_nastupa'] ?? null,
-                    'broj_golova' => $klub['broj_golova'] ?? null,
-                    'period_od' => $klub['period_od'] ?? null,
-                    'period_do' => $klub['period_do'] ?? null,
-                ]);
+        // Create player
+        $igrac = Igrac::create($validated);
+
+        // Process bivsi klubovi
+        if ($request->has('bivsi_klubovi')) {
+            foreach ($request->bivsi_klubovi as $klub) {
+                if (!empty($klub['naziv'])) { // Only add if klub name is provided
+                    $igrac->bivsiKlubovi()->create([
+                        'naziv' => $klub['naziv'],
+                        'drzava' => $klub['drzava'] ?? null,
+                        'stepen_takmicenja' => $klub['stepen_takmicenja'] ?? null,
+                        'broj_nastupa' => $klub['broj_nastupa'] ?? null,
+                        'broj_golova' => $klub['broj_golova'] ?? null,
+                        'period_od' => $klub['period_od'] ?? null,
+                        'period_do' => $klub['period_do'] ?? null,
+                    ]);
+                }
             }
         }
-    }
 
-    return redirect()->route('igraci.index')
-        ->with('success', 'Igrač uspešno kreiran.');
+        return redirect()->route('igraci.index')
+            ->with('success', 'Igrač uspešno kreiran.');
     }
 
     /**
