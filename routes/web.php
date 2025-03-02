@@ -40,7 +40,11 @@ Route::resource('tim-varijante', TimVarijanteController::class)->except(['show']
 Route::post('tim-varijante/postavi-glavni-tim/{tim}', [TimVarijanteController::class, 'postaviGlavniTim'])->name('tim-varijante.postaviGlavniTim');
 
 // CRUD rute za igrače
-Route::resource('igraci', IgraciController::class);
+Route::resource('igraci', IgraciController::class, ['parameters' => [
+    'igraci' => 'igrac'
+]]);
+
+Route::post('igraci/{igrac}/update-club', [IgraciController::class, 'updateClub'])->name('igraci.updateClub');
 
 // CRUD rute za utakmice
 Route::resource('utakmice', UtakmiceController::class);

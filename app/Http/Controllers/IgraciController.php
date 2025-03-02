@@ -202,4 +202,22 @@ class IgraciController extends Controller
                 ->with('error', 'Igrača nije moguće obrisati jer se koristi u drugim tabelama.');
         }
     }
+
+    /**
+     * Dodaje novi klub igraču.
+     */
+    public function updateClub(Request $request, Igrac $igrac)
+    {
+        $validated = $request->validate([
+            'klub' => 'required|string|max:255',
+            'drzava_kluba' => 'nullable|string|max:255',
+            'od_datuma' => 'required|date',
+            'do_datuma' => 'nullable|date|after_or_equal:od_datuma',
+        ]);
+
+        $igrac->bivsiKlubovi()->create($validated);
+
+        return redirect()->route('igraci.show', $igrac)
+            ->with('success', 'Klub uspešno dodat.');
+    }
 }
