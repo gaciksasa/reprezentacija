@@ -45,6 +45,7 @@ Route::resource('igraci', IgraciController::class, ['parameters' => [
 ]]);
 
 Route::post('igraci/{igrac}/update-club', [IgraciController::class, 'updateClub'])->name('igraci.updateClub');
+Route::delete('bivsi-klubovi/{klub}', [IgraciController::class, 'deleteClub'])->name('igraci.deleteClub');
 
 // CRUD rute za utakmice
 Route::resource('utakmice', UtakmiceController::class);

@@ -97,50 +97,50 @@
     
     <div class="col-md-8">
         <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Klubovi u karijeri</h5>
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addClubModal">
-                    <i class="fas fa-plus"></i> Dodaj klub
-                </button>
-            </div>
-            <div class="card-body">
-                @if($igrac->klubovi->count() > 0)
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Klub</th>
-                                <th>Država</th>
-                                <th>Od</th>
-                                <th>Do</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($igrac->klubovi->sortByDesc('od_datuma') as $klub)
-                            <tr>
-                                <td>{{ $klub->klub }}</td>
-                                <td>{{ $klub->drzava_kluba ?? '-' }}</td>
-                                <td>{{ $klub->od_datuma ? $klub->od_datuma->format('d.m.Y') : '-' }}</td>
-                                <td>{{ $klub->do_datuma ? $klub->do_datuma->format('d.m.Y') : 'Danas' }}</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-danger" 
-                                            onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <form id="delete-klub-{{ $klub->id }}" action="{{ route('igraci.deleteClub', $klub) }}" method="POST" class="d-none">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <p class="text-center text-muted">Nema evidentiranih klubova za ovog igrača.</p>
-                @endif
-            </div>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Klubovi u karijeri</h5>
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addClubModal">
+                <i class="fas fa-plus"></i> Dodaj klub
+            </button>
         </div>
+        <div class="card-body">
+            @if($igrac->bivsiKlubovi->count() > 0)
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Klub</th>
+                            <th>Država</th>
+                            <th>Od</th>
+                            <th>Do</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($igrac->bivsiKlubovi->sortByDesc('period_od') as $klub)
+                        <tr>
+                            <td>{{ $klub->naziv }}</td>
+                            <td>{{ $klub->drzava ?? '-' }}</td>
+                            <td>{{ $klub->period_od ? $klub->period_od->format('d.m.Y') : '-' }}</td>
+                            <td>{{ $klub->period_do ? $klub->period_do->format('d.m.Y') : 'Danas' }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <form id="delete-klub-{{ $klub->id }}" action="{{ route('igraci.deleteClub', $klub) }}" method="POST" class="d-none">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <p class="text-center text-muted">Nema evidentiranih klubova za ovog igrača.</p>
+            @endif
+        </div>
+    </div>
         
         <!-- Kartice za utakmice i golove -->
         <div class="card mb-4">
