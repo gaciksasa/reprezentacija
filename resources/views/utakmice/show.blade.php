@@ -118,12 +118,33 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Sastavi timova</h5>
                 <div class="btn-group">
+                @php
+                    // Dobavi glavni tim (izabrani tim)
+                    $glavniTim = \App\Models\Tim::glavniTim()->first();
+                    $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+                    
+                    // Proveri da li je domaći tim izabrani tim
+                    $domaciJeIzabraniTim = $glavniTim && (
+                        $utakmica->domacin_id == $glavniTim->id || 
+                        in_array($utakmica->domacin_id, $glavniTimIds)
+                    );
+                @endphp
+
+                @if($domaciJeIzabraniTim)
                     <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Domaćin
                     </a>
                     <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus"></i> Gost
                     </a>
+                @else
+                    <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Domaćin
+                    </a>
+                    <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Gost
+                    </a>
+                @endif
                 </div>
             </div>
             <div class="card-body">
