@@ -53,6 +53,11 @@ class Utakmica extends Model
     {
         return $this->hasMany(Sastav::class);
     }
+
+    public function protivnickiIgraci()
+    {
+        return $this->hasMany(ProtivnickiIgrac::class);
+    }
     
     public function golovi()
     {

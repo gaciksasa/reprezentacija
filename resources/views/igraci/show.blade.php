@@ -22,6 +22,20 @@
                 <h5 class="card-title mb-0">Osnovni podaci</h5>
             </div>
             <div class="card-body">
+                <div class="row">
+                @if($igrac->fotografija_path)
+                <div class="mb-4">
+                    <img src="{{ asset('storage/' . $igrac->fotografija_path) }}" alt="{{ $igrac->ime }} {{ $igrac->prezime }}" 
+                         class="img-fluid rounded">
+                </div>
+                @else
+                    <div class="bg-light d-flex justify-content-center align-items-center rounded" style="width: 100%;">
+                        <i class="fas fa-user fa-5x text-secondary"></i>
+                    </div>
+                @endif
+            
+            
+
                 <table class="table">
                     <tr>
                         <th>Ime i prezime</th>
@@ -65,6 +79,7 @@
                         </td>
                     </tr>
                 </table>
+            </div>
             </div>
         </div>
         
@@ -124,8 +139,8 @@
                         <td>{{ $klub->drzava ?? '-' }}</td>
                         <td>{{ $klub->sezona ?? '-' }}</td>
                         <td>{{ $klub->stepen_takmicenja ?? '-' }}</td>
-                        <td>{{ $klub->broj_nastupa ?? '-' }}</td>
-                        <td>{{ $klub->broj_golova ?? '-' }}</td>
+                        <td align="right">{{ $klub->broj_nastupa ?? '-' }}</td>
+                        <td align="right">{{ $klub->broj_golova ?? '-' }}</td>
                         <td>
                             <button type="button" class="btn btn-sm btn-danger" 
                                     onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
@@ -136,8 +151,14 @@
                                 @method('DELETE')
                             </form>
                         </td>
-                    </tr>
+                    </tr>                    
                     @endforeach
+                    <tr>
+                        <td colspan="4">&nbsp;</td>
+                        <td align="right">{{ $igrac->bivsiKlubovi->sum('broj_nastupa') }}</td>
+                        <td align="right">{{ $igrac->bivsiKlubovi->sum('broj_golova') }}</td>
+                        <td>&nbsp;</td>
+                    </tr>
                 </tbody>
             </table>
         @else

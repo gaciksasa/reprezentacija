@@ -10,6 +10,7 @@ use App\Http\Controllers\StadioniController;
 use App\Http\Controllers\TakmicenjaController;
 use App\Http\Controllers\SudijeController;
 use App\Http\Controllers\SastaviController;
+use App\Http\Controllers\ProtivnickiIgraciController;
 use App\Http\Controllers\GoloviController;
 use App\Http\Controllers\IzmeneController;
 use App\Http\Controllers\KartoniController;
@@ -43,13 +44,14 @@ Route::post('tim-varijante/postavi-glavni-tim/{tim}', [TimVarijanteController::c
 Route::resource('igraci', IgraciController::class, ['parameters' => [
     'igraci' => 'igrac'
 ]]);
-
 Route::post('igraci/{igrac}/update-club', [IgraciController::class, 'updateClub'])->name('igraci.updateClub');
 Route::delete('bivsi-klubovi/{klub}', [IgraciController::class, 'deleteClub'])->name('igraci.deleteClub');
 
+// CRUD rute za protivničke igrače
+Route::resource('protivnicki-igraci', ProtivnickiIgraciController::class);
+
 // CRUD rute za utakmice
 Route::resource('utakmice', UtakmiceController::class);
-
 Route::get('utakmice/{utakmica}', [UtakmiceController::class, 'show'])->name('utakmice.show');
 
 // CRUD rute za stadione

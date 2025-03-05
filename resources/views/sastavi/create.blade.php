@@ -36,53 +36,61 @@
         <h5 class="card-title mb-0">Dodaj igrača u sastav tima: {{ $tim->naziv }}</h5>
     </div>
     <div class="card-body">
-        <form action="{{ route('sastavi.store') }}" method="POST">
-            @csrf
-            
-            <input type="hidden" name="utakmica_id" value="{{ $utakmica->id }}">
-            <input type="hidden" name="tim_id" value="{{ $tim->id }}">
-            
-            <div class="mb-3">
-                <label for="igrac_id" class="form-label">Igrač *</label>
-                <select class="form-select @error('igrac_id') is-invalid @enderror" 
-                        id="igrac_id" name="igrac_id" required>
-                    <option value="">-- Izaberite igrača --</option>
-                    @foreach($igraci as $igrac)
-                        @if(!in_array($igrac->id, $postojeciIgraciIds))
-                            <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
-                                {{ $igrac->ime }} {{ $igrac->prezime }}
-                                @if($igrac->broj_dresa) ({{ $igrac->broj_dresa }}) @endif
-                            </option>
-                        @endif
-                    @endforeach
-                </select>
-                @error('igrac_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="starter" name="starter" value="1" {{ old('starter', true) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="starter">
-                        Starter (igrač u startnoj postavi)
-                    </label>
+        @if($igraci->count() > 0)
+            <form action="{{ route('sastavi.store') }}" method="POST">
+                @csrf
+                
+                <input type="hidden" name="utakmica_id" value="{{ $utakmica->id }}">
+                <input type="hidden" name="tim_id" value="{{ $tim->id }}">
+                
+                <div class="mb-3">
+                    <label for="igrac_id" class="form-label">Igrač *</label>
+                    <select class="form-select @error('igrac_id') is-invalid @enderror" 
+                            id="igrac_id" name="igrac_id" required>
+                        <option value="">-- Izaberite igrača --</option>
+                        @foreach($igraci as $igrac)
+                            @if(!in_array($igrac->id, $postojeciIgraciIds))
+                                <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
+                                    {{ $igrac->ime }} {{ $igrac->prezime }}
+                                </option>
+                            @endif
+                        @endforeach
+                    </select>
+                    @error('igrac_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="starter" name="starter" value="1" {{ old('starter', true) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="starter">
+                            Starter (igrač u startnoj postavi)
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="selektor" class="form-label">Selektor</label>
+                    <input type="text" class="form-control @error('selektor') is-invalid @enderror" 
+                           id="selektor" name="selektor" value="{{ old('selektor') }}">
+                    @error('selektor')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Sačuvaj igrača u sastavu</button>
+                </div>
+            </form>
+        @else
+            <div class="alert alert-warning">
+                <p>Nema dostupnih igrača za ovaj tim koji već nisu u sastavu.</p>
+                <a href="{{ route('igraci.create') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus"></i> Dodaj novog igrača
+                </a>
             </div>
-            
-            <div class="mb-3">
-                <label for="selektor" class="form-label">Selektor</label>
-                <input type="text" class="form-control @error('selektor') is-invalid @enderror" 
-                       id="selektor" name="selektor" value="{{ old('selektor') }}">
-                @error('selektor')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Sačuvaj igrača u sastavu</button>
-            </div>
-        </form>
+        @endif
     </div>
 </div>
 @endsection

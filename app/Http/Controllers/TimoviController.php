@@ -40,7 +40,7 @@ class TimoviController extends Controller
         if ($request->hasFile('grb')) {
             $file = $request->file('grb');
             $filename = strtolower($validated['skraceni_naziv']) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('assets/images/grbovi'), $filename);
+            $file->move(public_path('storage/grbovi'), $filename);
             $validated['grb_url'] = $filename;
         }
 
@@ -83,7 +83,7 @@ class TimoviController extends Controller
         if ($request->hasFile('grb')) {
             $file = $request->file('grb');
             $filename = strtolower($validated['skraceni_naziv']) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('assets/images/grbovi'), $filename);
+            $file->move(public_path('storage/grbovi'), $filename);
             $validated['grb_url'] = $filename;
         }
 

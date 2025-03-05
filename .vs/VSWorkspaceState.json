@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\Http",
+    "\\app\\Http\\Controllers",
+    "\\app\\Models",
+    "\\resources",
+    "\\resources\\views",
+    "\\resources\\views\\sastavi",
+    "\\resources\\views\\utakmice"
+  ],
+  "SelectedNode": "\\app\\Models\\ProtivnickiIgrac.php",
+  "PreviewInSolutionExplorer": false
+}

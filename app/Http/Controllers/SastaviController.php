@@ -7,6 +7,7 @@ use App\Models\Utakmica;
 use App\Models\Tim;
 use App\Models\Igrac;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SastaviController extends Controller
 {
@@ -64,13 +65,43 @@ class SastaviController extends Controller
                 ->with('error', 'Izabrani tim nije učesnik ove utakmice.');
         }
         
-        $igraci = Igrac::where('tim_id', $tim_id)->orderBy('prezime')->get();
+        // Dobavljanje svih ID-ova tima (glavni tim + varijante)
+        $sviIdTimova = [];
+        
+        // Ako je tim glavni tim, uzimamo i njegove varijante
+        if ($tim->glavni_tim) {
+            $sviIdTimova = $tim->getSviIdTimova();
+        } 
+        // Ako je tim varijanta (alias), uzimamo od matičnog tima sve varijante
+        elseif ($tim->maticni_tim_id) {
+            $maticniTim = Tim::find($tim->maticni_tim_id);
+            if ($maticniTim) {
+                $sviIdTimova = $maticniTim->getSviIdTimova();
+            }
+        }
+        
+        // Ako nismo našli povezane timove, koristimo samo ovaj tim
+        if (empty($sviIdTimova)) {
+            $sviIdTimova = [$tim_id];
+        }
+        
+        // Igrači svih verzija tima
+        $igraci = Igrac::whereIn('tim_id', $sviIdTimova)
+                 ->orderBy('prezime')
+                 ->orderBy('ime')
+                 ->get();
         
         // Već dodati igrači u sastav
         $postojeciIgraciIds = Sastav::where('utakmica_id', $utakmica_id)
             ->where('tim_id', $tim_id)
             ->pluck('igrac_id')
             ->toArray();
+        
+        // Za dijagnostiku
+        Log::debug('Tim ID: ' . $tim_id);
+        Log::debug('Svi ID-ovi tima: ' . implode(', ', $sviIdTimova));
+        Log::debug('Broj igrača: ' . $igraci->count());
+        Log::debug('Postojeći igrači IDs: ' . implode(', ', $postojeciIgraciIds));
         
         return view('sastavi.create', compact('utakmica', 'tim', 'igraci', 'postojeciIgraciIds'));
     }
