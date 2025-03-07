@@ -94,12 +94,11 @@
                             <td>
                                 <a href="{{ route('igraci.show', $igrac) }}" class="text-decoration-none">
                                     <span class="text-danger fw-bold">{{ $igrac->prezime }} {{ $igrac->ime }}</span>
-                                    @if($igrac->aktivan)
-                                        <span class="ms-1 text-warning">★</span>
-                                    @endif
                                 </a>
                             </td>
-                            <td>{{ $period }}</td>
+                            <td>{{ $period }} @if($igrac->aktivan)
+                                        <span class="ms-1 text-warning">★</span>
+                                    @endif</td>
                             <td class="text-center">{{ $igrac->broj_nastupa }}</td>
                             <td class="text-center">{{ $igrac->broj_golova }}</td>
                             <td>

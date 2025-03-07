@@ -116,7 +116,11 @@ class IgraciController extends Controller
             'mesto_smrti' => 'nullable|string|max:255',
             'biografija' => 'nullable|string',
             'fotografija' => 'nullable|image|max:2048', // max 2MB
+            'aktivan' => 'boolean',
         ]);
+        
+        // Set the aktivan field to true if checked, false otherwise
+        $validated['aktivan'] = $request->has('aktivan');
 
         // Automatski koristi ID glavnog tima
         $glavniTim = \App\Models\Tim::glavniTim()->first();
@@ -190,7 +194,11 @@ class IgraciController extends Controller
             'mesto_smrti' => 'nullable|string|max:255',
             'biografija' => 'nullable|string',
             'fotografija' => 'nullable|image|max:2048', // max 2MB
+            'aktivan' => 'boolean',
         ]);
+        
+        // Set the aktivan field to true if checked, false otherwise
+        $validated['aktivan'] = $request->has('aktivan');
 
         // Ne menjamo tim_id pri ažuriranju
 
@@ -204,6 +212,10 @@ class IgraciController extends Controller
             $path = $request->file('fotografija')->store('igraci', 'public');
             $validated['fotografija_path'] = $path;
         }
+
+        // Debugging to see what's being passed
+        \Log::debug('Aktivan vrednost: ' . ($request->has('aktivan') ? 'true' : 'false'));
+        \Log::debug('Validated data: ', $validated);
 
         $igrac->update($validated);
 
@@ -252,8 +264,8 @@ class IgraciController extends Controller
             $igrac->bivsiKlubovi()->delete();
         }
 
-        return redirect()->route('igraci.index')
-            ->with('success', 'Igrač uspešno ažuriran.');
+        // Redirect back to the edit page instead of index
+        return back()->with('success', 'Igrač uspešno ažuriran.');
     }
 
     /**
@@ -277,30 +289,42 @@ class IgraciController extends Controller
     }
 
     /**
- * Dodaje novi klub igraču.
- */
-public function updateClub(Request $request, Igrac $igrac)
-{
-    $validated = $request->validate([
-        'klub' => 'required|string|max:255',
-        'drzava_kluba' => 'nullable|string|max:255',
-        'sezona' => 'required|string|max:10',
-        'stepen_takmicenja' => 'nullable|string|max:100',
-        'broj_nastupa' => 'nullable|integer|min:0',
-        'broj_golova' => 'nullable|integer|min:0',
-    ]);
+     * Dodaje novi klub igraču.
+     */
+    public function updateClub(Request $request, Igrac $igrac)
+    {
+        $validated = $request->validate([
+            'klub' => 'required|string|max:255',
+            'drzava_kluba' => 'nullable|string|max:255',
+            'sezona' => 'required|string|max:10',
+            'stepen_takmicenja' => 'nullable|string|max:100',
+            'broj_nastupa' => 'nullable|integer|min:0',
+            'broj_golova' => 'nullable|integer|min:0',
+        ]);
 
-    // Mapiranje polja forme na kolone u bazi
-    $igrac->bivsiKlubovi()->create([
-        'naziv' => $validated['klub'],
-        'drzava' => $validated['drzava_kluba'],
-        'sezona' => $validated['sezona'],
-        'stepen_takmicenja' => $validated['stepen_takmicenja'],
-        'broj_nastupa' => $validated['broj_nastupa'],
-        'broj_golova' => $validated['broj_golova'],
-    ]);
+        // Mapiranje polja forme na kolone u bazi
+        $igrac->bivsiKlubovi()->create([
+            'naziv' => $validated['klub'],
+            'drzava' => $validated['drzava_kluba'],
+            'sezona' => $validated['sezona'],
+            'stepen_takmicenja' => $validated['stepen_takmicenja'],
+            'broj_nastupa' => $validated['broj_nastupa'],
+            'broj_golova' => $validated['broj_golova'],
+        ]);
 
-    return redirect()->route('igraci.show', $igrac)
-        ->with('success', 'Klub uspešno dodat.');
-}
+        return redirect()->route('igraci.show', $igrac)
+            ->with('success', 'Klub uspešno dodat.');
+    }
+
+    /**
+     * Briše klub igrača.
+     */
+    public function deleteClub(BivsiKlub $klub)
+    {
+        $igrac_id = $klub->igrac_id;
+        $klub->delete();
+        
+        return redirect()->route('igraci.show', $igrac_id)
+            ->with('success', 'Klub uspešno obrisan.');
+    }
 }

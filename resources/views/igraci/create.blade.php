@@ -113,6 +113,15 @@
                 @enderror
             </div>
 
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="aktivan" name="aktivan" value="1" {{ old('aktivan') ? 'checked' : '' }}>
+                    <label class="form-check-label" for="aktivan">
+                        Aktivan igrač
+                    </label>
+                </div>
+            </div>
+
             <hr>
             <h4 class="mb-3">Bivši klubovi</h4>
 
