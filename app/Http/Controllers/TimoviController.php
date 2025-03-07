@@ -12,7 +12,20 @@ class TimoviController extends Controller
      */
     public function index()
     {
-        $timovi = Tim::orderBy('naziv')->get();
+        // Dobavi glavni tim i njegove alijase
+        $glavniTim = Tim::glavniTim()->first();
+        
+        // Ukoliko postoji glavni tim, prikupi sve njegove ID-ove i ID-ove njegovih alijasa
+        $iskljuceniTimIds = [];
+        if ($glavniTim) {
+            $iskljuceniTimIds = $glavniTim->getSviIdTimova();
+        }
+        
+        // Dohvati sve timove OSIM glavnog tima i njegovih alijasa
+        $timovi = Tim::whereNotIn('id', $iskljuceniTimIds)
+                    ->orderBy('naziv')
+                    ->get();
+                    
         return view('timovi.index', compact('timovi'));
     }
 
