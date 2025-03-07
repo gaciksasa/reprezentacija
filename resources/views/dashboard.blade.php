@@ -7,8 +7,8 @@
     <div class="col-12 mb-4">
         <div class="card">
             <div class="card-body">
-                <h1 class="card-title">Dobrodošli u sistem Reprezentacija</h1>
-                <p class="card-text">Baza podataka fudbalskih reprezentacija i utakmica.</p>
+                <h1 class="card-title">Dobrodošli na sajt fudbalske reprezentacije Srbije</h1>
+                <p class="card-text">Baza podataka utakmica i igrača reprezentacije.</p>
             </div>
         </div>
     </div>
@@ -18,7 +18,7 @@
     <div class="col-md-4 mb-4">
         <div class="card bg-primary text-white">
             <div class="card-body text-center">
-                <h5 class="card-title">Timovi</h5>
+                <h5 class="card-title">Bilansi</h5>
                 <p class="display-4">{{ $brojTimova }}</p>
                 <a href="{{ route('timovi.index') }}" class="btn btn-light">Prikaži sve</a>
             </div>
@@ -27,7 +27,7 @@
     <div class="col-md-4 mb-4">
         <div class="card bg-success text-white">
             <div class="card-body text-center">
-                <h5 class="card-title">Igrači</h5>
+                <h5 class="card-title">Reprezentativci</h5>
                 <p class="display-4">{{ $brojIgraca }}</p>
                 <a href="{{ route('igraci.index') }}" class="btn btn-light">Prikaži sve</a>
             </div>

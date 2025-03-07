@@ -35,10 +35,10 @@
                         <a class="nav-link" href="{{ route('utakmice.index') }}">Utakmice</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('timovi.index') }}">Timovi</a>
+                        <a class="nav-link" href="{{ route('timovi.index') }}">Bilansi</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('igraci.index') }}">Igrači</a>
+                        <a class="nav-link" href="{{ route('igraci.index') }}">Reprezentativci</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">

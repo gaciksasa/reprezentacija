@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Timovi')
+@section('title', 'Bilansi')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Timovi</h1>
+    <h1>Bilans protiv reprezentacija od 1920 do danas</h1>
     <a href="{{ route('timovi.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Novi tim
     </a>
