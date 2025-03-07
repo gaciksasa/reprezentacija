@@ -2,6 +2,46 @@
 
 @section('title', $tim->naziv)
 
+@php
+    // Dodaj funkciju za ispravno prikazivanje zastava ako helper nije dostupan
+    if (!function_exists('zastava_url')) {
+        function image_url($path, $default = 'img/no-image.png') {
+            if (empty($path)) {
+                return asset($default);
+            }
+            
+            if (preg_match('/^https?:\/\//', $path)) {
+                return $path;
+            }
+            
+            if (strpos($path, 'storage/zastave/') === 0) {
+                return asset($path);
+            }
+            
+            return asset('storage/zastave/' . $path);
+        }
+    }
+
+    // Dodaj funkciju za ispravno prikazivanje grbova ako helper nije dostupan
+    if (!function_exists('grb_url')) {
+        function image_url($path, $default = 'img/no-image.png') {
+            if (empty($path)) {
+                return asset($default);
+            }
+            
+            if (preg_match('/^https?:\/\//', $path)) {
+                return $path;
+            }
+            
+            if (strpos($path, 'storage/grbovi/') === 0) {
+                return asset($path);
+            }
+            
+            return asset('storage/grbovi/' . $path);
+        }
+    }
+@endphp
+
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>{{ $tim->naziv }}</h1>
@@ -20,10 +60,10 @@
         <div class="card">
             <div class="card-body text-center">
                 @if($tim->grb_url)
-                    <img src="{{ $tim->grb_url }}" alt="{{ $tim->naziv }} grb" class="img-fluid mb-3" style="max-height: 150px;">
+                    <img src="{{ image_url($tim->grb_url) }}" alt="{{ $tim->naziv }} grb" class="img-fluid mb-3" style="max-height: 150px;">
                 @endif
                 @if($tim->zastava_url)
-                    <img src="{{ $tim->zastava_url }}" alt="{{ $tim->naziv }} zastava" class="img-fluid mb-3" style="max-height: 80px;">
+                    <img src="{{ image_url($tim->zastava_url) }}" alt="{{ $tim->naziv }} zastava" class="img-fluid mb-3" style="max-height: 80px;">
                 @endif
                 <h4>{{ $tim->naziv }}</h4>
                 @if($tim->skraceni_naziv)
@@ -32,11 +72,9 @@
                 <p><strong>Zemlja:</strong> {{ $tim->zemlja }}</p>
             </div>
         </div>
-    </div>
-
-    <div class="col-md-8">
+        
         <!-- Kartica za bilans protiv trenutnog tima -->
-        <div class="card">
+        <div class="card mt-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">Bilans protiv {{ $tim->naziv }}</h5>
             </div>
@@ -148,10 +186,11 @@
                                     <div class="d-flex align-items-center">
                                         @php
                                             // Dobavi zastavu za taj tim
-                                            $timZastava = \App\Models\Tim::where('naziv', $naziv)->first()->zastava_url ?? null;
+                                            $alijasTim = \App\Models\Tim::where('naziv', $naziv)->first();
+                                            $timZastava = $alijasTim ? $alijasTim->zastava_url : null;
                                         @endphp
                                         @if($timZastava)
-                                            <img src="{{ $timZastava }}" alt="{{ $naziv }}" height="20" class="me-2">
+                                            <img src="{{ image_url($timZastava) }}" alt="{{ $naziv }}" height="12" class="me-2">
                                         @endif
                                         {{ $naziv }}
                                     </div>
@@ -176,6 +215,9 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="col-md-8">
         <!-- Utakmice -->
         <div class="card">
             <div class="card-header">
