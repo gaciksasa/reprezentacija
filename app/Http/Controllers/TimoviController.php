@@ -66,10 +66,21 @@ class TimoviController extends Controller
     /**
      * Prikaz pojedinog tima.
      */
-    public function show(Tim $tim)
+    public function show($id)
     {
-        $tim->load(['igraci', 'domaceUtakmice', 'gostujuceUtakmice']);
-        return view('timovi.show', compact('tim'));
+        try {
+            // Eksplicitno dohvatamo tim po ID-u umesto da se oslanjamo na route model binding
+            $tim = Tim::with(['igraci', 'domaceUtakmice.takmicenje', 'domaceUtakmice.domacin', 
+                            'domaceUtakmice.gost', 'gostujuceUtakmice.takmicenje', 
+                            'gostujuceUtakmice.domacin', 'gostujuceUtakmice.gost'])
+                    ->findOrFail($id);
+
+            return view('timovi.show', compact('tim'));
+        } catch (\Exception $e) {
+            // U slučaju greške, preusmeravamo korisnika i prikazujemo poruku
+            return redirect()->route('timovi.index')
+                ->with('error', 'Tim sa ID ' . $id . ' nije pronađen: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -30,68 +30,112 @@
                     <p class="text-muted">{{ $tim->skraceni_naziv }}</p>
                 @endif
                 <p><strong>Zemlja:</strong> {{ $tim->zemlja }}</p>
+                
+                <!-- Dodao sam prikaz ID tima za lakše debugovanje -->
+                <p class="text-muted"><small>ID tima: {{ $tim->id }}</small></p>
+            </div>
+        </div>
+        
+        <!-- Dodata kartica za bilans -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Bilans protiv {{ $tim->naziv }}</h5>
+            </div>
+            <div class="card-body">
+                @php
+                    // Dobavi glavni tim (Srbija)
+                    $glavniTim = \App\Models\Tim::glavniTim()->first();
+                    
+                    // Ukoliko postoji glavni tim, prikupi sve njegove ID-ove
+                    $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+                    
+                    // Početni brojači
+                    $pobede = 0;
+                    $neresene = 0;
+                    $porazi = 0;
+                    $datiGolovi = 0;
+                    $primljeniGolovi = 0;
+                    
+                    // Za domaće utakmice gde je naš tim bio domaćin, a trenutni tim gost
+                    $domaceUtakmice = \App\Models\Utakmica::whereIn('domacin_id', $nasTimIds)
+                                    ->where('gost_id', $tim->id)
+                                    ->get();
+                    
+                    // Za gostujuće utakmice gde je naš tim bio gost, a trenutni tim domaćin
+                    $gostujuceUtakmice = \App\Models\Utakmica::where('domacin_id', $tim->id)
+                                        ->whereIn('gost_id', $nasTimIds)
+                                        ->get();
+                    
+                    // Obračunaj pobede/neresene/poraze za domaće utakmice
+                    foreach ($domaceUtakmice as $utakmica) {
+                        $datiGolovi += $utakmica->rezultat_domacin;
+                        $primljeniGolovi += $utakmica->rezultat_gost;
+                        
+                        if ($utakmica->rezultat_domacin > $utakmica->rezultat_gost) {
+                            $pobede++;
+                        } elseif ($utakmica->rezultat_domacin < $utakmica->rezultat_gost) {
+                            $porazi++;
+                        } else {
+                            $neresene++;
+                        }
+                    }
+                    
+                    // Obračunaj pobede/neresene/poraze za gostujuće utakmice
+                    foreach ($gostujuceUtakmice as $utakmica) {
+                        $datiGolovi += $utakmica->rezultat_gost;
+                        $primljeniGolovi += $utakmica->rezultat_domacin;
+                        
+                        if ($utakmica->rezultat_domacin < $utakmica->rezultat_gost) {
+                            $pobede++;
+                        } elseif ($utakmica->rezultat_domacin > $utakmica->rezultat_gost) {
+                            $porazi++;
+                        } else {
+                            $neresene++;
+                        }
+                    }
+                    
+                    $ukupnoUtakmica = $pobede + $neresene + $porazi;
+                    $golRazlika = $datiGolovi - $primljeniGolovi;
+                @endphp
+                
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h5 class="text-success">{{ $pobede }}</h5>
+                        <small>Pobede</small>
+                    </div>
+                    <div class="col-4">
+                        <h5>{{ $neresene }}</h5>
+                        <small>Nerešene</small>
+                    </div>
+                    <div class="col-4">
+                        <h5 class="text-danger">{{ $porazi }}</h5>
+                        <small>Porazi</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h5>{{ $ukupnoUtakmica }}</h5>
+                        <small>Utakmice</small>
+                    </div>
+                    <div class="col-4">
+                        <h5>{{ $datiGolovi }}:{{ $primljeniGolovi }}</h5>
+                        <small>Golovi</small>
+                    </div>
+                    <div class="col-4">
+                        <h5 class="{{ $golRazlika > 0 ? 'text-success' : ($golRazlika < 0 ? 'text-danger' : '') }}">
+                            {{ $golRazlika > 0 ? '+' : '' }}{{ $golRazlika }}
+                        </h5>
+                        <small>Gol razlika</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="col-md-8">
-        <!-- Igrači -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Igrači</h5>
-                <a href="{{ route('igraci.create', ['tim_id' => $tim->id]) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Dodaj igrača
-                </a>
-            </div>
-            <div class="card-body">
-                @if($tim->igraci->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Ime i prezime</th>
-                                    <th>Pozicija</th>
-                                    <th>Klub</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($tim->igraci as $igrac)
-                                <tr>
-                                    <td>{{ $igrac->broj_dresa ?? '-' }}</td>
-                                    <td>
-                                        <a href="{{ route('igraci.show', $igrac) }}">
-                                            {{ $igrac->ime }} {{ $igrac->prezime }}
-                                        </a>
-                                    </td>
-                                    <td>{{ $igrac->pozicija ?? '-' }}</td>
-                                    <td>
-                                        @if($igrac->klub)
-                                            {{ $igrac->klub }}
-                                            @if($igrac->drzava_kluba)
-                                                <small>({{ $igrac->drzava_kluba }})</small>
-                                            @endif
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('igraci.show', $igrac) }}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <p class="text-center text-muted">Nema evidentiranih igrača za ovaj tim.</p>
-                @endif
-            </div>
-        </div>
-
         <!-- Utakmice -->
         <div class="card">
             <div class="card-header">
@@ -118,34 +162,39 @@
 
                 <div class="tab-content pt-3" id="utakmiceTabContent">
                     <div class="tab-pane fade show active" id="sve-utakmice" role="tabpanel">
-                        @if($tim->domaceUtakmice->count() > 0 || $tim->gostujuceUtakmice->count() > 0)
+                        @if(($tim->domaceUtakmice && $tim->domaceUtakmice->count() > 0) || 
+                           ($tim->gostujuceUtakmice && $tim->gostujuceUtakmice->count() > 0))
                             <div class="list-group">
-                                @foreach($tim->domaceUtakmice->sortByDesc('datum') as $utakmica)
-                                    <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ $utakmica->domacin->naziv }}</strong> 
-                                                {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }} 
-                                                <strong>{{ $utakmica->gost->naziv }}</strong>
+                                @if($tim->domaceUtakmice)
+                                    @foreach($tim->domaceUtakmice->sortByDesc('datum') as $utakmica)
+                                        <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>{{ $utakmica->domacin->naziv }}</strong> 
+                                                    {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }} 
+                                                    <strong>{{ $utakmica->gost->naziv }}</strong>
+                                                </div>
+                                                <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
                                             </div>
-                                            <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
-                                        </div>
-                                        <small class="text-muted">{{ $utakmica->takmicenje->naziv }}</small>
-                                    </a>
-                                @endforeach
-                                @foreach($tim->gostujuceUtakmice->sortByDesc('datum') as $utakmica)
-                                    <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ $utakmica->domacin->naziv }}</strong> 
-                                                {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }} 
-                                                <strong>{{ $utakmica->gost->naziv }}</strong>
+                                            <small class="text-muted">{{ $utakmica->takmicenje->naziv }}</small>
+                                        </a>
+                                    @endforeach
+                                @endif
+                                @if($tim->gostujuceUtakmice)
+                                    @foreach($tim->gostujuceUtakmice->sortByDesc('datum') as $utakmica)
+                                        <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>{{ $utakmica->domacin->naziv }}</strong> 
+                                                    {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }} 
+                                                    <strong>{{ $utakmica->gost->naziv }}</strong>
+                                                </div>
+                                                <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
                                             </div>
-                                            <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
-                                        </div>
-                                        <small class="text-muted">{{ $utakmica->takmicenje->naziv }}</small>
-                                    </a>
-                                @endforeach
+                                            <small class="text-muted">{{ $utakmica->takmicenje->naziv }}</small>
+                                        </a>
+                                    @endforeach
+                                @endif
                             </div>
                         @else
                             <p class="text-center text-muted">Nema evidentiranih utakmica za ovaj tim.</p>
@@ -153,7 +202,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="domace-utakmice" role="tabpanel">
-                        @if($tim->domaceUtakmice->count() > 0)
+                        @if($tim->domaceUtakmice && $tim->domaceUtakmice->count() > 0)
                             <div class="list-group">
                                 @foreach($tim->domaceUtakmice->sortByDesc('datum') as $utakmica)
                                     <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action">
@@ -175,7 +224,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="gostujuce-utakmice" role="tabpanel">
-                        @if($tim->gostujuceUtakmice->count() > 0)
+                        @if($tim->gostujuceUtakmice && $tim->gostujuceUtakmice->count() > 0)
                             <div class="list-group">
                                 @foreach($tim->gostujuceUtakmice->sortByDesc('datum') as $utakmica)
                                     <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action">
