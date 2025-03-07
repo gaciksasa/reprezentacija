@@ -5,7 +5,7 @@
 @php
     // Dodaj funkciju za ispravno prikazivanje zastava ako helper nije dostupan
     if (!function_exists('zastava_url')) {
-        function image_url($path, $default = 'img/no-image.png') {
+        function zastava_url($path, $default = 'img/no-image.png') {
             if (empty($path)) {
                 return asset($default);
             }
@@ -24,7 +24,7 @@
 
     // Dodaj funkciju za ispravno prikazivanje grbova ako helper nije dostupan
     if (!function_exists('grb_url')) {
-        function image_url($path, $default = 'img/no-image.png') {
+        function grb_url($path, $default = 'img/no-image.png') {
             if (empty($path)) {
                 return asset($default);
             }
@@ -60,10 +60,10 @@
         <div class="card">
             <div class="card-body text-center">
                 @if($tim->grb_url)
-                    <img src="{{ image_url($tim->grb_url) }}" alt="{{ $tim->naziv }} grb" class="img-fluid mb-3" style="max-height: 150px;">
+                    <img src="{{ grb_url($tim->grb_url) }}" alt="{{ $tim->naziv }} grb" class="img-fluid mb-3" style="max-height: 150px;">
                 @endif
                 @if($tim->zastava_url)
-                    <img src="{{ image_url($tim->zastava_url) }}" alt="{{ $tim->naziv }} zastava" class="img-fluid mb-3" style="max-height: 80px;">
+                    <img src="{{ zastava_url($tim->zastava_url) }}" alt="{{ $tim->naziv }} zastava" class="img-fluid mb-3" style="max-height: 80px;">
                 @endif
                 <h4>{{ $tim->naziv }}</h4>
                 @if($tim->skraceni_naziv)
@@ -190,7 +190,7 @@
                                             $timZastava = $alijasTim ? $alijasTim->zastava_url : null;
                                         @endphp
                                         @if($timZastava)
-                                            <img src="{{ image_url($timZastava) }}" alt="{{ $naziv }}" height="12" class="me-2">
+                                            <img src="{{ zastava_url($timZastava) }}" alt="{{ $naziv }}" height="12" class="me-2">
                                         @endif
                                         {{ $naziv }}
                                     </div>
