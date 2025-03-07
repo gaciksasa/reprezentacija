@@ -16,33 +16,43 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Zastava</th>
-                        <th>Naziv</th>
-                        <th>Zemlja</th>
-                        <th>Akcije</th>
+                        <th>Država</th>
+                        <th class="text-center">Ut</th>
+                        <th class="text-center">W</th>
+                        <th class="text-center">D</th>
+                        <th class="text-center">L</th>
+                        <th class="text-center">G</th>
+                        <th class="text-center">A</th>
+                        <th class="text-center">+/-</th>
+                        <th class="text-center">g/m</th>
+                        <th class="text-center">g/m</th>
+                        <th class="text-center">Akcije</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($timovi as $tim)
                     <tr>
                         <td>
-                            @if($tim->zastava_url)
-                                <img src="{{ $tim->zastava_url }}" alt="{{ $tim->naziv }}" height="30">
-                            @else
-                                <div class="bg-light text-center" style="width: 45px; height: 30px;">
-                                    <small>Nema</small>
-                                </div>
-                            @endif
-                        </td>
-                        <td>
-                            <a href="{{ route('timovi.show', $tim) }}">
-                                {{ $tim->naziv }}
-                                @if($tim->skraceni_naziv)
-                                    <small>({{ $tim->skraceni_naziv }})</small>
+                            <div class="d-flex align-items-center">
+                                @if($tim->zastava_url)
+                                    <img src="{{ zastava_url($tim->zastava_url) }}" alt="{{ $tim->naziv }}" height="12" class="me-2">
                                 @endif
-                            </a>
+                                <a href="{{ route('timovi.show', $tim) }}">
+                                    {{ $tim->naziv }}
+                                </a>
+                            </div>
                         </td>
-                        <td>{{ $tim->zemlja }}</td>
+                        <td class="text-center">{{ $tim->stats['ut'] }}</td>
+                        <td class="text-center">{{ $tim->stats['w'] }}</td>
+                        <td class="text-center">{{ $tim->stats['d'] }}</td>
+                        <td class="text-center">{{ $tim->stats['l'] }}</td>
+                        <td class="text-center">{{ $tim->stats['g'] }}</td>
+                        <td class="text-center">{{ $tim->stats['a'] }}</td>
+                        <td class="text-center {{ $tim->stats['diff'] > 0 ? 'text-success' : ($tim->stats['diff'] < 0 ? 'text-danger' : '') }}">
+                            {{ $tim->stats['diff'] > 0 ? '+' : '' }}{{ $tim->stats['diff'] }}
+                        </td>
+                        <td class="text-center">{{ $tim->stats['g_per_match'] }}</td>
+                        <td class="text-center">{{ $tim->stats['a_per_match'] }}</td>
                         <td>
                             <div class="btn-group">
                                 <a href="{{ route('timovi.show', $tim) }}" class="btn btn-sm btn-info">
@@ -64,7 +74,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center">Nema timova u bazi podataka</td>
+                        <td colspan="11" class="text-center">Nema timova u bazi podataka</td>
                     </tr>
                     @endforelse
                 </tbody>

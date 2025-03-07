@@ -9,27 +9,6 @@
     @yield('styles')
 </head>
 <body>
-    @php
-        // Dodaj funkciju za ispravno prikazivanje slika ako helper nije dostupan
-        if (!function_exists('image_url')) {
-            function image_url($path, $default = 'img/no-image.png') {
-                if (empty($path)) {
-                    return asset($default);
-                }
-                
-                if (preg_match('/^https?:\/\//', $path)) {
-                    return $path;
-                }
-                
-                if (strpos($path, 'storage/') === 0) {
-                    return asset($path);
-                }
-                
-                return asset('storage/' . $path);
-            }
-        }
-    @endphp
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
         <div class="container">
             <a class="navbar-brand" href="{{ route('dashboard') }}">Reprezentacija</a>

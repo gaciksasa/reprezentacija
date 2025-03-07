@@ -2,46 +2,6 @@
 
 @section('title', $tim->naziv)
 
-@php
-    // Dodaj funkciju za ispravno prikazivanje zastava ako helper nije dostupan
-    if (!function_exists('zastava_url')) {
-        function zastava_url($path, $default = 'img/no-image.png') {
-            if (empty($path)) {
-                return asset($default);
-            }
-            
-            if (preg_match('/^https?:\/\//', $path)) {
-                return $path;
-            }
-            
-            if (strpos($path, 'storage/zastave/') === 0) {
-                return asset($path);
-            }
-            
-            return asset('storage/zastave/' . $path);
-        }
-    }
-
-    // Dodaj funkciju za ispravno prikazivanje grbova ako helper nije dostupan
-    if (!function_exists('grb_url')) {
-        function grb_url($path, $default = 'img/no-image.png') {
-            if (empty($path)) {
-                return asset($default);
-            }
-            
-            if (preg_match('/^https?:\/\//', $path)) {
-                return $path;
-            }
-            
-            if (strpos($path, 'storage/grbovi/') === 0) {
-                return asset($path);
-            }
-            
-            return asset('storage/grbovi/' . $path);
-        }
-    }
-@endphp
-
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>{{ $tim->naziv }}</h1>
@@ -60,16 +20,8 @@
         <div class="card">
             <div class="card-body text-center">
                 @if($tim->grb_url)
-                    <img src="{{ grb_url($tim->grb_url) }}" alt="{{ $tim->naziv }} grb" class="img-fluid mb-3" style="max-height: 150px;">
+                    <img src="{{ grb_url($tim->grb_url) }}" alt="{{ $tim->naziv }} grb" class="img-fluid" style="max-height: 100px;">
                 @endif
-                @if($tim->zastava_url)
-                    <img src="{{ zastava_url($tim->zastava_url) }}" alt="{{ $tim->naziv }} zastava" class="img-fluid mb-3" style="max-height: 80px;">
-                @endif
-                <h4>{{ $tim->naziv }}</h4>
-                @if($tim->skraceni_naziv)
-                    <p class="text-muted">{{ $tim->skraceni_naziv }}</p>
-                @endif
-                <p><strong>Zemlja:</strong> {{ $tim->zemlja }}</p>
             </div>
         </div>
         
