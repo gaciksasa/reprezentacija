@@ -50,7 +50,6 @@
                     @foreach($igraci as $igrac)
                         <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
                             {{ $igrac->ime }} {{ $igrac->prezime }}
-                            @if($igrac->broj_dresa) ({{ $igrac->broj_dresa }}) @endif
                         </option>
                     @endforeach
                 </select>

@@ -13,9 +13,82 @@ class IgraciController extends Controller
     /**
      * Prikaz svih igrača.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $igraci = Igrac::with('tim')->orderBy('prezime')->paginate(20);
+        // Start with a base query
+        $query = Igrac::with('tim');
+        
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('ime', 'like', "%{$search}%")
+                  ->orWhere('prezime', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT(ime, ' ', prezime) LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("CONCAT(prezime, ' ', ime) LIKE ?", ["%{$search}%"]);
+            });
+        }
+        
+        // Apply period filter
+        if ($request->has('period') && !empty($request->period)) {
+            $period = explode('-', $request->period);
+            if (count($period) === 2) {
+                $startYear = $period[0];
+                $endYear = $period[1] === 'danas' ? date('Y') : $period[1];
+                
+                $query->where(function($q) use ($startYear, $endYear) {
+                    $q->whereHas('sastavi', function($sq) use ($startYear, $endYear) {
+                        $sq->whereHas('utakmica', function($uq) use ($startYear, $endYear) {
+                            $uq->whereYear('datum', '>=', $startYear)
+                               ->whereYear('datum', '<=', $endYear);
+                        });
+                    });
+                });
+            }
+        }
+        
+        // Apply active filter
+        if ($request->has('active') && $request->active == '1') {
+            $query->where('aktivan', true);
+        }
+        
+        // Add fields with subqueries for better performance
+        $query->addSelect([
+            'debitovao_za_tim' => function($q) {
+                $q->select('datum')
+                  ->from('utakmice')
+                  ->join('sastavi', 'utakmice.id', '=', 'sastavi.utakmica_id')
+                  ->whereColumn('sastavi.igrac_id', 'igraci.id')
+                  ->orderBy('datum', 'asc')
+                  ->limit(1);
+            },
+            'poslednja_utakmica' => function($q) {
+                $q->select('datum')
+                  ->from('utakmice')
+                  ->join('sastavi', 'utakmice.id', '=', 'sastavi.utakmica_id')
+                  ->whereColumn('sastavi.igrac_id', 'igraci.id')
+                  ->orderBy('datum', 'desc')
+                  ->limit(1);
+            },
+            'broj_nastupa' => function($q) {
+                $q->selectRaw('COUNT(*)')
+                  ->from('sastavi')
+                  ->whereColumn('sastavi.igrac_id', 'igraci.id');
+            },
+            'broj_golova' => function($q) {
+                $q->selectRaw('COUNT(*)')
+                  ->from('golovi')
+                  ->whereColumn('golovi.igrac_id', 'igraci.id')
+                  ->where('auto_gol', false);
+            }
+        ]);
+        
+        // Order by player's last name
+        $query->orderBy('prezime')->orderBy('ime');
+        
+        // Get paginated results
+        $igraci = $query->paginate(50)->withQueryString();
+        
         return view('igraci.index', compact('igraci'));
     }
 

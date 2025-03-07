@@ -240,7 +240,6 @@
                                                     @foreach($igraciDomacina as $igrac)
                                                         <option value="{{ $igrac->id }}" {{ $sastav->igrac_id == $igrac->id ? 'selected' : '' }}>
                                                             {{ $igrac->ime }} {{ $igrac->prezime }}
-                                                            @if($igrac->broj_dresa) ({{ $igrac->broj_dresa }}) @endif
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -292,7 +291,6 @@
                                                     @foreach($igraciGosta as $igrac)
                                                         <option value="{{ $igrac->id }}" {{ $sastav->igrac_id == $igrac->id ? 'selected' : '' }}>
                                                             {{ $igrac->ime }} {{ $igrac->prezime }}
-                                                            @if($igrac->broj_dresa) ({{ $igrac->broj_dresa }}) @endif
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -659,15 +657,14 @@
         });
         
         // Add handlers for other dynamic forms
+
+        function generatePlayerOptions(players) {
+            if (!players) return '';
+            
+            return players.map(player => {
+                return `<option value="${player.id}">${player.ime} ${player.prezime}</option>`;
+            }).join('');
+        }
     });
-    
-    function generatePlayerOptions(players) {
-        if (!players) return '';
-        
-        return players.map(player => {
-            const dressBadge = player.broj_dresa ? ` (${player.broj_dresa})` : '';
-            return `<option value="${player.id}">${player.ime} ${player.prezime}${dressBadge}</option>`;
-        }).join('');
-    }
 </script>
 @endsection

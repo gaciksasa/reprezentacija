@@ -63,7 +63,6 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
                                         <th>Igrač</th>
                                         <th>Starter</th>
                                         <th>Akcije</th>
@@ -72,7 +71,6 @@
                                 <tbody>
                                     @foreach($domaciSastav as $sastav)
                                     <tr>
-                                        <td>{{ $sastav->igrac->broj_dresa ?? '-' }}</td>
                                         <td>{{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}</td>
                                         <td>
                                             @if($sastav->starter)
@@ -127,7 +125,6 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
                                         <th>Igrač</th>
                                         <th>Starter</th>
                                         <th>Akcije</th>
@@ -136,7 +133,6 @@
                                 <tbody>
                                     @foreach($gostujuciSastav as $sastav)
                                     <tr>
-                                        <td>{{ $sastav->igrac->broj_dresa ?? '-' }}</td>
                                         <td>{{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}</td>
                                         <td>
                                             @if($sastav->starter)

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('mesto_rodjenja')->nullable();
             $table->date('datum_smrti')->nullable();
             $table->string('mesto_smrti')->nullable();
+            $table->boolean('aktivan')->default(false);
             $table->timestamps();
         });
     }

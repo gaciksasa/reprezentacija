@@ -14,15 +14,18 @@ class Igrac extends Model
     protected $fillable = [
         'ime', 'prezime', 'tim_id', 'pozicija', 
         'datum_rodjenja', 'mesto_rodjenja', 'datum_smrti', 'mesto_smrti',
-        'biografija', 'fotografija_path'
+        'biografija', 'fotografija_path', 'aktivan'
     ];
     
     protected $casts = [
         'datum_rodjenja' => 'date',
-        'detum_smrti' => 'date',
+        'datum_smrti' => 'date',
+        'aktivan' => 'boolean',
+        'debitovao_za_tim' => 'date',
+        'poslednja_utakmica' => 'date',
     ];
     
-    // Relacije
+    // Relationships
     public function tim()
     {
         return $this->belongsTo(Tim::class);
@@ -58,20 +61,31 @@ class Igrac extends Model
         return $this->hasMany(Karton::class);
     }
     
-    // Atributi
+    // Attributes
     public function getImePrezimeAttribute()
     {
         return $this->ime . ' ' . $this->prezime;
     }
     
-    // Metode za statistiku koja se računa dinamički
+    public function getPrezimeImeAttribute()
+    {
+        return $this->prezime . ' ' . $this->ime;
+    }
+    
+    // Dynamic statistics calculation methods
     public function getBrojNastupaAttribute()
     {
-        return $this->sastavi()->where('starter', true)->count();
+        if (isset($this->attributes['broj_nastupa'])) {
+            return $this->attributes['broj_nastupa'];
+        }
+        return $this->sastavi()->count();
     }
     
     public function getBrojGolovaAttribute()
     {
+        if (isset($this->attributes['broj_golova'])) {
+            return $this->attributes['broj_golova'];
+        }
         return $this->golovi()->where('auto_gol', false)->count();
     }
     
@@ -84,5 +98,52 @@ class Igrac extends Model
     {
         return $this->kartoni()->where('tip', 'crveni')->count();
     }
-
+    
+    // Get the player's debut date
+    public function getDebitovaoDatumAttribute()
+    {
+        if (isset($this->attributes['debitovao_za_tim'])) {
+            return $this->attributes['debitovao_za_tim'];
+        }
+        
+        $utakmica = Utakmica::join('sastavi', 'utakmice.id', '=', 'sastavi.utakmica_id')
+            ->where('sastavi.igrac_id', $this->id)
+            ->orderBy('utakmice.datum', 'asc')
+            ->select('utakmice.datum')
+            ->first();
+            
+        return $utakmica ? $utakmica->datum : null;
+    }
+    
+    // Get the player's last match date
+    public function getPoslednjaUtakmicaDatumAttribute()
+    {
+        if (isset($this->attributes['poslednja_utakmica'])) {
+            return $this->attributes['poslednja_utakmica'];
+        }
+        
+        $utakmica = Utakmica::join('sastavi', 'utakmice.id', '=', 'sastavi.utakmica_id')
+            ->where('sastavi.igrac_id', $this->id)
+            ->orderBy('utakmice.datum', 'desc')
+            ->select('utakmice.datum')
+            ->first();
+            
+        return $utakmica ? $utakmica->datum : null;
+    }
+    
+    // Get the player's playing period string
+    public function getPeriodAttribute()
+    {
+        $debitovao = $this->debitovao_datum;
+        $poslednja = $this->poslednja_utakmica_datum;
+        
+        if (!$debitovao) {
+            return '';
+        }
+        
+        $startYear = $debitovao->format('Y');
+        $endYear = $poslednja ? $poslednja->format('Y') : date('Y');
+        
+        return $startYear . '/' . $endYear;
+    }
 }

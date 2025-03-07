@@ -169,7 +169,7 @@
                             <ul class="list-group">
                                 @foreach($domaciSastav as $sastav)
                                     <li class="list-group-item {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                        {{ $sastav->igrac->broj_dresa ?? '-' }}. {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
+                                        {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
                                         @if(!$sastav->starter) <small>(rezerva)</small> @endif
                                     </li>
                                 @endforeach
@@ -186,7 +186,7 @@
                             <ul class="list-group">
                                 @foreach($gostujuciSastav as $sastav)
                                     <li class="list-group-item {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                        {{ $sastav->igrac->broj_dresa ?? '-' }}. {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
+                                        {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
                                         @if(!$sastav->starter) <small>(rezerva)</small> @endif
                                     </li>
                                 @endforeach

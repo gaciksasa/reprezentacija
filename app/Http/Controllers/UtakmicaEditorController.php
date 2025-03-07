@@ -293,13 +293,13 @@ class UtakmicaEditorController extends Controller
         if ($domacin_id) {
             $igraciDomacina = Igrac::where('tim_id', $domacin_id)
                 ->orderBy('prezime')
-                ->get(['id', 'ime', 'prezime', 'broj_dresa']);
+                ->get(['id', 'ime', 'prezime']);
         }
         
         if ($gost_id) {
             $igraciGosta = Igrac::where('tim_id', $gost_id)
                 ->orderBy('prezime')
-                ->get(['id', 'ime', 'prezime', 'broj_dresa']);
+                ->get(['id', 'ime', 'prezime']);
         }
         
         return response()->json([
