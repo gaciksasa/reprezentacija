@@ -170,7 +170,7 @@ class GoloviController extends Controller
         // Ažuriranje rezultata utakmice
         $this->updateUtakmicaRezultat($validated['utakmica_id']);
         
-        return redirect()->route('golovi.index', ['utakmica_id' => $validated['utakmica_id']])
+        return redirect()->route('utakmice.show', $validated['utakmica_id'])
             ->with('success', 'Gol uspešno zabeležen.');
     }
 
@@ -243,7 +243,7 @@ class GoloviController extends Controller
         // Ažuriranje rezultata utakmice
         $this->updateUtakmicaRezultat($gol->utakmica_id);
 
-        return redirect()->route('golovi.index', ['utakmica_id' => $gol->utakmica_id])
+        return redirect()->route('utakmice.show', $gol->utakmica_id)
             ->with('success', 'Gol uspešno ažuriran.');
     }
 
@@ -258,7 +258,7 @@ class GoloviController extends Controller
         // Ažuriranje rezultata utakmice
         $this->updateUtakmicaRezultat($utakmica_id);
         
-        return redirect()->route('golovi.index', ['utakmica_id' => $utakmica_id])
+        return redirect()->route('utakmice.show', $utakmica_id)
             ->with('success', 'Gol uspešno obrisan.');
     }
 
