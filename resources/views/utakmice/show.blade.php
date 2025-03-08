@@ -89,19 +89,23 @@
                         <div class="col-md-6">
                             <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
                             <ul class="list-group">
-                                @foreach($utakmica->golovi as $gol)
-                                    @if(($gol->tim_id == $utakmica->domacin_id && !$gol->auto_gol) || 
-                                        ($gol->tim_id == $utakmica->gost_id && $gol->auto_gol))
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @foreach($utakmica->golovi as $gol)
+                                @if(($gol->tim_id == $utakmica->domacin_id && !$gol->auto_gol) || 
+                                    ($gol->tim_id == $utakmica->gost_id && $gol->auto_gol))
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @if($gol->igrac)
                                             {{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}
-                                            <span class="badge bg-primary rounded-pill">
-                                                {{ $gol->minut }}'
-                                                @if($gol->penal) (P) @endif
-                                                @if($gol->auto_gol) (AG) @endif
-                                            </span>
-                                        </li>
-                                    @endif
-                                @endforeach
+                                        @else
+                                            Unknown Player
+                                        @endif
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ $gol->minut }}'
+                                            @if($gol->penal) (P) @endif
+                                            @if($gol->auto_gol) (AG) @endif
+                                        </span>
+                                    </li>
+                                @endif
+                            @endforeach
                             </ul>
                         </div>
                     </div>

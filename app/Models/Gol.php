@@ -26,8 +26,12 @@ class Gol extends Model
         return $this->belongsTo(Utakmica::class);
     }
     
+    // app/Models/Gol.php
     public function igrac()
     {
+        if ($this->igrac_tip === 'protivnicki') {
+            return $this->belongsTo(ProtivnickiIgrac::class, 'igrac_id');
+        }
         return $this->belongsTo(Igrac::class);
     }
     
