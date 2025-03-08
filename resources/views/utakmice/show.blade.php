@@ -65,6 +65,100 @@
     </div>
 </div>
 
+<!-- Sastavi -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Sastavi timova</h5>
+        <div class="btn-group">
+            @php
+                // Dobavi glavni tim (izabrani tim)
+                $glavniTim = \App\Models\Tim::glavniTim()->first();
+                $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+                
+                // Proveri da li je domaći tim izabrani tim
+                $domaciJeIzabraniTim = $glavniTim && (
+                    $utakmica->domacin_id == $glavniTim->id || 
+                    in_array($utakmica->domacin_id, $glavniTimIds)
+                );
+            @endphp
+
+            @if($domaciJeIzabraniTim)
+                <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Domaćin
+                </a>
+                <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Gost
+                </a>
+            @else
+                <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Domaćin
+                </a>
+                <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Gost
+                </a>
+            @endif
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
+                @php
+                    $domaciSastav = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)->sortByDesc('starter');
+                    $domaciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->domacin_id);
+                    $imaDomacihIgraca = $domaciSastav->count() > 0 || $domaciProtivnickiIgraci->count() > 0;
+                @endphp
+                @if($imaDomacihIgraca)
+                    <ul class="list-unstyled">
+                        @foreach($domaciSastav as $sastav)
+                            <li class="py-1 {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
+                                {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
+                                @if(!$sastav->starter) <small>(rezerva)</small> @endif
+                            </li>
+                        @endforeach
+                        
+                        @foreach($domaciProtivnickiIgraci as $igrac)
+                            <li class="py-1 fw-bold">
+                                {{ $igrac->ime }} {{ $igrac->prezime }}
+                                @if($igrac->kapiten) <small>(k)</small> @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-center text-muted">Nema evidentiranih igrača za domaći tim.</p>
+                @endif
+            </div>
+            <div class="col-md-6">
+                <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
+                @php
+                    $gostujuciSastav = $utakmica->sastavi->where('tim_id', $utakmica->gost_id)->sortByDesc('starter');
+                    $gostujuciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->gost_id);
+                    $imaGostujucihIgraca = $gostujuciSastav->count() > 0 || $gostujuciProtivnickiIgraci->count() > 0;
+                @endphp
+                @if($imaGostujucihIgraca)
+                    <ul class="list-unstyled">
+                        @foreach($gostujuciSastav as $sastav)
+                            <li class="py-1 {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
+                                {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
+                                @if(!$sastav->starter) <small>(rezerva)</small> @endif
+                            </li>
+                        @endforeach
+                        
+                        @foreach($gostujuciProtivnickiIgraci as $igrac)
+                            <li class="py-1 fw-bold">
+                                {{ $igrac->ime }} {{ $igrac->prezime }}
+                                @if($igrac->kapiten) <small>(k)</small> @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-center text-muted">Nema evidentiranih igrača za gostujući tim.</p>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Golovi -->
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -205,94 +299,6 @@
 </div>
 
 <div class="row">
-    <!-- Sastavi -->
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Sastavi timova</h5>
-                <div class="btn-group">
-                @php
-                    // Dobavi glavni tim (izabrani tim)
-                    $glavniTim = \App\Models\Tim::glavniTim()->first();
-                    $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
-                    
-                    // Proveri da li je domaći tim izabrani tim
-                    $domaciJeIzabraniTim = $glavniTim && (
-                        $utakmica->domacin_id == $glavniTim->id || 
-                        in_array($utakmica->domacin_id, $glavniTimIds)
-                    );
-                @endphp
-
-                @if($domaciJeIzabraniTim)
-                    <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Domaćin
-                    </a>
-                    <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Gost
-                    </a>
-                @else
-                    <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Domaćin
-                    </a>
-                    <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Gost
-                    </a>
-                @endif
-                </div>
-            </div>
-            <div class="card-body">
-                <ul class="nav nav-tabs" id="sastaviTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="domacin-tab" data-bs-toggle="tab" data-bs-target="#domacin" type="button" role="tab">
-                            {{ $utakmica->domacin->naziv }}
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="gost-tab" data-bs-toggle="tab" data-bs-target="#gost" type="button" role="tab">
-                            {{ $utakmica->gost->naziv }}
-                        </button>
-                    </li>
-                </ul>
-                <div class="tab-content pt-3" id="sastaviTabContent">
-                    <div class="tab-pane fade show active" id="domacin" role="tabpanel">
-                        @php
-                            $domaciSastav = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)->sortByDesc('starter');
-                        @endphp
-                        @if($domaciSastav->count() > 0)
-                            <ul class="list-group">
-                                @foreach($domaciSastav as $sastav)
-                                    <li class="list-group-item {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                        {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
-                                        @if(!$sastav->starter) <small>(rezerva)</small> @endif
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <p class="text-center text-muted">Nema evidentiranih igrača za domaći tim.</p>
-                        @endif
-                    </div>
-                    <div class="tab-pane fade" id="gost" role="tabpanel">
-                        @php
-                            $gostujuciSastav = $utakmica->sastavi->where('tim_id', $utakmica->gost_id)->sortByDesc('starter');
-                        @endphp
-                        @if($gostujuciSastav->count() > 0)
-                            <ul class="list-group">
-                                @foreach($gostujuciSastav as $sastav)
-                                    <li class="list-group-item {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                        {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
-                                        @if(!$sastav->starter) <small>(rezerva)</small> @endif
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <p class="text-center text-muted">Nema evidentiranih igrača za gostujući tim.</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="col-md-6">
         <!-- Izmene -->
         <div class="card mb-4">
@@ -337,7 +343,9 @@
                 @endif
             </div>
         </div>
+    </div>
 
+    <div class="col-md-6">
         <!-- Kartoni -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
