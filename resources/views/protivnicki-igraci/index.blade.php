@@ -27,7 +27,11 @@
             <div class="col-md-4 text-center">
                 <div class="display-5">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
                 <div class="text-muted">{{ $utakmica->datum->format('d.m.Y') }}</div>
-                <div>{{ $utakmica->takmicenje->naziv }}</div>
+                <div>
+                    @if($utakmica->takmicenje)
+                        {{ $utakmica->takmicenje->naziv }}
+                    @endif
+                </div>
             </div>
             <div class="col-md-4">
                 <h5>{{ $utakmica->gost->naziv }}</h5>

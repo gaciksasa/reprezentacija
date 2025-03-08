@@ -59,7 +59,11 @@
                         @foreach($utakmice as $utakmica)
                             <tr>
                                 <td>{{ $utakmica->datum->format('d.m.Y') }}</td>
-                                <td>{{ $utakmica->takmicenje->naziv }}</td>
+                                <td>
+                                    @if($utakmica->takmicenje)
+                                        {{ $utakmica->takmicenje->naziv }}
+                                    @endif
+                                </td>
                                 <td>
                                     <a href="{{ route('timovi.show', $utakmica->domacin) }}">
                                         {{ $utakmica->domacin->naziv }}
