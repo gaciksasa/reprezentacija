@@ -89,20 +89,81 @@
                         <div class="col-md-6">
                             <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
                             <ul class="list-group">
-                            @foreach($utakmica->golovi as $gol)
-                                @if(($gol->tim_id == $utakmica->domacin_id && !$gol->auto_gol) || 
-                                    ($gol->tim_id == $utakmica->gost_id && $gol->auto_gol))
+                            @php
+                                // Predračunaj trenutni rezultat za svaki gol
+                                $domaciGolovi = 0;
+                                $gostGolovi = 0;
+                                $goloviSaRezultatom = [];
+                                
+                                foreach($utakmica->golovi->sortBy('minut') as $g) {
+                                    // Dodaj gol na odgovarajuću stranu
+                                    if ($g->auto_gol) {
+                                        // Autogol ide na stranu protivničkog tima
+                                        if ($g->tim_id == $utakmica->domacin_id) {
+                                            $gostGolovi++;
+                                        } else {
+                                            $domaciGolovi++;
+                                        }
+                                    } else {
+                                        // Regularan gol
+                                        if ($g->tim_id == $utakmica->domacin_id) {
+                                            $domaciGolovi++;
+                                        } else {
+                                            $gostGolovi++;
+                                        }
+                                    }
+                                    
+                                    // Sačuvaj trenutni rezultat za ovaj gol
+                                    $g->trenutni_rezultat = $domaciGolovi . '-' . $gostGolovi;
+                                }
+                            @endphp
+
+                            {{-- Golovi domaćeg tima (samo regularni, ne i autogolovi gostujućeg tima) --}}
+                            @foreach($utakmica->golovi->sortBy('minut') as $gol)
+                                @if($gol->tim_id == $utakmica->domacin_id)
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        @if($gol->igrac)
-                                            {{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}
-                                        @else
-                                            Unknown Player
-                                        @endif
-                                        <span class="badge bg-primary rounded-pill">
-                                            {{ $gol->minut }}'
-                                            @if($gol->penal) (P) @endif
-                                            @if($gol->auto_gol) (AG) @endif
-                                        </span>
+                                        <div>
+                                            <span class="text-muted">{{ $gol->minut }}' </span>
+                                            @if($gol->igrac)
+                                                @if($gol->penal)
+                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
+                                                @elseif($gol->auto_gol)
+                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
+                                                @else
+                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
+                                                @endif
+                                            @else
+                                                <strong>Nepoznat igrač</strong>
+                                            @endif
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                                    </li>
+                                @endif
+                            @endforeach
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
+                            <ul class="list-group">
+                            {{-- Golovi gostujućeg tima (samo regularni, ne i autogolovi domaćeg tima) --}}
+                            @foreach($utakmica->golovi->sortBy('minut') as $gol)
+                                @if($gol->tim_id == $utakmica->gost_id)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="text-muted">{{ $gol->minut }}' </span>
+                                            @if($gol->igrac)
+                                                @if($gol->penal)
+                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
+                                                @elseif($gol->auto_gol)
+                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
+                                                @else
+                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
+                                                @endif
+                                            @else
+                                                <strong>Nepoznat igrač</strong>
+                                            @endif
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
                                     </li>
                                 @endif
                             @endforeach
