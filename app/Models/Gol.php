@@ -45,14 +45,19 @@ class Gol extends Model
     {
         $opis = $this->minut . "' ";
         
-        if ($this->igrac) {
-            if ($this->igrac_tip === 'protivnicki') {
-                $opis .= $this->igrac->ime . ' ' . $this->igrac->prezime;
+        if ($this->igrac_tip === 'protivnicki') {
+            $protivnickiIgrac = ProtivnickiIgrac::find($this->igrac_id);
+            if ($protivnickiIgrac) {
+                $opis .= $protivnickiIgrac->ime . ' ' . $protivnickiIgrac->prezime;
             } else {
-                $opis .= $this->igrac->ime_prezime;
+                $opis .= "Nepoznat igrač";
             }
         } else {
-            $opis .= "Nepoznat igrač";
+            if ($this->igrac) {
+                $opis .= $this->igrac->ime_prezime;
+            } else {
+                $opis .= "Nepoznat igrač";
+            }
         }
         
         if ($this->penal) {
