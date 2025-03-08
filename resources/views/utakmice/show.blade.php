@@ -15,60 +15,30 @@
     </div>
 </div>
 
-<!-- Glavni prikaz utakmice -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row align-items-center">
-            <div class="col-4 text-center">
-                <a href="{{ route('timovi.show', $utakmica->domacin) }}">
-                    @if($utakmica->domacin && $utakmica->domacin->grb_url)
-                        <img src="{{ asset('storage/grbovi/' . $utakmica->domacin->grb_url) }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
-                    @endif
-                    <h4>{{ $utakmica->domacin->naziv }}</h4>
-                </a>
-            </div>
-            <div class="col-4 text-center">
-                <div class="display-1 fw-bold">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
-                <div class="text-muted">
-                    {{ $utakmica->poluvremenskiRezultat }}
-                </div>
-            </div>
-            <div class="col-4 text-center">
-                <a href="{{ route('timovi.show', $utakmica->gost) }}">
-                    @if($utakmica->gost && $utakmica->gost->grb_url)
-                        <img src="{{ asset('storage/grbovi/' . $utakmica->gost->grb_url) }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
-                    @endif
-                    <h4>{{ $utakmica->gost->naziv }}</h4>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Informacije o utakmici -->
 <div class="card mb-4">
     <div class="card-body">
         <div class="row">
             <div class="col-md-3">
-                <p><strong>Datum:</strong> {{ $utakmica->datum->format('d.m.Y') }}</p>
+                <strong>Datum:</strong> {{ $utakmica->datum->format('d.m.Y') }}
             </div>
             <div class="col-md-3">
-                <p><strong>Stadion:</strong> {{ $utakmica->stadion }}</p>
+                <strong>Stadion:</strong> {{ $utakmica->stadion }}
             </div>
             <div class="col-md-3">
-                <p><strong>Sudija:</strong> {{ $utakmica->sudija }}</p>
+                <strong>Sudija:</strong> {{ $utakmica->sudija }}
             </div>
             <div class="col-md-3">
-                <p><strong>Publika:</strong> {{ $utakmica->publika }}</p>
+                <strong>Publika:</strong> {{ $utakmica->publika }}
             </div>
         </div>
     </div>
 </div>
 
-<!-- Sastavi -->
+<!-- Glavni prikaz utakmice -->
 <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Sastavi timova</h5>
+<div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0"></h5>
         <div class="btn-group">
             @php
                 // Dobavi glavni tim (izabrani tim)
@@ -100,9 +70,34 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
+        <div class="row py-4 align-items-center">
+            <div class="col-4 text-center">
+                <a href="{{ route('timovi.show', $utakmica->domacin) }}">
+                    @if($utakmica->domacin && $utakmica->domacin->grb_url)
+                        <img src="{{ asset('storage/grbovi/' . $utakmica->domacin->grb_url) }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
+                    @endif
+                    <h4>{{ $utakmica->domacin->naziv }}</h4>
+                </a>
+            </div>
+            <div class="col-4 text-center">
+                <div class="display-3 fw-bold">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
+                <div class="text-muted">
+                    {{ $utakmica->poluvremenskiRezultat }}
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ route('timovi.show', $utakmica->gost) }}">
+                    @if($utakmica->gost && $utakmica->gost->grb_url)
+                        <img src="{{ asset('storage/grbovi/' . $utakmica->gost->grb_url) }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
+                    @endif
+                    <h4>{{ $utakmica->gost->naziv }}</h4>
+                </a>
+            </div>
+        </div>
+
+        <!-- Sastavi -->
+        <div class="row py-4 align-items-center">
+            <div class="col-4 text-end">
                 @php
                     $domaciSastav = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)->sortByDesc('starter');
                     $domaciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->domacin_id);
@@ -128,8 +123,8 @@
                     <p class="text-center text-muted">Nema evidentiranih igrača za domaći tim.</p>
                 @endif
             </div>
-            <div class="col-md-6">
-                <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
+            <div class="col-4"></div>
+            <div class="col-4">
                 @php
                     $gostujuciSastav = $utakmica->sastavi->where('tim_id', $utakmica->gost_id)->sortByDesc('starter');
                     $gostujuciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->gost_id);
