@@ -120,7 +120,7 @@
                         @foreach($domaciProtivnickiIgraci as $igrac)
                             <li class="py-1 fw-bold">
                                 {{ $igrac->ime }} {{ $igrac->prezime }}
-                                @if($igrac->kapiten) <small>(k)</small> @endif
+                                @if($igrac->kapiten) <small>(C)</small> @endif
                             </li>
                         @endforeach
                     </ul>
@@ -147,7 +147,7 @@
                         @foreach($gostujuciProtivnickiIgraci as $igrac)
                             <li class="py-1 fw-bold">
                                 {{ $igrac->ime }} {{ $igrac->prezime }}
-                                @if($igrac->kapiten) <small>(k)</small> @endif
+                                @if($igrac->kapiten) <small>(C)</small> @endif
                             </li>
                         @endforeach
                     </ul>
