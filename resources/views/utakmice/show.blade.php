@@ -4,7 +4,13 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3>{{ $utakmica->takmicenje->naziv }}</h3>
+    <h3>
+        <td>
+            @if($utakmica->takmicenje)
+                {{ $utakmica->takmicenje->naziv }}
+            @endif
+        </td>
+    </h3>
     <div>
         <a href="{{ route('utakmice.edit', $utakmica) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
