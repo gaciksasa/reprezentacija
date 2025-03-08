@@ -59,14 +59,14 @@
                 <select class="form-select @error('igrac_id') is-invalid @enderror" 
                         id="igrac_id" name="igrac_id" required>
                     <option value="">-- Izaberite igrača --</option>
-                    <optgroup label="{{ $utakmica->domacin->naziv }}">
+                    <optgroup label="{{ $utakmica->domacin->naziv }}" data-team-id="{{ $utakmica->domacin_id }}">
                         @foreach($igraciDomacina as $igrac)
                             <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
                                 {{ $igrac->ime }} {{ $igrac->prezime }}
                             </option>
                         @endforeach
                     </optgroup>
-                    <optgroup label="{{ $utakmica->gost->naziv }}">
+                    <optgroup label="{{ $utakmica->gost->naziv }}" data-team-id="{{ $utakmica->gost_id }}">
                         @foreach($igraciGosta as $igrac)
                             <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
                                 {{ $igrac->ime }} {{ $igrac->prezime }}
@@ -108,19 +108,38 @@
 
 @section('scripts')
 <script>
-    // Dinamički ažurira listu igrača prema izabranom timu
-    document.getElementById('tim_id').addEventListener('change', function() {
-        const timId = this.value;
+    // Funkcija za filtriranje igrača na osnovu izabranog tima
+    function filterPlayersByTeam() {
+        const timId = document.getElementById('tim_id').value;
         const igracSelect = document.getElementById('igrac_id');
         
-        // Sakrij sve opcije i zatim prikaži samo one koje pripadaju izabranom timu
-        Array.from(igracSelect.options).forEach(option => {
-            if (option.parentElement.tagName === 'OPTGROUP') {
-                option.style.display = option.parentElement.label === 
-                    (timId == {{ $utakmica->domacin_id }} ? '{{ $utakmica->domacin->naziv }}' : '{{ $utakmica->gost->naziv }}') 
-                    ? '' : 'none';
+        // Ako tim nije izabran, sakrijemo sve opcije
+        if (!timId) {
+            for (const optgroup of igracSelect.querySelectorAll('optgroup')) {
+                optgroup.style.display = 'none';
             }
-        });
+            return;
+        }
+        
+        // Prikažemo samo optgroupu tima koji je izabran
+        for (const optgroup of igracSelect.querySelectorAll('optgroup')) {
+            if (optgroup.getAttribute('data-team-id') === timId) {
+                optgroup.style.display = '';
+            } else {
+                optgroup.style.display = 'none';
+            }
+        }
+        
+        // Resetujemo izabranog igrača
+        igracSelect.value = '';
+    }
+    
+    // Pozivamo funkciju inicijalno
+    document.addEventListener('DOMContentLoaded', function() {
+        filterPlayersByTeam();
+        
+        // Dodajemo event listener za promenu tima
+        document.getElementById('tim_id').addEventListener('change', filterPlayersByTeam);
     });
 </script>
 @endsection

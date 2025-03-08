@@ -6,6 +6,7 @@ use App\Models\Gol;
 use App\Models\Utakmica;
 use App\Models\Tim;
 use App\Models\Igrac;
+use App\Models\ProtivnickiIgrac;
 use Illuminate\Http\Request;
 
 class GoloviController extends Controller
@@ -47,39 +48,128 @@ class GoloviController extends Controller
                 ->with('error', 'Morate izabrati utakmicu.');
         }
         
-        $utakmica = Utakmica::with(['domacin', 'gost'])->findOrFail($utakmica_id);
+        $utakmica = Utakmica::with(['domacin', 'gost', 'sastavi.igrac'])->findOrFail($utakmica_id);
         $timovi = [$utakmica->domacin, $utakmica->gost];
         
-        // Igrači oba tima koji su u sastavu ove utakmice
-        $igraciDomacina = Igrac::where('tim_id', $utakmica->domacin_id)->orderBy('prezime')->get();
-        $igraciGosta = Igrac::where('tim_id', $utakmica->gost_id)->orderBy('prezime')->get();
+        // Dobavljanje samo igrača koji su u sastavu
+        $igraciDomacina = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)
+            ->map(function($sastav) {
+                return $sastav->igrac;
+            })->sortBy('prezime')->values();
+        
+        $igraciGosta = $utakmica->sastavi->where('tim_id', $utakmica->gost_id)
+            ->map(function($sastav) {
+                return $sastav->igrac;
+            })->sortBy('prezime')->values();
+        
+        // Ako nema igrača u sastavima, koristimo standardni pristup
+        if ($igraciDomacina->isEmpty()) {
+            $igraciDomacina = Igrac::where('tim_id', $utakmica->domacin_id)->orderBy('prezime')->get();
+        }
+        
+        if ($igraciGosta->isEmpty()) {
+            $igraciGosta = Igrac::where('tim_id', $utakmica->gost_id)->orderBy('prezime')->get();
+        }
+        
+        // Dobavljanje glavnog tima za proveru
+        $glavniTim = Tim::glavniTim()->first();
+        $glavniTimId = $glavniTim ? $glavniTim->id : null;
+        
+        // Dobavljanje protivničkih igrača takođe
+        $protivnickiIgraciDomacina = [];
+        $protivnickiIgraciGosta = [];
+        
+        // Ako je domaćin protivnički tim, dohvati njihove igrače iz protivničkih igrača
+        if ($utakmica->domacin_id != $glavniTimId) {
+            $protivnickiIgraciDomacina = ProtivnickiIgrac::where('utakmica_id', $utakmica_id)
+                ->where('tim_id', $utakmica->domacin_id)
+                ->get();
+            
+            // Spoji ih sa regularnim igračima ako ih ima
+            if ($protivnickiIgraciDomacina->count() > 0 && $igraciDomacina instanceof \Illuminate\Support\Collection) {
+                foreach ($protivnickiIgraciDomacina as $protivnickiIgrac) {
+                    // Kreiraj virtualni objekat igrača
+                    $virtualniIgrac = new \stdClass();
+                    $virtualniIgrac->id = 'pi_' . $protivnickiIgrac->id; // Prefiks za identifikaciju
+                    $virtualniIgrac->ime = $protivnickiIgrac->ime;
+                    $virtualniIgrac->prezime = $protivnickiIgrac->prezime;
+                    $virtualniIgrac->je_protivnicki = true;
+                    
+                    $igraciDomacina->push($virtualniIgrac);
+                }
+            }
+        }
+        
+        // Isto za gostujući tim
+        if ($utakmica->gost_id != $glavniTimId) {
+            $protivnickiIgraciGosta = ProtivnickiIgrac::where('utakmica_id', $utakmica_id)
+                ->where('tim_id', $utakmica->gost_id)
+                ->get();
+            
+            // Spoji ih sa regularnim igračima ako ih ima
+            if ($protivnickiIgraciGosta->count() > 0 && $igraciGosta instanceof \Illuminate\Support\Collection) {
+                foreach ($protivnickiIgraciGosta as $protivnickiIgrac) {
+                    // Kreiraj virtualni objekat igrača
+                    $virtualniIgrac = new \stdClass();
+                    $virtualniIgrac->id = 'pi_' . $protivnickiIgrac->id; // Prefiks za identifikaciju
+                    $virtualniIgrac->ime = $protivnickiIgrac->ime;
+                    $virtualniIgrac->prezime = $protivnickiIgrac->prezime;
+                    $virtualniIgrac->je_protivnicki = true;
+                    
+                    $igraciGosta->push($virtualniIgrac);
+                }
+            }
+        }
         
         return view('golovi.create', compact('utakmica', 'timovi', 'igraciDomacina', 'igraciGosta'));
     }
 
-    /**
-     * Čuvanje novog gola.
-     */
     public function store(Request $request)
     {
+        // Provera da li je protivnički igrač
+        $igracId = $request->input('igrac_id');
+        $isProtivnicki = false;
+        
+        // Ako ID počinje sa "pi_", to je protivnički igrač
+        if (strpos($igracId, 'pi_') === 0) {
+            $isProtivnicki = true;
+            $igracId = (int)substr($igracId, 3); // Uzimamo samo broj
+        }
+        
         $validated = $request->validate([
             'utakmica_id' => 'required|exists:utakmice,id',
-            'igrac_id' => 'required|exists:igraci,id',
             'tim_id' => 'required|exists:timovi,id',
             'minut' => 'required|integer|min:1|max:120',
-            'penal' => 'boolean',
-            'auto_gol' => 'boolean',
         ]);
-
-        // Postavljanje podrazumevanih vrednosti
+        
+        // Dodajemo obrađene podatke
+        $validated['igrac_id'] = $igracId;
+        $validated['igrac_tip'] = $isProtivnicki ? 'protivnicki' : 'regularni';
         $validated['penal'] = $request->has('penal');
         $validated['auto_gol'] = $request->has('auto_gol');
-
+        
+        // Proveravamo da li ID igrača postoji u odgovarajućoj tabeli
+        if ($isProtivnicki) {
+            $igracPostoji = ProtivnickiIgrac::where('id', $igracId)
+                                        ->where('utakmica_id', $validated['utakmica_id'])
+                                        ->exists();
+            if (!$igracPostoji) {
+                return back()->withErrors(['igrac_id' => 'Izabrani protivnički igrač ne postoji.'])
+                            ->withInput();
+            }
+        } else {
+            $igracPostoji = Igrac::where('id', $igracId)->exists();
+            if (!$igracPostoji) {
+                return back()->withErrors(['igrac_id' => 'Izabrani igrač ne postoji.'])
+                            ->withInput();
+            }
+        }
+        
         Gol::create($validated);
-
+        
         // Ažuriranje rezultata utakmice
         $this->updateUtakmicaRezultat($validated['utakmica_id']);
-
+        
         return redirect()->route('golovi.index', ['utakmica_id' => $validated['utakmica_id']])
             ->with('success', 'Gol uspešno zabeležen.');
     }
@@ -103,8 +193,30 @@ class GoloviController extends Controller
         $utakmica = $gol->utakmica;
         $timovi = [$utakmica->domacin, $utakmica->gost];
         
-        $igraciDomacina = Igrac::where('tim_id', $utakmica->domacin_id)->orderBy('prezime')->get();
-        $igraciGosta = Igrac::where('tim_id', $utakmica->gost_id)->orderBy('prezime')->get();
+        // Dobavljanje igrača koji su u sastavu
+        $sastaviDomacina = $utakmica->sastavi()->where('tim_id', $utakmica->domacin_id)->pluck('igrac_id')->toArray();
+        $sastaviGosta = $utakmica->sastavi()->where('tim_id', $utakmica->gost_id)->pluck('igrac_id')->toArray();
+        
+        if (!empty($sastaviDomacina)) {
+            $igraciDomacina = Igrac::whereIn('id', $sastaviDomacina)->orderBy('prezime')->get();
+        } else {
+            $igraciDomacina = Igrac::where('tim_id', $utakmica->domacin_id)->orderBy('prezime')->get();
+        }
+        
+        if (!empty($sastaviGosta)) {
+            $igraciGosta = Igrac::whereIn('id', $sastaviGosta)->orderBy('prezime')->get();
+        } else {
+            $igraciGosta = Igrac::where('tim_id', $utakmica->gost_id)->orderBy('prezime')->get();
+        }
+        
+        // Dodajemo trenutnog igrača koji je dao gol, ako slučajno nije u sastavu
+        $currentPlayerId = $gol->igrac_id;
+        
+        if ($gol->tim_id == $utakmica->domacin_id && !$igraciDomacina->contains('id', $currentPlayerId)) {
+            $igraciDomacina->push(Igrac::find($currentPlayerId));
+        } elseif ($gol->tim_id == $utakmica->gost_id && !$igraciGosta->contains('id', $currentPlayerId)) {
+            $igraciGosta->push(Igrac::find($currentPlayerId));
+        }
         
         return view('golovi.edit', compact('gol', 'utakmica', 'timovi', 'igraciDomacina', 'igraciGosta'));
     }

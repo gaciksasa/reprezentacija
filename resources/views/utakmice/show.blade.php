@@ -26,7 +26,7 @@
                     <div class="col-4 text-center">
                         <a href="{{ route('timovi.show', $utakmica->domacin) }}">
                             @if($utakmica->domacin && $utakmica->domacin->grb_url)
-                                <img src="{{ $utakmica->domacin->grb_url }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2 img-fluid mb-2" style="max-height: 80px;">
+                                <img src="{{ grb_url($utakmica->domacin->grb_url) }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2" style="max-height: 80px;">
                             @endif
                             <h4>{{ $utakmica->domacin ? $utakmica->domacin->naziv : 'Nepoznat tim' }}</h4>
                         </a>
@@ -42,7 +42,7 @@
                     <div class="col-4 text-center">
                         <a href="{{ route('timovi.show', $utakmica->gost) }}">
                             @if($utakmica->gost && $utakmica->gost->grb_url)
-                                <img src="{{ $utakmica->gost->grb_url }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 80px;">
+                                <img src="{{ grb_url($utakmica->gost->grb_url) }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 80px;">
                             @endif
                             <h4>{{ $utakmica->gost ? $utakmica->gost->naziv : 'Nepoznat tim' }}</h4>
                         </a>

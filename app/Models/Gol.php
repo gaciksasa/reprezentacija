@@ -12,7 +12,7 @@ class Gol extends Model
     protected $table = 'golovi';
     
     protected $fillable = [
-        'utakmica_id', 'igrac_id', 'minut', 'tim_id', 'penal', 'auto_gol'
+        'utakmica_id', 'igrac_id', 'igrac_tip', 'minut', 'tim_id', 'penal', 'auto_gol'
     ];
     
     protected $casts = [
