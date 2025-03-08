@@ -12,7 +12,7 @@ class Igrac extends Model
     protected $table = 'igraci';
     
     protected $fillable = [
-        'ime', 'prezime', 'tim_id', 'pozicija', 
+        'ime', 'prezime', 'pozicija', 
         'datum_rodjenja', 'mesto_rodjenja', 'datum_smrti', 'mesto_smrti',
         'biografija', 'fotografija_path', 'aktivan'
     ];
@@ -26,9 +26,10 @@ class Igrac extends Model
     ];
     
     // Relationships
+
     public function tim()
     {
-        return $this->belongsTo(Tim::class);
+        return Tim::glavniTim()->first();
     }
 
     public function bivsiKlubovi()
@@ -43,7 +44,10 @@ class Igrac extends Model
     
     public function golovi()
     {
-        return $this->hasMany(Gol::class);
+        return $this->hasMany(Gol::class)->where(function($query) {
+            $query->where('igrac_tip', 'regularni')
+                  ->orWhereNull('igrac_tip');
+        });
     }
     
     public function izmeneIzlazne()

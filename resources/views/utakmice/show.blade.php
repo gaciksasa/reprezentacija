@@ -221,13 +221,16 @@
                                         @endif
                                     @else
                                         {{-- Prikazujemo regularnog igrača --}}
-                                        @if($gol->igrac)
+                                        @php
+                                            $regularniIgrac = \App\Models\Igrac::find($gol->igrac_id);
+                                        @endphp
+                                        @if($regularniIgrac)
                                             @if($gol->penal)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
+                                                <strong>{{ $regularniIgrac->ime }} {{ $regularniIgrac->prezime }}</strong> (p)
                                             @elseif($gol->auto_gol)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
+                                                <strong>{{ $regularniIgrac->ime }} {{ $regularniIgrac->prezime }}</strong> (ag)
                                             @else
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
+                                                <strong>{{ $regularniIgrac->ime }} {{ $regularniIgrac->prezime }}</strong>
                                             @endif
                                         @else
                                             <strong>Nepoznat igrač</strong>
@@ -267,13 +270,16 @@
                                         @endif
                                     @else
                                         {{-- Prikazujemo regularnog igrača --}}
-                                        @if($gol->igrac)
+                                        @php
+                                            $regularniIgrac = \App\Models\Igrac::find($gol->igrac_id);
+                                        @endphp
+                                        @if($regularniIgrac)
                                             @if($gol->penal)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
+                                                <strong>{{ $regularniIgrac->ime }} {{ $regularniIgrac->prezime }}</strong> (p)
                                             @elseif($gol->auto_gol)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
+                                                <strong>{{ $regularniIgrac->ime }} {{ $regularniIgrac->prezime }}</strong> (ag)
                                             @else
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
+                                                <strong>{{ $regularniIgrac->ime }} {{ $regularniIgrac->prezime }}</strong>
                                             @endif
                                         @else
                                             <strong>Nepoznat igrač</strong>

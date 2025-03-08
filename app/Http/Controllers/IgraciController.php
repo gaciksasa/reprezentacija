@@ -16,7 +16,7 @@ class IgraciController extends Controller
     public function index(Request $request)
     {
         // Start with a base query
-        $query = Igrac::with('tim');
+        $query = Igrac::query();
         
         // Apply search filter
         if ($request->has('search') && !empty($request->search)) {
@@ -86,8 +86,8 @@ class IgraciController extends Controller
         // Order by player's last name
         $query->orderBy('prezime')->orderBy('ime');
         
-        // Get paginated results
-        $igraci = $query->paginate(50)->withQueryString();
+        // Get ALL players without pagination
+        $igraci = $query->get();
         
         return view('igraci.index', compact('igraci'));
     }
@@ -165,7 +165,7 @@ class IgraciController extends Controller
      */
     public function show(Igrac $igrac)
     {
-        $igrac->load(['tim', 'golovi.utakmica', 'kartoni.utakmica', 'bivsiKlubovi']);
+        $igrac->load(['golovi.utakmica', 'kartoni.utakmica', 'bivsiKlubovi']);
         return view('igraci.show', compact('igrac'));
     }
 

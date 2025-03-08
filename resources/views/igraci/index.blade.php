@@ -129,10 +129,6 @@
             </table>
         </div>
         
-        <div class="d-flex justify-content-center mt-4">
-            {{ $igraci->links() }}
-        </div>
-        
         <div class="mt-3 text-center">
             <p class="small text-muted">
                 <span class="text-warning">★</span> Aktivan igrač / Active player
@@ -140,4 +136,89 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dohvati sve alfabet linkove
+            const alfabetLinks = document.querySelectorAll('.mb-3.text-center a.btn-sm');
+            
+            // Dodaj event listener na svaki link
+            alfabetLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault(); // Sprečava standardno ponašanje linka
+                    
+                    const slovo = this.textContent; // Dobija slovo na koje je kliknuto
+                    
+                    // Ako je već aktivan link, ne radimo ništa (ostajemo na istom filteru)
+                    if (this.classList.contains('btn-primary')) {
+                        return;
+                    }
+                    
+                    // Resetuj sve linkove na outline stil
+                    alfabetLinks.forEach(l => {
+                        l.classList.remove('btn-primary');
+                        l.classList.add('btn-outline-secondary');
+                    });
+                    
+                    // Označi trenutni link kao aktivan
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('btn-primary');
+                    
+                    // Filtriraj igrače
+                    filterByFirstLetter(slovo);
+                });
+            });
+            
+            // Po učitavanju stranice, automatski klikni na slovo "A"
+            const slovoA = document.querySelector('.mb-3.text-center a.btn-sm[href="#A"]');
+            if (slovoA) {
+                slovoA.click();
+            }
+            
+            // Funkcija za filtriranje igrača po prvom slovu prezimena
+            function filterByFirstLetter(slovo) {
+                // Dohvati sve redove igrača (tr elementi u tbody)
+                const igraciRedovi = document.querySelectorAll('table.table tbody tr');
+                
+                // Prolazi kroz sve redove
+                igraciRedovi.forEach(red => {
+                    // Proveri da li je prvi red koji ima prezime
+                    if (red.querySelector('td:first-child a .text-danger')) {
+                        // Dohvati tekst prezimena
+                        const prezimeTekst = red.querySelector('td:first-child a .text-danger').textContent;
+                        // Izdvoji prezime (pre razmaka)
+                        const prezime = prezimeTekst.split(' ')[0];
+                        // Proveri da li prezime počinje sa traženim slovom
+                        if (prezime.toUpperCase().startsWith(slovo)) {
+                            red.style.display = ''; // Prikaži red
+                        } else {
+                            red.style.display = 'none'; // Sakrij red
+                        }
+                    } else if (red.cells.length === 1 && red.cells[0].id === slovo) {
+                        // Ovo je zaglavlje slova (npr. red koji sadrži samo "A")
+                        red.style.display = ''; // Prikaži red
+                    } else if (red.cells.length === 1 && red.cells[0].id) {
+                        // Ovo je zaglavlje nekog drugog slova
+                        red.style.display = 'none'; // Sakrij red
+                    }
+                });
+                
+                // Ukloni element za paginaciju ako postoji
+                const paginacija = document.querySelector('.d-flex.justify-content-center.mt-4');
+                if (paginacija) {
+                    paginacija.style.display = 'none';
+                }
+            }
+            
+            // Funkcija za resetovanje filtera - prikazuje sve igrače
+            function resetFilter() {
+                const igraciRedovi = document.querySelectorAll('table.table tbody tr');
+                igraciRedovi.forEach(red => {
+                    red.style.display = ''; // Prikaži sve redove
+                });
+            }
+        });
+    </script>
 @endsection

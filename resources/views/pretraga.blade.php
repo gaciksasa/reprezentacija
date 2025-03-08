@@ -65,7 +65,6 @@
                                         <small>({{ $igrac->pozicija }})</small>
                                     @endif
                                 </div>
-                                <span class="badge bg-info rounded-pill">{{ $igrac->tim->naziv }}</span>
                             </div>
                         </a>
                     @endforeach

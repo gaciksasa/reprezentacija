@@ -26,13 +26,13 @@ class Gol extends Model
         return $this->belongsTo(Utakmica::class);
     }
     
-    // app/Models/Gol.php
+    // Ažurirana relacija za igrača koja razlikuje tipove igrača
     public function igrac()
     {
         if ($this->igrac_tip === 'protivnicki') {
             return $this->belongsTo(ProtivnickiIgrac::class, 'igrac_id');
         }
-        return $this->belongsTo(Igrac::class);
+        return $this->belongsTo(Igrac::class, 'igrac_id');
     }
     
     public function tim()
@@ -43,7 +43,17 @@ class Gol extends Model
     // Atributi
     public function getOpisAttribute()
     {
-        $opis = $this->minut . "' " . $this->igrac->ime_prezime;
+        $opis = $this->minut . "' ";
+        
+        if ($this->igrac) {
+            if ($this->igrac_tip === 'protivnicki') {
+                $opis .= $this->igrac->ime . ' ' . $this->igrac->prezime;
+            } else {
+                $opis .= $this->igrac->ime_prezime;
+            }
+        } else {
+            $opis .= "Nepoznat igrač";
+        }
         
         if ($this->penal) {
             $opis .= ' (p)';

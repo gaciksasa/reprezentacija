@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>{{ $igrac->ime }} {{ $igrac->prezime }}</h1>
+    <h1>{{ $igrac->prezime }} {{ $igrac->ime }}</h1>
     <div>
         <a href="{{ route('igraci.edit', $igrac) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
@@ -25,7 +25,7 @@
                 <div class="row">
                 @if($igrac->fotografija_path)
                 <div class="mb-4">
-                    <img src="{{ asset('storage/' . $igrac->fotografija_path) }}" alt="{{ $igrac->ime }} {{ $igrac->prezime }}" 
+                    <img src="{{ asset('storage/' . $igrac->fotografija_path) }}" alt="{{ $igrac->prezime }} {{ $igrac->ime }}" 
                          class="img-fluid rounded">
                 </div>
                 @else
@@ -38,16 +38,8 @@
 
                 <table class="table">
                     <tr>
-                        <th>Ime i prezime</th>
-                        <td>{{ $igrac->ime }} {{ $igrac->prezime }}</td>
-                    </tr>
-                    <tr>
-                        <th>Tim</th>
-                        <td>
-                            <a href="{{ route('timovi.show', $igrac->tim) }}">
-                                {{ $igrac->tim->naziv }}
-                            </a>
-                        </td>
+                        <th>Prezime i ime</th>
+                        <td>{{ $igrac->prezime }} {{ $igrac->ime }}</td>
                     </tr>
                     <tr>
                         <th>Pozicija</th>
@@ -68,7 +60,7 @@
                     <tr>
                         <th>Trenutni klub</th>
                         <td>
-                            @if($igrac->trenutniKlub)
+                            @if(isset($igrac->trenutniKlub) && $igrac->trenutniKlub)
                                 {{ $igrac->trenutniKlub->klub }}
                                 @if($igrac->trenutniKlub->drzava_kluba)
                                     <small>({{ $igrac->trenutniKlub->drzava_kluba }})</small>
@@ -205,15 +197,23 @@
                                     <tbody>
                                         @foreach($igrac->sastavi->sortByDesc('utakmica.datum') as $sastav)
                                         <tr>
-                                            <td>{{ $sastav->utakmica->datum->format('d.m.Y') }}</td>
+                                            <td>{{ $sastav->utakmica ? $sastav->utakmica->datum->format('d.m.Y') : '-' }}</td>
                                             <td>
-                                                <a href="{{ route('utakmice.show', $sastav->utakmica) }}">
-                                                    {{ $sastav->utakmica->domacin->naziv }} 
-                                                    {{ $sastav->utakmica->rezultat_domacin }}-{{ $sastav->utakmica->rezultat_gost }} 
-                                                    {{ $sastav->utakmica->gost->naziv }}
-                                                </a>
+                                                @if($sastav->utakmica)
+                                                    <a href="{{ route('utakmice.show', $sastav->utakmica) }}">
+                                                        @php
+                                                            $domacin = $sastav->utakmica->domacin_id ? \App\Models\Tim::find($sastav->utakmica->domacin_id) : null;
+                                                            $gost = $sastav->utakmica->gost_id ? \App\Models\Tim::find($sastav->utakmica->gost_id) : null;
+                                                        @endphp
+                                                        {{ $domacin ? $domacin->naziv : '?' }} 
+                                                        {{ $sastav->utakmica->rezultat_domacin }}-{{ $sastav->utakmica->rezultat_gost }} 
+                                                        {{ $gost ? $gost->naziv : '?' }}
+                                                    </a>
+                                                @else
+                                                    -
+                                                @endif
                                             </td>
-                                            <td>{{ $sastav->utakmica->takmicenje->naziv }}</td>
+                                            <td>{{ $sastav->utakmica && $sastav->utakmica->takmicenje ? $sastav->utakmica->takmicenje->naziv : '-' }}</td>
                                             <td>
                                                 @if($sastav->starter)
                                                     <span class="badge bg-success">Starter</span>
@@ -246,13 +246,21 @@
                                     <tbody>
                                         @foreach($igrac->golovi->sortByDesc('utakmica.datum') as $gol)
                                         <tr>
-                                            <td>{{ $gol->utakmica->datum->format('d.m.Y') }}</td>
+                                            <td>{{ $gol->utakmica ? $gol->utakmica->datum->format('d.m.Y') : '-' }}</td>
                                             <td>
-                                                <a href="{{ route('utakmice.show', $gol->utakmica) }}">
-                                                    {{ $gol->utakmica->domacin->naziv }} 
-                                                    {{ $gol->utakmica->rezultat_domacin }}-{{ $gol->utakmica->rezultat_gost }} 
-                                                    {{ $gol->utakmica->gost->naziv }}
-                                                </a>
+                                                @if($gol->utakmica)
+                                                    <a href="{{ route('utakmice.show', $gol->utakmica) }}">
+                                                        @php
+                                                            $domacin = $gol->utakmica->domacin_id ? \App\Models\Tim::find($gol->utakmica->domacin_id) : null;
+                                                            $gost = $gol->utakmica->gost_id ? \App\Models\Tim::find($gol->utakmica->gost_id) : null;
+                                                        @endphp
+                                                        {{ $domacin ? $domacin->naziv : '?' }} 
+                                                        {{ $gol->utakmica->rezultat_domacin }}-{{ $gol->utakmica->rezultat_gost }} 
+                                                        {{ $gost ? $gost->naziv : '?' }}
+                                                    </a>
+                                                @else
+                                                    -
+                                                @endif
                                             </td>
                                             <td>{{ $gol->minut }}′</td>
                                             <td>
@@ -289,13 +297,21 @@
                                     <tbody>
                                         @foreach($igrac->kartoni->sortByDesc('utakmica.datum') as $karton)
                                         <tr>
-                                            <td>{{ $karton->utakmica->datum->format('d.m.Y') }}</td>
+                                            <td>{{ $karton->utakmica ? $karton->utakmica->datum->format('d.m.Y') : '-' }}</td>
                                             <td>
-                                                <a href="{{ route('utakmice.show', $karton->utakmica) }}">
-                                                    {{ $karton->utakmica->domacin->naziv }} 
-                                                    {{ $karton->utakmica->rezultat_domacin }}-{{ $karton->utakmica->rezultat_gost }} 
-                                                    {{ $karton->utakmica->gost->naziv }}
-                                                </a>
+                                                @if($karton->utakmica)
+                                                    <a href="{{ route('utakmice.show', $karton->utakmica) }}">
+                                                        @php
+                                                            $domacin = $karton->utakmica->domacin_id ? \App\Models\Tim::find($karton->utakmica->domacin_id) : null;
+                                                            $gost = $karton->utakmica->gost_id ? \App\Models\Tim::find($karton->utakmica->gost_id) : null;
+                                                        @endphp
+                                                        {{ $domacin ? $domacin->naziv : '?' }} 
+                                                        {{ $karton->utakmica->rezultat_domacin }}-{{ $karton->utakmica->rezultat_gost }} 
+                                                        {{ $gost ? $gost->naziv : '?' }}
+                                                    </a>
+                                                @else
+                                                    -
+                                                @endif
                                             </td>
                                             <td>{{ $karton->minut }}′</td>
                                             <td>

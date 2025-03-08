@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('pozicija')->nullable();
             $table->string('fotografija_path')->nullable();
             $table->string('biografija')->nullable();
-            $table->foreignId('tim_id')->nullable()->constrained('timovi');
             $table->date('datum_rodjenja')->nullable();
             $table->string('mesto_rodjenja')->nullable();
             $table->date('datum_smrti')->nullable();
