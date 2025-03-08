@@ -62,7 +62,11 @@
                             </div>
                             <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
                         </div>
-                        <small class="text-muted">{{ $utakmica->takmicenje->naziv }}</small>
+                        <small class="text-muted">
+                            @if($utakmica->takmicenje)
+                                {{ $utakmica->takmicenje->naziv }}
+                            @endif
+                        </small>
                     </a>
                     @endforeach
                 </div>
