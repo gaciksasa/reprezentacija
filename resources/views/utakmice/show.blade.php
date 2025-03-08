@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Detalji utakmice</h1>
+    <h3>{{ $utakmica->takmicenje->naziv }}</h3>
     <div>
         <a href="{{ route('utakmice.edit', $utakmica) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
@@ -15,170 +15,162 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">{{ $utakmica->takmicenje->naziv }}</h5>
-            </div>
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-4 text-center">
-                        <a href="{{ route('timovi.show', $utakmica->domacin) }}">
-                            @if($utakmica->domacin && $utakmica->domacin->grb_url)
-                                <img src="{{ grb_url($utakmica->domacin->grb_url) }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2" style="max-height: 80px;">
-                            @endif
-                            <h4>{{ $utakmica->domacin ? $utakmica->domacin->naziv : 'Nepoznat tim' }}</h4>
-                        </a>
-                    </div>
-                    <div class="col-4 text-center">
-                        <div class="display-4 fw-bold">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
-                        @if($utakmica->poluvreme_rezultat_domacin !== null && $utakmica->poluvreme_rezultat_gost !== null)
-                            <div class="text-muted">
-                                ({{ $utakmica->poluvreme_rezultat_domacin }} - {{ $utakmica->poluvreme_rezultat_gost }})
-                            </div>
-                        @endif
-                    </div>
-                    <div class="col-4 text-center">
-                        <a href="{{ route('timovi.show', $utakmica->gost) }}">
-                            @if($utakmica->gost && $utakmica->gost->grb_url)
-                                <img src="{{ grb_url($utakmica->gost->grb_url) }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 80px;">
-                            @endif
-                            <h4>{{ $utakmica->gost ? $utakmica->gost->naziv : 'Nepoznat tim' }}</h4>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Datum:</strong> {{ $utakmica->datum->format('d.m.Y') }}</p>
-                        @if($utakmica->vreme)
-                            <p><strong>Vreme:</strong> {{ $utakmica->vreme->format('H:i') }}</p>
-                        @endif
-                        @if($utakmica->stadion)
-                            <p><strong>Stadion:</strong> {{ $utakmica->stadion->naziv }}, {{ $utakmica->stadion->grad }}</p>
-                        @endif
-                    </div>
-                    <div class="col-md-6">
-                        @if($utakmica->sudija)
-                            <p><strong>Sudija:</strong> {{ $utakmica->sudija->ime }} {{ $utakmica->sudija->prezime }}</p>
-                        @endif
-                        @if($utakmica->publika)
-                            <p><strong>Publika:</strong> {{ $utakmica->publika }}</p>
-                        @endif
-                        @if($utakmica->sezona)
-                            <p><strong>Sezona:</strong> {{ $utakmica->sezona }}</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Golovi -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Golovi</h5>
-                <a href="{{ route('golovi.create', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Dodaj
+<!-- Glavni prikaz utakmice -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-4 text-center">
+                <a href="{{ route('timovi.show', $utakmica->domacin) }}">
+                    @if($utakmica->domacin && $utakmica->domacin->grb_url)
+                        <img src="{{ asset('storage/grbovi/' . $utakmica->domacin->grb_url) }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
+                    @endif
+                    <h4>{{ $utakmica->domacin->naziv }}</h4>
                 </a>
             </div>
-            <div class="card-body">
-                @if($utakmica->golovi->count() > 0)
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
-                            <ul class="list-group">
-                            @php
-                                // Predračunaj trenutni rezultat za svaki gol
-                                $domaciGolovi = 0;
-                                $gostGolovi = 0;
-                                $goloviSaRezultatom = [];
-                                
-                                foreach($utakmica->golovi->sortBy('minut') as $g) {
-                                    // Dodaj gol na odgovarajuću stranu
-                                    if ($g->auto_gol) {
-                                        // Autogol ide na stranu protivničkog tima
-                                        if ($g->tim_id == $utakmica->domacin_id) {
-                                            $gostGolovi++;
-                                        } else {
-                                            $domaciGolovi++;
-                                        }
-                                    } else {
-                                        // Regularan gol
-                                        if ($g->tim_id == $utakmica->domacin_id) {
-                                            $domaciGolovi++;
-                                        } else {
-                                            $gostGolovi++;
-                                        }
-                                    }
-                                    
-                                    // Sačuvaj trenutni rezultat za ovaj gol
-                                    $g->trenutni_rezultat = $domaciGolovi . '-' . $gostGolovi;
-                                }
-                            @endphp
-
-                            {{-- Golovi domaćeg tima (samo regularni, ne i autogolovi gostujućeg tima) --}}
-                            @foreach($utakmica->golovi->sortBy('minut') as $gol)
-                                @if($gol->tim_id == $utakmica->domacin_id)
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="text-muted">{{ $gol->minut }}' </span>
-                                            @if($gol->igrac)
-                                                @if($gol->penal)
-                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
-                                                @elseif($gol->auto_gol)
-                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
-                                                @else
-                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
-                                                @endif
-                                            @else
-                                                <strong>Nepoznat igrač</strong>
-                                            @endif
-                                        </div>
-                                        <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
-                                    </li>
-                                @endif
-                            @endforeach
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
-                            <ul class="list-group">
-                            {{-- Golovi gostujućeg tima (samo regularni, ne i autogolovi domaćeg tima) --}}
-                            @foreach($utakmica->golovi->sortBy('minut') as $gol)
-                                @if($gol->tim_id == $utakmica->gost_id)
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="text-muted">{{ $gol->minut }}' </span>
-                                            @if($gol->igrac)
-                                                @if($gol->penal)
-                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
-                                                @elseif($gol->auto_gol)
-                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
-                                                @else
-                                                    <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
-                                                @endif
-                                            @else
-                                                <strong>Nepoznat igrač</strong>
-                                            @endif
-                                        </div>
-                                        <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
-                                    </li>
-                                @endif
-                            @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                @else
-                    <p class="text-center text-muted">Nema evidentiranih golova za ovu utakmicu.</p>
-                @endif
+            <div class="col-4 text-center">
+                <div class="display-1 fw-bold">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
+                <div class="text-muted">
+                    {{ $utakmica->poluvremenskiRezultat }}
+                </div>
+            </div>
+            <div class="col-4 text-center">
+                <a href="{{ route('timovi.show', $utakmica->gost) }}">
+                    @if($utakmica->gost && $utakmica->gost->grb_url)
+                        <img src="{{ asset('storage/grbovi/' . $utakmica->gost->grb_url) }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
+                    @endif
+                    <h4>{{ $utakmica->gost->naziv }}</h4>
+                </a>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-md-4">
-        <!-- Sastavi -->
+<!-- Informacije o utakmici -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <p><strong>Datum:</strong> {{ $utakmica->datum->format('d.m.Y') }}</p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>Stadion:</strong> {{ $utakmica->stadion }}</p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>Sudija:</strong> {{ $utakmica->sudija }}</p>
+            </div>
+            <div class="col-md-3">
+                <p><strong>Publika:</strong> {{ $utakmica->publika }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Golovi -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Golovi</h5>
+        <a href="{{ route('golovi.create', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Dodaj
+        </a>
+    </div>
+    <div class="card-body">
+        @if($utakmica->golovi->count() > 0)
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
+                    <ul class="list-group">
+                    @php
+                        // Predračunaj trenutni rezultat za svaki gol
+                        $domaciGolovi = 0;
+                        $gostGolovi = 0;
+                        $goloviSaRezultatom = [];
+                        
+                        foreach($utakmica->golovi->sortBy('minut') as $g) {
+                            // Dodaj gol na odgovarajuću stranu
+                            if ($g->auto_gol) {
+                                // Autogol ide na stranu protivničkog tima
+                                if ($g->tim_id == $utakmica->domacin_id) {
+                                    $gostGolovi++;
+                                } else {
+                                    $domaciGolovi++;
+                                }
+                            } else {
+                                // Regularan gol
+                                if ($g->tim_id == $utakmica->domacin_id) {
+                                    $domaciGolovi++;
+                                } else {
+                                    $gostGolovi++;
+                                }
+                            }
+                            
+                            // Sačuvaj trenutni rezultat za ovaj gol
+                            $g->trenutni_rezultat = $domaciGolovi . '-' . $gostGolovi;
+                        }
+                    @endphp
+
+                    {{-- Golovi domaćeg tima --}}
+                    @foreach($utakmica->golovi->sortBy('minut') as $gol)
+                        @if(($gol->tim_id == $utakmica->domacin_id && !$gol->auto_gol) || 
+                            ($gol->tim_id == $utakmica->gost_id && $gol->auto_gol))
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">{{ $gol->minut }}' </span>
+                                    @if($gol->igrac)
+                                        @if($gol->penal)
+                                            <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
+                                        @elseif($gol->auto_gol)
+                                            <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
+                                        @else
+                                            <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
+                                        @endif
+                                    @else
+                                        <strong>Nepoznat igrač</strong>
+                                    @endif
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                            </li>
+                        @endif
+                    @endforeach
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
+                    <ul class="list-group">
+                    {{-- Golovi gostujućeg tima --}}
+                    @foreach($utakmica->golovi->sortBy('minut') as $gol)
+                        @if(($gol->tim_id == $utakmica->gost_id && !$gol->auto_gol) || 
+                            ($gol->tim_id == $utakmica->domacin_id && $gol->auto_gol))
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">{{ $gol->minut }}' </span>
+                                    @if($gol->igrac)
+                                        @if($gol->penal)
+                                            <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
+                                        @elseif($gol->auto_gol)
+                                            <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
+                                        @else
+                                            <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
+                                        @endif
+                                    @else
+                                        <strong>Nepoznat igrač</strong>
+                                    @endif
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                            </li>
+                        @endif
+                    @endforeach
+                    </ul>
+                </div>
+            </div>
+        @else
+            <p class="text-center text-muted">Nema evidentiranih golova za ovu utakmicu.</p>
+        @endif
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sastavi -->
+    <div class="col-md-6">
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Sastavi timova</h5>
@@ -263,7 +255,9 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="col-md-6">
         <!-- Izmene -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -289,7 +283,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($utakmica->izmene as $izmena)
+                                @foreach($utakmica->izmene->sortBy('minut') as $izmena)
                                 <tr>
                                     <td>{{ $izmena->minut }}'</td>
                                     <td>{{ $izmena->tim->skraceni_naziv ?? $izmena->tim->naziv }}</td>
@@ -334,7 +328,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($utakmica->kartoni as $karton)
+                                @foreach($utakmica->kartoni->sortBy('minut') as $karton)
                                 <tr>
                                     <td>{{ $karton->minut }}'</td>
                                     <td>{{ $karton->tim->skraceni_naziv ?? $karton->tim->naziv }}</td>

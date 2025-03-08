@@ -12,18 +12,24 @@ class Utakmica extends Model
     protected $table = 'utakmice';
     
     protected $fillable = [
-        'datum', 'vreme', 'takmicenje_id', 'domacin_id', 'gost_id',
-        'stadion_id', 'rezultat_domacin', 'rezultat_gost',
-        'poluvreme_rezultat_domacin', 'poluvreme_rezultat_gost',
-        'sudija_id', 'publika', 'admin_id', 'sezona'
+        'datum', 
+        'takmicenje_id', 
+        'domacin_id', 
+        'gost_id',
+        'stadion', 
+        'sudija',
+        'rezultat_domacin', 
+        'rezultat_gost',
+        'publika'
     ];
     
     protected $casts = [
         'datum' => 'date',
-        'vreme' => 'datetime:H:i',
+        'rezultat_domacin' => 'integer',
+        'rezultat_gost' => 'integer',
     ];
     
-    // Relacije
+    // Relationships
     public function takmicenje()
     {
         return $this->belongsTo(Takmicenje::class);
@@ -37,16 +43,6 @@ class Utakmica extends Model
     public function gost()
     {
         return $this->belongsTo(Tim::class, 'gost_id');
-    }
-    
-    public function stadion()
-    {
-        return $this->belongsTo(Stadion::class);
-    }
-    
-    public function sudija()
-    {
-        return $this->belongsTo(Sudija::class);
     }
     
     public function sastavi()
@@ -74,17 +70,29 @@ class Utakmica extends Model
         return $this->hasMany(Karton::class)->orderBy('minut');
     }
     
-    // Atributi
+    // Attributes
     public function getRezultatAttribute()
     {
         return $this->rezultat_domacin . '-' . $this->rezultat_gost;
     }
     
+    // Calculate halftime score based on goals before 45th minute
     public function getPoluvremenskiRezultatAttribute()
     {
-        if ($this->poluvreme_rezultat_domacin !== null && $this->poluvreme_rezultat_gost !== null) {
-            return '(' . $this->poluvreme_rezultat_domacin . '-' . $this->poluvreme_rezultat_gost . ')';
+        $domacin_poluvreme = 0;
+        $gost_poluvreme = 0;
+        
+        foreach ($this->golovi as $gol) {
+            if ($gol->minut <= 45) {
+                if (($gol->tim_id == $this->domacin_id && !$gol->auto_gol) || 
+                    ($gol->tim_id == $this->gost_id && $gol->auto_gol)) {
+                    $domacin_poluvreme++;
+                } else {
+                    $gost_poluvreme++;
+                }
+            }
         }
-        return '';
+        
+        return '(' . $domacin_poluvreme . '-' . $gost_poluvreme . ')';
     }
 }

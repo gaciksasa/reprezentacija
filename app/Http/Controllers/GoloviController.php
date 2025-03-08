@@ -209,13 +209,45 @@ class GoloviController extends Controller
             $igraciGosta = Igrac::where('tim_id', $utakmica->gost_id)->orderBy('prezime')->get();
         }
         
-        // Dodajemo trenutnog igrača koji je dao gol, ako slučajno nije u sastavu
+        // Get opponent players if this is an opponent goal
+        if ($gol->igrac_tip === 'protivnicki') {
+            // Load opponent players
+            $protivnickiIgraci = ProtivnickiIgrac::where('utakmica_id', $utakmica->id)
+                                ->where('tim_id', $gol->tim_id)
+                                ->get();
+                                
+            if ($gol->tim_id == $utakmica->domacin_id) {
+                foreach ($protivnickiIgraci as $protivnickiIgrac) {
+                    $virtualniIgrac = new \stdClass();
+                    $virtualniIgrac->id = 'pi_' . $protivnickiIgrac->id;
+                    $virtualniIgrac->ime = $protivnickiIgrac->ime;
+                    $virtualniIgrac->prezime = $protivnickiIgrac->prezime;
+                    $virtualniIgrac->je_protivnicki = true;
+                    
+                    $igraciDomacina->push($virtualniIgrac);
+                }
+            } else {
+                foreach ($protivnickiIgraci as $protivnickiIgrac) {
+                    $virtualniIgrac = new \stdClass();
+                    $virtualniIgrac->id = 'pi_' . $protivnickiIgrac->id;
+                    $virtualniIgrac->ime = $protivnickiIgrac->ime;
+                    $virtualniIgrac->prezime = $protivnickiIgrac->prezime;
+                    $virtualniIgrac->je_protivnicki = true;
+                    
+                    $igraciGosta->push($virtualniIgrac);
+                }
+            }
+        }
+        
+        // Add current player who scored if they're not in the lineup
         $currentPlayerId = $gol->igrac_id;
         
-        if ($gol->tim_id == $utakmica->domacin_id && !$igraciDomacina->contains('id', $currentPlayerId)) {
-            $igraciDomacina->push(Igrac::find($currentPlayerId));
-        } elseif ($gol->tim_id == $utakmica->gost_id && !$igraciGosta->contains('id', $currentPlayerId)) {
-            $igraciGosta->push(Igrac::find($currentPlayerId));
+        if ($gol->igrac_tip === 'regularni') {
+            if ($gol->tim_id == $utakmica->domacin_id && !$igraciDomacina->contains('id', $currentPlayerId)) {
+                $igraciDomacina->push(Igrac::find($currentPlayerId));
+            } elseif ($gol->tim_id == $utakmica->gost_id && !$igraciGosta->contains('id', $currentPlayerId)) {
+                $igraciGosta->push(Igrac::find($currentPlayerId));
+            }
         }
         
         return view('golovi.edit', compact('gol', 'utakmica', 'timovi', 'igraciDomacina', 'igraciGosta'));
@@ -226,21 +258,29 @@ class GoloviController extends Controller
      */
     public function update(Request $request, Gol $gol)
     {
+        // Check if it's an opponent player
+        $igracId = $request->input('igrac_id');
+        $isProtivnicki = false;
+        
+        if (strpos($igracId, 'pi_') === 0) {
+            $isProtivnicki = true;
+            $igracId = (int)substr($igracId, 3);
+        }
+        
         $validated = $request->validate([
-            'igrac_id' => 'required|exists:igraci,id',
             'tim_id' => 'required|exists:timovi,id',
             'minut' => 'required|integer|min:1|max:120',
-            'penal' => 'boolean',
-            'auto_gol' => 'boolean',
         ]);
 
-        // Postavljanje podrazumevanih vrednosti
+        // Set other values
+        $validated['igrac_id'] = $igracId;
+        $validated['igrac_tip'] = $isProtivnicki ? 'protivnicki' : 'regularni';
         $validated['penal'] = $request->has('penal');
         $validated['auto_gol'] = $request->has('auto_gol');
 
         $gol->update($validated);
 
-        // Ažuriranje rezultata utakmice
+        // Update match score
         $this->updateUtakmicaRezultat($gol->utakmica_id);
 
         return redirect()->route('utakmice.show', $gol->utakmica_id)
@@ -255,7 +295,7 @@ class GoloviController extends Controller
         $utakmica_id = $gol->utakmica_id;
         $gol->delete();
         
-        // Ažuriranje rezultata utakmice
+        // Update match score
         $this->updateUtakmicaRezultat($utakmica_id);
         
         return redirect()->route('utakmice.show', $utakmica_id)

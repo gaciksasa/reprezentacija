@@ -24,30 +24,13 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                
-                <div class="col-md-6 mb-3">
-                    <label for="vreme" class="form-label">Vreme</label>
-                    <input type="time" class="form-control @error('vreme') is-invalid @enderror" 
-                           id="vreme" name="vreme" value="{{ old('vreme') }}">
-                    @error('vreme')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
             </div>
             
             <div class="mb-3">
-                <label for="takmicenje_id" class="form-label">Takmičenje *</label>
-                <select class="form-select @error('takmicenje_id') is-invalid @enderror" 
-                        id="takmicenje_id" name="takmicenje_id" required>
-                    <option value="">-- Izaberite takmičenje --</option>
-                    @foreach($takmicenja as $takmicenje)
-                        <option value="{{ $takmicenje->id }}" {{ old('takmicenje_id') == $takmicenje->id ? 'selected' : '' }}>
-                            {{ $takmicenje->naziv }}
-                            @if($takmicenje->sezona) ({{ $takmicenje->sezona }}) @endif
-                        </option>
-                    @endforeach
-                </select>
-                @error('takmicenje_id')
+                <label for="takmicenje" class="form-label">Takmičenje *</label>
+                <input type="text" class="form-control @error('takmicenje') is-invalid @enderror" 
+                       id="takmicenje" name="takmicenje" value="{{ old('takmicenje') }}" required>
+                @error('takmicenje')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -86,65 +69,20 @@
                 </div>
             </div>
             
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="rezultat_domacin" class="form-label">Golovi domaćina</label>
-                    <input type="number" class="form-control @error('rezultat_domacin') is-invalid @enderror" 
-                           id="rezultat_domacin" name="rezultat_domacin" value="{{ old('rezultat_domacin', 0) }}" min="0">
-                    @error('rezultat_domacin')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                
-                <div class="col-md-6 mb-3">
-                    <label for="rezultat_gost" class="form-label">Golovi gosta</label>
-                    <input type="number" class="form-control @error('rezultat_gost') is-invalid @enderror" 
-                           id="rezultat_gost" name="rezultat_gost" value="{{ old('rezultat_gost', 0) }}" min="0">
-                    @error('rezultat_gost')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-            
-            <div class="row">
-            <div class="col-md-6 mb-3">
-                    <label for="poluvreme_rezultat_gost" class="form-label">Golovi gosta (poluvreme)</label>
-                    <input type="number" class="form-control @error('poluvreme_rezultat_gost') is-invalid @enderror" 
-                           id="poluvreme_rezultat_gost" name="poluvreme_rezultat_gost" value="{{ old('poluvreme_rezultat_gost') }}" min="0">
-                    @error('poluvreme_rezultat_gost')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-            
             <div class="mb-3">
-                <label for="stadion_id" class="form-label">Stadion</label>
-                <select class="form-select @error('stadion_id') is-invalid @enderror" 
-                        id="stadion_id" name="stadion_id">
-                    <option value="">-- Izaberite stadion --</option>
-                    @foreach($stadioni as $stadion)
-                        <option value="{{ $stadion->id }}" {{ old('stadion_id') == $stadion->id ? 'selected' : '' }}>
-                            {{ $stadion->naziv }}, {{ $stadion->grad }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('stadion_id')
+                <label for="stadion" class="form-label">Stadion</label>
+                <input type="text" class="form-control @error('stadion') is-invalid @enderror" 
+                       id="stadion" name="stadion" value="{{ old('stadion') }}">
+                @error('stadion')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
             
             <div class="mb-3">
-                <label for="sudija_id" class="form-label">Sudija</label>
-                <select class="form-select @error('sudija_id') is-invalid @enderror" 
-                        id="sudija_id" name="sudija_id">
-                    <option value="">-- Izaberite sudiju --</option>
-                    @foreach($sudije as $sudija)
-                        <option value="{{ $sudija->id }}" {{ old('sudija_id') == $sudija->id ? 'selected' : '' }}>
-                            {{ $sudija->ime }} {{ $sudija->prezime }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('sudija_id')
+                <label for="sudija" class="form-label">Sudija</label>
+                <input type="text" class="form-control @error('sudija') is-invalid @enderror" 
+                       id="sudija" name="sudija" value="{{ old('sudija') }}">
+                @error('sudija')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -154,15 +92,6 @@
                 <input type="text" class="form-control @error('publika') is-invalid @enderror" 
                        id="publika" name="publika" value="{{ old('publika') }}">
                 @error('publika')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
-            <div class="mb-3">
-                <label for="sezona" class="form-label">Sezona</label>
-                <input type="text" class="form-control @error('sezona') is-invalid @enderror" 
-                       id="sezona" name="sezona" value="{{ old('sezona') }}">
-                @error('sezona')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
