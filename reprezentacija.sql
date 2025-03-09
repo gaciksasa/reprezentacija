@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 08, 2025 at 10:06 PM
+-- Generation Time: Mar 09, 2025 at 09:53 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -393,7 +393,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `migrations`
@@ -419,7 +419,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (33, '2025_03_02_000002_add_team_alias_columns_to_timovi_table', 2),
 (34, '2025_03_05_200518_create_protivnicki_igraci_table', 3),
 (35, '2025_03_08_165802_add_player_type_to_goals_table', 4),
-(36, '2025_03_08_181016_modify_utakmice_table', 5);
+(36, '2025_03_08_181016_modify_utakmice_table', 5),
+(37, '2025_03_08_231310_make_takmicenje_nullable_in_utakmice_table', 6);
 
 -- --------------------------------------------------------
 
@@ -524,7 +525,8 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('xdss485kT1mRAbgdk0ytgrqqhr1f5JBbiLWwRNEA', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWmkzN2RkZ3pTQVdzQmg0blhudkRxZXAzS1pKUmFmaEZyaE01bHVZMCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDk6Imh0dHA6Ly9sb2NhbGhvc3QvcmVwcmV6ZW50YWNpamEvcHVibGljL3V0YWttaWNlLzEiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1741471373);
+('xdss485kT1mRAbgdk0ytgrqqhr1f5JBbiLWwRNEA', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWmkzN2RkZ3pTQVdzQmg0blhudkRxZXAzS1pKUmFmaEZyaE01bHVZMCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly9sb2NhbGhvc3QvcmVwcmV6ZW50YWNpamEvcHVibGljL3RpbW92aSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1741473847),
+('7q99eCxSV6cFvM1xOCHjPCmGbxnRKzdTVlImP1sq', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiaWdQNEJ0ZTE3b2s0Rm5kb1RoeEE2TTBmeE1sNnlZc0o1azZ0dEc3SCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly9sb2NhbGhvc3QvcmVwcmV6ZW50YWNpamEvcHVibGljL3RpbW92aSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1741513586);
 
 -- --------------------------------------------------------
 
@@ -608,7 +610,7 @@ CREATE TABLE IF NOT EXISTS `timovi` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `timovi_maticni_tim_id_foreign` (`maticni_tim_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `timovi`
@@ -618,29 +620,24 @@ INSERT INTO `timovi` (`id`, `naziv`, `skraceni_naziv`, `zastava_url`, `grb_url`,
 (1, 'Srbija', 'SRB', 'ser.png', 'ser.png', 'Srbija', 1, NULL, '2006-06-05 00:00:00', NULL, '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
 (2, 'Srbija i Crna Gora', 'SCG', 'scg.png', 'scg.png', 'Srbija i Crna Gora', 0, 1, '2003-02-04 00:00:00', '2006-06-04 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
 (3, 'SR Jugoslavija', 'SRJ', 'srj.png', 'srj.png', 'SR Jugoslavija', 0, 1, '1992-04-27 00:00:00', '2003-02-03 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
-(4, 'SFRJ', 'YUG', 'yug.png', 'yug.png', 'Jugoslavija', 0, 1, '1945-11-29 00:00:00', '1992-04-26 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
-(5, 'Kraljevina Jugoslavija', 'YUG', 'yug.png', 'yug.png', 'Kraljevina Jugoslavija', 0, 1, '1929-10-03 00:00:00', '1945-11-28 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
-(6, 'Kraljevina SHS', 'SHS', 'shs.png', 'shs.png', 'Kraljevina SHS', 0, 1, '1918-12-01 00:00:00', '1929-10-02 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
-(7, 'Kraljevina Srbija', 'SRB', 'srb.png', 'srb.png', 'Kraljevina Srbija', 0, 1, '1882-03-06 00:00:00', '1918-11-30 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
+(4, 'SFRJ', 'YUG', 'yug.png', 'yug.png', 'SFRJ', 0, 1, '1945-11-29 00:00:00', '1992-04-26 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
+(5, 'Jugoslavija', 'YUG', 'yug.png', 'yug.png', 'Jugoslavija', 0, 1, '1929-10-03 00:00:00', '1945-11-28 00:00:00', '2025-03-02 18:11:49', '2025-03-02 18:11:49'),
 (8, 'Turska', 'TUR', 'tur.png', 'tur.png', 'Turska', 0, NULL, NULL, NULL, '2025-03-02 19:45:47', '2025-03-02 19:45:47'),
 (9, 'Rusija', 'RUS', 'rus.png', 'rus.png', 'Rusija', 0, NULL, NULL, NULL, '2025-03-05 19:39:24', '2025-03-05 19:39:24'),
 (10, 'Norveška', 'NOR', 'nor.png', 'nor.png', 'Norveška', 0, NULL, NULL, NULL, '2025-03-08 17:16:49', '2025-03-08 17:16:49'),
-(11, 'Albanija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
-(12, 'Alžir', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
+(11, 'Albanija', NULL, 'alb.png', 'alb.png', '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
+(12, 'Alžir', 'ALG', 'alg.png', 'alg.png', 'Alžir', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-09 09:46:08'),
 (13, 'Argentina', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (14, 'Australija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
-(15, 'Austrija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (16, 'Azerbejdžan', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (17, 'Belgija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (18, 'Bolivija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (19, 'Bosna i Hercegovina', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (20, 'Brazil', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
-(21, 'Bugarska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (22, 'Crna Gora', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
-(23, 'Čehoslovačka/Češka', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
+(23, 'Čehoslovačka', NULL, 'cze.png', 'cze.png', '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (24, 'Čile', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (25, 'Danska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
-(26, 'Egipat', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (27, 'Ekvador', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (28, 'El Salvador', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (29, 'Engleska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
@@ -649,7 +646,6 @@ INSERT INTO `timovi` (`id`, `naziv`, `skraceni_naziv`, `zastava_url`, `grb_url`,
 (32, 'Evropa', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (33, 'Farska Ostrva', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (34, 'Finska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
-(35, 'Francuska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (36, 'Gana', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (37, 'Grčka', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (38, 'Gruzija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
@@ -662,7 +658,6 @@ INSERT INTO `timovi` (`id`, `naziv`, `skraceni_naziv`, `zastava_url`, `grb_url`,
 (45, 'Iran', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (46, 'Republika Irska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (47, 'Severna Irska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
-(48, 'Italija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (49, 'Izrael', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (50, 'Jamajka', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (51, 'Japan', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
@@ -686,16 +681,12 @@ INSERT INTO `timovi` (`id`, `naziv`, `skraceni_naziv`, `zastava_url`, `grb_url`,
 (69, 'Nemačka DR', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (70, 'Nemačka SR', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (71, 'Nigerija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
-(72, 'Norveška', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (73, 'Novi Zeland', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (74, 'Obala Slonovače', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (75, 'Panama', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (76, 'Paragvaj', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (77, 'Peru', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
-(78, 'Poljska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (79, 'Portugal', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
-(80, 'Rumunija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
-(81, 'Rusija / SSSR', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (82, 'SAD', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (83, 'San Marino', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (84, 'Saudijska Arabija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
@@ -706,14 +697,20 @@ INSERT INTO `timovi` (`id`, `naziv`, `skraceni_naziv`, `zastava_url`, `grb_url`,
 (89, 'Švajcarska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (90, 'Švedska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (91, 'Tunis', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
-(92, 'Turska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (93, 'UAE', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (94, 'Ukrajina', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
-(95, 'Urugvaj', NULL, NULL, NULL, 'Urugvaj', 0, NULL, NULL, NULL, '2025-03-08 18:12:54', '2025-03-08 18:12:54'),
 (96, 'Velika Britanija', NULL, NULL, NULL, 'Velika Britanija', 0, NULL, NULL, NULL, '2025-03-08 18:13:04', '2025-03-08 18:13:04'),
 (97, 'Vels', NULL, NULL, NULL, 'Vels', 0, NULL, NULL, NULL, '2025-03-08 18:13:18', '2025-03-08 18:13:18'),
 (98, 'Venecuela', NULL, NULL, NULL, 'Venecuela', 0, NULL, NULL, NULL, '2025-03-08 18:13:29', '2025-03-08 18:13:29'),
-(99, 'Zair', NULL, NULL, NULL, 'Zair', 0, NULL, NULL, NULL, '2025-03-08 18:13:40', '2025-03-08 18:13:40');
+(99, 'Zair', NULL, NULL, NULL, 'Zair', 0, NULL, NULL, NULL, '2025-03-08 18:13:40', '2025-03-08 18:13:40'),
+(102, 'Egipat', 'EGY', NULL, NULL, 'Egipat', 0, NULL, NULL, NULL, NULL, NULL),
+(103, 'Rumunija', 'ROU', NULL, NULL, 'Rumunija', 0, NULL, NULL, NULL, NULL, NULL),
+(104, 'Poljska', 'POL', NULL, NULL, 'Poljska', 0, NULL, NULL, NULL, NULL, NULL),
+(105, 'Austrija', 'AUT', NULL, NULL, 'Austrija', 0, NULL, NULL, NULL, NULL, NULL),
+(106, 'Urugvaj', 'URU', 'uru.png', 'uru.png', 'Urugvaj', 0, NULL, NULL, NULL, NULL, NULL),
+(107, 'Italija', 'ITA', NULL, NULL, 'Italija', 0, NULL, NULL, NULL, NULL, NULL),
+(108, 'Bugarska', 'BUL', NULL, NULL, 'Bugarska', 0, NULL, NULL, NULL, NULL, NULL),
+(109, 'Francuska', 'FRA', NULL, NULL, 'Francuska', 0, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -745,7 +742,7 @@ DROP TABLE IF EXISTS `utakmice`;
 CREATE TABLE IF NOT EXISTS `utakmice` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `datum` date NOT NULL,
-  `takmicenje_id` bigint UNSIGNED NOT NULL,
+  `takmicenje_id` bigint UNSIGNED DEFAULT NULL,
   `domacin_id` bigint UNSIGNED NOT NULL,
   `gost_id` bigint UNSIGNED NOT NULL,
   `stadion` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -757,10 +754,10 @@ CREATE TABLE IF NOT EXISTS `utakmice` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `utakmice_takmicenje_id_foreign` (`takmicenje_id`),
   KEY `utakmice_domacin_id_foreign` (`domacin_id`),
-  KEY `utakmice_gost_id_foreign` (`gost_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `utakmice_gost_id_foreign` (`gost_id`),
+  KEY `utakmice_takmicenje_id_foreign` (`takmicenje_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `utakmice`
@@ -769,7 +766,25 @@ CREATE TABLE IF NOT EXISTS `utakmice` (
 INSERT INTO `utakmice` (`id`, `datum`, `takmicenje_id`, `domacin_id`, `gost_id`, `stadion`, `sudija`, `rezultat_domacin`, `rezultat_gost`, `publika`, `admin_id`, `created_at`, `updated_at`) VALUES
 (1, '1988-02-05', 1, 4, 8, NULL, NULL, 0, 0, '2000', NULL, '2025-03-02 19:46:56', '2025-03-02 19:46:56'),
 (2, '2020-09-03', 1, 9, 1, 'VTB Arena', 'William Collum (Sco)', 3, 5, '0', NULL, '2025-03-05 19:40:21', '2025-03-08 16:58:35'),
-(3, '2020-08-10', 2, 10, 1, 'Ullevaal Stadion', 'Daniele Orsato (Ita)', 2, 0, '200', NULL, '2025-03-08 17:17:54', '2025-03-08 17:43:31');
+(3, '2020-08-10', 2, 10, 1, 'Ullevaal Stadion', 'Daniele Orsato (Ita)', 2, 0, '200', NULL, '2025-03-08 17:17:54', '2025-03-08 17:43:31'),
+(8, '1920-08-28', NULL, 5, 23, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(10, '1920-09-02', NULL, 5, 102, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(11, '1921-10-28', NULL, 23, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(12, '1922-06-08', NULL, 5, 103, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(13, '1922-06-28', NULL, 5, 23, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(14, '1922-10-01', NULL, 5, 104, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(15, '1923-06-03', NULL, 104, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(16, '1923-06-10', NULL, 103, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(17, '1923-10-28', NULL, 23, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(18, '1924-02-10', NULL, 5, 105, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(19, '1924-05-26', NULL, 5, 106, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(20, '1924-09-28', NULL, 5, 23, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(21, '1925-10-28', NULL, 23, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(22, '1925-11-04', NULL, 107, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(23, '1926-05-30', NULL, 5, 108, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(24, '1926-06-13', NULL, 109, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(25, '1926-06-28', NULL, 5, 23, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(26, '1926-10-05', NULL, 5, 103, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

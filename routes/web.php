@@ -30,7 +30,9 @@ Route::get('/kalendar', [DashboardController::class, 'kalendar'])->name('kalenda
 Route::get('/pretraga', [DashboardController::class, 'pretraga'])->name('pretraga');
 
 // CRUD rute za timove
-Route::resource('timovi', TimoviController::class);
+Route::resource('timovi', TimoviController::class, ['parameters' => [
+    'timovi' => 'tim'
+]]);
 
 // Tim varijante routes
 Route::resource('tim-varijante', TimVarijanteController::class)->except(['show']);

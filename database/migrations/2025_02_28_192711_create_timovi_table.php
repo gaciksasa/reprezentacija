@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('skraceni_naziv')->nullable();
             $table->string('zastava_url')->nullable();
             $table->string('grb_url')->nullable();
-            $table->string('zemlja');
+            $table->string('zemlja')->nullable();
             $table->timestamps();
         });
     }
