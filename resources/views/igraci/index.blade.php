@@ -66,12 +66,6 @@
                     
                     @forelse($igraci as $igrac)
                         @php
-                            // Create alphabet dividers
-                            $firstLetter = mb_strtoupper(mb_substr($igrac->prezime, 0, 1));
-                            if($firstLetter != $currentLetter) {
-                                $currentLetter = $firstLetter;
-                                echo '<tr><td colspan="5" class="bg-light text-primary" id="'.$currentLetter.'"><strong>'.$currentLetter.'</strong></td></tr>';
-                            }
                             
                             // Format the playing period
                             $period = '';
