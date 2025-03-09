@@ -141,6 +141,27 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Croatian alphabet - 30 letters
+            const hrvatskaAbeceda = [
+                'A', 'B', 'C', 'Č', 'Ć', 'D', 'DŽ', 'Đ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 
+                'L', 'LJ', 'M', 'N', 'NJ', 'O', 'P', 'R', 'S', 'Š', 'T', 'U', 'V', 'Z', 'Ž'
+            ];
+            
+            // Find the container where alphabet links are displayed
+            const alfabetContainer = document.querySelector('.mb-3.text-center');
+            
+            // Clear existing alphabet links
+            alfabetContainer.innerHTML = '';
+            
+            // Create and append new links for Croatian alphabet
+            hrvatskaAbeceda.forEach(slovo => {
+                const link = document.createElement('a');
+                link.href = `#${slovo}`;
+                link.className = 'btn btn-sm btn-outline-secondary me-1';
+                link.textContent = slovo;
+                alfabetContainer.appendChild(link);
+            });
+            
             // Dohvati sve alfabet linkove
             const alfabetLinks = document.querySelectorAll('.mb-3.text-center a.btn-sm');
             
@@ -190,8 +211,33 @@
                         const prezimeTekst = red.querySelector('td:first-child a .text-danger').textContent;
                         // Izdvoji prezime (pre razmaka)
                         const prezime = prezimeTekst.split(' ')[0];
-                        // Proveri da li prezime počinje sa traženim slovom
-                        if (prezime.toUpperCase().startsWith(slovo)) {
+                        
+                        // Special handling for digraphs (LJ, NJ, DŽ)
+                        let prikazati = false;
+                        
+                        if (slovo === 'LJ' && prezime.toUpperCase().startsWith('LJ')) {
+                            prikazati = true;
+                        } else if (slovo === 'NJ' && prezime.toUpperCase().startsWith('NJ')) {
+                            prikazati = true;
+                        } else if (slovo === 'DŽ' && prezime.toUpperCase().startsWith('DŽ')) {
+                            prikazati = true;
+                        } else if (slovo.length === 1) {
+                            // For single letters, make sure we don't match the start of digraphs
+                            const firstChar = prezime.charAt(0).toUpperCase();
+                            const secondChar = prezime.charAt(1).toUpperCase();
+                            
+                            if (slovo === 'D' && secondChar === 'Ž') {
+                                prikazati = false;
+                            } else if (slovo === 'L' && secondChar === 'J') {
+                                prikazati = false;
+                            } else if (slovo === 'N' && secondChar === 'J') {
+                                prikazati = false;
+                            } else if (firstChar === slovo) {
+                                prikazati = true;
+                            }
+                        }
+                        
+                        if (prikazati) {
                             red.style.display = ''; // Prikaži red
                         } else {
                             red.style.display = 'none'; // Sakrij red
