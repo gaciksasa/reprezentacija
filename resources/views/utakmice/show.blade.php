@@ -162,36 +162,32 @@
         <div class="row mb-4">
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Selektor {{ $utakmica->domacin->naziv }}</h5>
-                    </div>
-                    <div class="card-body">
+                        <!-- Dugme za dodavanje selektora domaćeg tima -->
                         @php
                             // Proveri da li je domaćin naš tim
                             $glavniTim = \App\Models\Tim::glavniTim()->first();
                             $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
                             $domacinJeNasTim = in_array($utakmica->domacin_id, $nasTimIds);
                             
-                            if ($domacinJeNasTim) {
-                                // Dohvati selektora našeg tima preko mandata
-                                $selektor = \App\Models\SelektorMandat::where('tim_id', $utakmica->domacin_id)
-                                    ->where('pocetak_mandata', '<=', $utakmica->datum)
-                                    ->where(function($query) use ($utakmica) {
-                                        $query->whereNull('kraj_mandata')
-                                            ->orWhere('kraj_mandata', '>=', $utakmica->datum);
-                                    })
-                                    ->with('selektor')
+                            // Dohvati selektora protivničkog tima ako postoji
+                            $domacinSelektor = null;
+                            if (!$domacinJeNasTim) {
+                                $domacinSelektor = \App\Models\ProtivnickiSelektor::where('utakmica_id', $utakmica->id)
+                                    ->where('tim_id', $utakmica->domacin_id)
                                     ->first();
-                            } else {
-                                // Za protivnički tim koristimo polje selektor iz tabele sastavi
-                                $selektor = null;
-                                if (isset($domaciSastav) && $domaciSastav->count() > 0) {
-                                    $selektorIme = $domaciSastav->first()->selektor;
-                                }
                             }
                         @endphp
                         
-                        @if($domacinJeNasTim && $selektor)
+                        @if(!$domacinJeNasTim)
+                            <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus"></i> Dodaj
+                            </a>
+                        @endif
+                    </div>
+                    <div class="card-body">
+                        @if($domacinJeNasTim && isset($selektor) && $selektor)
                             <div class="d-flex align-items-center">
                                 @if($selektor->selektor->fotografija_path)
                                     <div class="me-3">
@@ -213,6 +209,30 @@
                                     </p>
                                 </div>
                             </div>
+                        @elseif(!$domacinJeNasTim && $domacinSelektor)
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">{{ $domacinSelektor->ime_prezime }}</h5>
+                                    @if($domacinSelektor->napomena)
+                                        <p class="mb-0 text-muted"><small>{{ $domacinSelektor->napomena }}</small></p>
+                                    @endif
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ route('protivnicki-selektori.edit', $domacinSelektor->id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            onclick="document.getElementById('delete-selektor-{{ $domacinSelektor->id }}').submit()">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <form id="delete-selektor-{{ $domacinSelektor->id }}" 
+                                          action="{{ route('protivnicki-selektori.destroy', $domacinSelektor->id) }}" 
+                                          method="POST" class="d-none">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </div>
+                            </div>
                         @elseif(isset($selektorIme) && $selektorIme)
                             <p class="mb-0">{{ $selektorIme }}</p>
                         @else
@@ -224,34 +244,30 @@
             
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Selektor {{ $utakmica->gost->naziv }}</h5>
-                    </div>
-                    <div class="card-body">
+                        <!-- Dugme za dodavanje selektora gostujućeg tima -->
                         @php
                             // Proveri da li je gost naš tim
                             $gostJeNasTim = in_array($utakmica->gost_id, $nasTimIds);
                             
-                            if ($gostJeNasTim) {
-                                // Dohvati selektora našeg tima preko mandata
-                                $selektor = \App\Models\SelektorMandat::where('tim_id', $utakmica->gost_id)
-                                    ->where('pocetak_mandata', '<=', $utakmica->datum)
-                                    ->where(function($query) use ($utakmica) {
-                                        $query->whereNull('kraj_mandata')
-                                            ->orWhere('kraj_mandata', '>=', $utakmica->datum);
-                                    })
-                                    ->with('selektor')
+                            // Dohvati selektora protivničkog tima ako postoji
+                            $gostSelektor = null;
+                            if (!$gostJeNasTim) {
+                                $gostSelektor = \App\Models\ProtivnickiSelektor::where('utakmica_id', $utakmica->id)
+                                    ->where('tim_id', $utakmica->gost_id)
                                     ->first();
-                            } else {
-                                // Za protivnički tim koristimo polje selektor iz tabele sastavi
-                                $selektor = null;
-                                if (isset($gostujuciSastav) && $gostujuciSastav->count() > 0) {
-                                    $selektorIme = $gostujuciSastav->first()->selektor;
-                                }
                             }
                         @endphp
                         
-                        @if($gostJeNasTim && $selektor)
+                        @if(!$gostJeNasTim)
+                            <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus"></i> Dodaj
+                            </a>
+                        @endif
+                    </div>
+                    <div class="card-body">
+                        @if($gostJeNasTim && isset($selektor) && $selektor)
                             <div class="d-flex align-items-center">
                                 @if($selektor->selektor->fotografija_path)
                                     <div class="me-3">
@@ -271,6 +287,30 @@
                                         <small>Period: {{ $selektor->pocetak_mandata->format('d.m.Y') }} - 
                                         {{ $selektor->kraj_mandata ? $selektor->kraj_mandata->format('d.m.Y') : 'danas' }}</small>
                                     </p>
+                                </div>
+                            </div>
+                        @elseif(!$gostJeNasTim && $gostSelektor)
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">{{ $gostSelektor->ime_prezime }}</h5>
+                                    @if($gostSelektor->napomena)
+                                        <p class="mb-0 text-muted"><small>{{ $gostSelektor->napomena }}</small></p>
+                                    @endif
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ route('protivnicki-selektori.edit', $gostSelektor->id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            onclick="document.getElementById('delete-selektor-{{ $gostSelektor->id }}').submit()">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <form id="delete-selektor-{{ $gostSelektor->id }}" 
+                                          action="{{ route('protivnicki-selektori.destroy', $gostSelektor->id) }}" 
+                                          method="POST" class="d-none">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
                                 </div>
                             </div>
                         @elseif(isset($selektorIme) && $selektorIme)

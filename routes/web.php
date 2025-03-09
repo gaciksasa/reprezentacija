@@ -11,6 +11,7 @@ use App\Http\Controllers\TakmicenjaController;
 use App\Http\Controllers\SudijeController;
 use App\Http\Controllers\SastaviController;
 use App\Http\Controllers\SelektoriController;
+use App\Http\Controllers\ProtivnickiSelektoriController;
 use App\Http\Controllers\ProtivnickiIgraciController;
 use App\Http\Controllers\GoloviController;
 use App\Http\Controllers\IzmeneController;
