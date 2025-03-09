@@ -56,6 +56,11 @@ Route::resource('protivnicki-igraci', ProtivnickiIgraciController::class);
 Route::resource('utakmice', UtakmiceController::class);
 Route::get('utakmice/{utakmica}', [UtakmiceController::class, 'show'])->name('utakmice.show');
 
+// CRUD rute za selektore
+Route::resource('selektori', SelektoriController::class);
+Route::post('selektori/{selektor}/dodaj-mandat', [SelektoriController::class, 'dodajMandat'])->name('selektori.dodajMandat');
+Route::delete('selektor-mandati/{mandat}', [SelektoriController::class, 'obrisiMandat'])->name('selektori.obrisiMandat');
+
 // CRUD rute za stadione
 Route::resource('stadioni', StadioniController::class);
 

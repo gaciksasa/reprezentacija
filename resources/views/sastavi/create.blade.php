@@ -74,14 +74,24 @@
                     </div>
                 </div>
                 
-                <div class="mb-3">
-                    <label for="selektor" class="form-label">Selektor</label>
-                    <input type="text" class="form-control @error('selektor') is-invalid @enderror" 
-                           id="selektor" name="selektor" value="{{ old('selektor') }}">
-                    @error('selektor')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                <!-- Selektor za protivnički tim -->
+                @php
+                    $glavniTim = \App\Models\Tim::glavniTim()->first();
+                    $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+                    $timJeProtivnicki = !in_array($tim->id, $nasTimIds);
+                @endphp
+
+                @if($timJeProtivnicki)
+                    <div class="mb-3">
+                        <label for="selektor" class="form-label">Selektor</label>
+                        <input type="text" class="form-control @error('selektor') is-invalid @enderror" 
+                            id="selektor" name="selektor" value="{{ old('selektor') }}">
+                        <small class="form-text text-muted">Unesite ime i prezime selektora protivničkog tima</small>
+                        @error('selektor')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                @endif
                 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">Sačuvaj igrača u sastavu</button>

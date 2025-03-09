@@ -157,6 +157,131 @@
                 @endif
             </div>
         </div>
+
+        <!-- Selektori -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Selektor {{ $utakmica->domacin->naziv }}</h5>
+                    </div>
+                    <div class="card-body">
+                        @php
+                            // Proveri da li je domaćin naš tim
+                            $glavniTim = \App\Models\Tim::glavniTim()->first();
+                            $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+                            $domacinJeNasTim = in_array($utakmica->domacin_id, $nasTimIds);
+                            
+                            if ($domacinJeNasTim) {
+                                // Dohvati selektora našeg tima preko mandata
+                                $selektor = \App\Models\SelektorMandat::where('tim_id', $utakmica->domacin_id)
+                                    ->where('pocetak_mandata', '<=', $utakmica->datum)
+                                    ->where(function($query) use ($utakmica) {
+                                        $query->whereNull('kraj_mandata')
+                                            ->orWhere('kraj_mandata', '>=', $utakmica->datum);
+                                    })
+                                    ->with('selektor')
+                                    ->first();
+                            } else {
+                                // Za protivnički tim koristimo polje selektor iz tabele sastavi
+                                $selektor = null;
+                                if (isset($domaciSastav) && $domaciSastav->count() > 0) {
+                                    $selektorIme = $domaciSastav->first()->selektor;
+                                }
+                            }
+                        @endphp
+                        
+                        @if($domacinJeNasTim && $selektor)
+                            <div class="d-flex align-items-center">
+                                @if($selektor->selektor->fotografija_path)
+                                    <div class="me-3">
+                                        <img src="{{ asset('storage/' . $selektor->selektor->fotografija_path) }}" alt="{{ $selektor->selektor->ime_prezime }}" class="img-thumbnail" style="max-height: 80px">
+                                    </div>
+                                @endif
+                                <div>
+                                    <h5 class="mb-1">
+                                        <a href="{{ route('selektori.show', $selektor->selektor) }}">
+                                            {{ $selektor->selektor->ime_prezime }}
+                                        </a>
+                                        @if($selektor->v_d_status)
+                                            <span class="badge bg-warning text-dark">v.d.</span>
+                                        @endif
+                                    </h5>
+                                    <p class="mb-0 text-muted">
+                                        <small>Period: {{ $selektor->pocetak_mandata->format('d.m.Y') }} - 
+                                        {{ $selektor->kraj_mandata ? $selektor->kraj_mandata->format('d.m.Y') : 'danas' }}</small>
+                                    </p>
+                                </div>
+                            </div>
+                        @elseif(isset($selektorIme) && $selektorIme)
+                            <p class="mb-0">{{ $selektorIme }}</p>
+                        @else
+                            <p class="text-muted mb-0">Nema podataka o selektoru</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Selektor {{ $utakmica->gost->naziv }}</h5>
+                    </div>
+                    <div class="card-body">
+                        @php
+                            // Proveri da li je gost naš tim
+                            $gostJeNasTim = in_array($utakmica->gost_id, $nasTimIds);
+                            
+                            if ($gostJeNasTim) {
+                                // Dohvati selektora našeg tima preko mandata
+                                $selektor = \App\Models\SelektorMandat::where('tim_id', $utakmica->gost_id)
+                                    ->where('pocetak_mandata', '<=', $utakmica->datum)
+                                    ->where(function($query) use ($utakmica) {
+                                        $query->whereNull('kraj_mandata')
+                                            ->orWhere('kraj_mandata', '>=', $utakmica->datum);
+                                    })
+                                    ->with('selektor')
+                                    ->first();
+                            } else {
+                                // Za protivnički tim koristimo polje selektor iz tabele sastavi
+                                $selektor = null;
+                                if (isset($gostujuciSastav) && $gostujuciSastav->count() > 0) {
+                                    $selektorIme = $gostujuciSastav->first()->selektor;
+                                }
+                            }
+                        @endphp
+                        
+                        @if($gostJeNasTim && $selektor)
+                            <div class="d-flex align-items-center">
+                                @if($selektor->selektor->fotografija_path)
+                                    <div class="me-3">
+                                        <img src="{{ asset('storage/' . $selektor->selektor->fotografija_path) }}" alt="{{ $selektor->selektor->ime_prezime }}" class="img-thumbnail" style="max-height: 80px">
+                                    </div>
+                                @endif
+                                <div>
+                                    <h5 class="mb-1">
+                                        <a href="{{ route('selektori.show', $selektor->selektor) }}">
+                                            {{ $selektor->selektor->ime_prezime }}
+                                        </a>
+                                        @if($selektor->v_d_status)
+                                            <span class="badge bg-warning text-dark">v.d.</span>
+                                        @endif
+                                    </h5>
+                                    <p class="mb-0 text-muted">
+                                        <small>Period: {{ $selektor->pocetak_mandata->format('d.m.Y') }} - 
+                                        {{ $selektor->kraj_mandata ? $selektor->kraj_mandata->format('d.m.Y') : 'danas' }}</small>
+                                    </p>
+                                </div>
+                            </div>
+                        @elseif(isset($selektorIme) && $selektorIme)
+                            <p class="mb-0">{{ $selektorIme }}</p>
+                        @else
+                            <p class="text-muted mb-0">Nema podataka o selektoru</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
