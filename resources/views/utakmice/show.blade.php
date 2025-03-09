@@ -207,10 +207,6 @@
                                             <span class="badge bg-warning text-dark">v.d.</span>
                                         @endif
                                     </h5>
-                                    <p class="mb-0 text-muted">
-                                        <small>Period: {{ $selektor->pocetak_mandata->format('d.m.Y') }} - 
-                                        {{ $selektor->kraj_mandata ? $selektor->kraj_mandata->format('d.m.Y') : 'danas' }}</small>
-                                    </p>
                                 </div>
                             </div>
                         @elseif(isset($selektorIme) && $selektorIme)
@@ -267,10 +263,6 @@
                                             <span class="badge bg-warning text-dark">v.d.</span>
                                         @endif
                                     </h5>
-                                    <p class="mb-0 text-muted">
-                                        <small>Period: {{ $selektor->pocetak_mandata->format('d.m.Y') }} - 
-                                        {{ $selektor->kraj_mandata ? $selektor->kraj_mandata->format('d.m.Y') : 'danas' }}</small>
-                                    </p>
                                 </div>
                             </div>
                         @elseif(isset($selektorIme) && $selektorIme)

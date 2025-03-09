@@ -90,7 +90,11 @@
                                 </div>
                                 <div>
                                     <span class="badge bg-secondary">{{ $utakmica->datum->format('d.m.Y') }}</span>
-                                    <span class="badge bg-primary">{{ $utakmica->takmicenje->naziv }}</span>
+                                    <span class="badge bg-primary">
+                                        @if($utakmica->takmicenje)
+                                            {{ $utakmica->takmicenje->naziv }}
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
                         </a>
