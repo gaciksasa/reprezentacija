@@ -140,30 +140,35 @@
                     <input type="hidden" name="bivsi_klubovi[{{ $index }}][id]" value="{{ $klub->id }}">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Naziv kluba *</label>
-                            <input type="text" class="form-control" name="bivsi_klubovi[{{ $index }}][naziv]" value="{{ $klub->naziv }}" required>
+                            <label class="form-label">Naziv kluba</label>
+                            <input type="text" class="form-control" name="bivsi_klubovi[{{ $index }}][naziv]" value="{{ $klub->naziv }}">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Država kluba</label>
-                            <input type="text" class="form-control" name="bivsi_klubovi[{{ $index }}][drzava]" value="{{ $klub->drzava }}">
+                            <label for="drzava_kluba" class="form-label">Država kluba</label>
+                            <select class="form-select" id="drzava_kluba" name="bivsi_klubovi[0][drzava]">
+                                <option value="">-- Izaberite državu --</option>
+                                @foreach($drzave as $drzava)
+                                    <option value="{{ $drzava }}" {{ isset($klub) && $klub->drzava == $drzava ? 'selected' : '' }}>
+                                        {{ $drzava }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Sezona</label>
                             <input type="text" class="form-control" name="bivsi_klubovi[{{ $index }}][sezona]" value="{{ $klub->sezona }}" placeholder="npr. 1989-90">
                         </div>
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Stepen takmičenja</label>
                             <input type="text" class="form-control" name="bivsi_klubovi[{{ $index }}][stepen_takmicenja]" value="{{ $klub->stepen_takmicenja }}">
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Broj nastupa</label>
                             <input type="number" class="form-control" name="bivsi_klubovi[{{ $index }}][broj_nastupa]" value="{{ $klub->broj_nastupa }}" min="0">
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Broj golova</label>
                             <input type="number" class="form-control" name="bivsi_klubovi[{{ $index }}][broj_golova]" value="{{ $klub->broj_golova }}" min="0">
                         </div>
@@ -231,8 +236,8 @@
 @endsection
 
 @section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('bivsi-klubovi-container');
         const addButton = document.getElementById('add-klub-btn');
         let klubCounter = {{ $igrac->bivsiKlubovi->count() > 0 ? $igrac->bivsiKlubovi->count() : 1 }};
@@ -242,7 +247,7 @@
             const newRow = document.querySelector('.bivsi-klub-row').cloneNode(true);
 
             // Update all input names with new index
-            const inputs = newRow.querySelectorAll('input');
+            const inputs = newRow.querySelectorAll('input, select');
             inputs.forEach(input => {
                 const name = input.getAttribute('name');
                 if (name) {
@@ -276,7 +281,7 @@
                     row.remove();
                 } else {
                     // If it's the last row, just clear the values instead of removing
-                    const inputs = row.querySelectorAll('input:not([type="hidden"])');
+                    const inputs = row.querySelectorAll('input:not([type="hidden"]), select');
                     inputs.forEach(input => {
                         input.value = '';
                     });
@@ -291,6 +296,68 @@
                 firstRemoveBtn.style.display = 'none';
             }
         }
+        
+        // Add event listeners for country dropdowns to populate them when a team is selected
+        const drzaveDostupne = [
+            @foreach($drzave as $drzava)
+                "{{ $drzava }}",
+            @endforeach
+        ];
+        
+        // Initialize any existing dropdowns with the available countries
+        document.querySelectorAll('select[name^="bivsi_klubovi"][name$="[drzava]"]').forEach(select => {
+            const currentValue = select.value;
+            
+            // Clear existing options
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+            
+            // Add default empty option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = '-- Izaberite državu --';
+            select.add(defaultOption);
+            
+            // Add all available countries
+            drzaveDostupne.forEach(drzava => {
+                const option = document.createElement('option');
+                option.value = drzava;
+                option.text = drzava;
+                if (currentValue === drzava) {
+                    option.selected = true;
+                }
+                select.add(option);
+            });
+        });
+        
+        // When a new row is added, make sure to properly set up its country dropdown
+        addButton.addEventListener('click', function() {
+            // Find the newly added row (last row in the container)
+            const newRow = container.querySelector('.bivsi-klub-row:last-child');
+            const drzavaSelect = newRow.querySelector('select[name^="bivsi_klubovi"][name$="[drzava]"]');
+            
+            if (drzavaSelect) {
+                // Clear existing options
+                while (drzavaSelect.options.length > 0) {
+                    drzavaSelect.remove(0);
+                }
+                
+                // Add default empty option
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.text = '-- Izaberite državu --';
+                drzavaSelect.add(defaultOption);
+                
+                // Add all available countries
+                drzaveDostupne.forEach(drzava => {
+                    const option = document.createElement('option');
+                    option.value = drzava;
+                    option.text = drzava;
+                    drzavaSelect.add(option);
+                });
+            }
+        });
     });
 </script>
 @endsection

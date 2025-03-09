@@ -98,7 +98,8 @@ class IgraciController extends Controller
     public function create()
     {
         $pozicije = ['Golman', 'Odbrana', 'Sredina', 'Napad'];
-        return view('igraci.create', compact('pozicije'));
+        $drzave = Tim::select('zemlja')->distinct()->whereNotNull('zemlja')->where('zemlja', '!=', '')->orderBy('zemlja')->pluck('zemlja');
+        return view('igraci.create', compact('pozicije','drzave'));
     }
 
     /**
@@ -109,7 +110,7 @@ class IgraciController extends Controller
         $validated = $request->validate([
             'ime' => 'required|string|max:255',
             'prezime' => 'required|string|max:255',
-            'pozicija' => 'required|in:Golman,Odbrana,Sredina,Napad',
+            'pozicija' => 'nullable|in:Golman,Odbrana,Sredina,Napad',
             'datum_rodjenja' => 'nullable|date',
             'mesto_rodjenja' => 'nullable|string|max:255',
             'datum_smrti' => 'nullable|date|after_or_equal:datum_rodjenja',
@@ -176,7 +177,8 @@ class IgraciController extends Controller
     {
         $pozicije = ['Golman', 'Odbrana', 'Sredina', 'Napad'];
         $igrac->load('bivsiKlubovi');
-        return view('igraci.edit', compact('igrac', 'pozicije'));
+        $drzave = Tim::select('zemlja')->distinct()->whereNotNull('zemlja')->where('zemlja', '!=', '')->orderBy('zemlja')->pluck('zemlja');
+        return view('igraci.edit', compact('igrac', 'pozicije', 'drzave'));
     }
 
     /**
