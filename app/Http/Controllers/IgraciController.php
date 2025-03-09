@@ -235,11 +235,10 @@ class IgraciController extends Controller
                             $klub->update([
                                 'naziv' => $klubData['naziv'],
                                 'drzava' => $klubData['drzava'] ?? null,
+                                'sezona' => $klubData['sezona'] ?? null,
                                 'stepen_takmicenja' => $klubData['stepen_takmicenja'] ?? null,
                                 'broj_nastupa' => $klubData['broj_nastupa'] ?? null,
                                 'broj_golova' => $klubData['broj_golova'] ?? null,
-                                'period_od' => $klubData['period_od'] ?? null,
-                                'period_do' => $klubData['period_do'] ?? null,
                             ]);
                             $existingIds[] = $klub->id;
                         }
@@ -248,11 +247,10 @@ class IgraciController extends Controller
                         $klub = $igrac->bivsiKlubovi()->create([
                             'naziv' => $klubData['naziv'],
                             'drzava' => $klubData['drzava'] ?? null,
+                            'sezona' => $klubData['sezona'] ?? null,
                             'stepen_takmicenja' => $klubData['stepen_takmicenja'] ?? null,
                             'broj_nastupa' => $klubData['broj_nastupa'] ?? null,
                             'broj_golova' => $klubData['broj_golova'] ?? null,
-                            'period_od' => $klubData['period_od'] ?? null,
-                            'period_do' => $klubData['period_do'] ?? null,
                         ]);
                         $existingIds[] = $klub->id;
                     }
