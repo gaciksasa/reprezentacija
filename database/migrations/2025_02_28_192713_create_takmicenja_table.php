@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('takmicenja', function (Blueprint $table) {
             $table->id();
-            $table->string('naziv');
+            $table->string('naziv')->nullable();
             $table->string('sezona')->nullable();
             $table->string('organizator')->nullable();
             $table->timestamps();

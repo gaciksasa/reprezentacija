@@ -75,6 +75,12 @@ class Utakmica extends Model
     {
         return $this->rezultat_domacin . '-' . $this->rezultat_gost;
     }
+
+    // Protivnicki selektori
+    public function protivnickiSelektori()
+    {
+        return $this->hasMany(ProtivnickiSelektor::class);
+    }
     
     // Calculate halftime score based on goals before 45th minute
     public function getPoluvremenskiRezultatAttribute()

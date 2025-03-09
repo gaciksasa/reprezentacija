@@ -35,6 +35,19 @@
     </div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Selektor tima: {{ $tim->naziv }}</h5>
+    </div>
+    <div class="card-body">
+        <input type="text" class="form-control @error('selektor') is-invalid @enderror" 
+            id="selektor" name="selektor" value="{{ old('selektor') }}">
+        @error('selektor')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header">
         <h5 class="card-title mb-0">Novi igrač tima: {{ $tim->naziv }}</h5>

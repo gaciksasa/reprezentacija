@@ -54,16 +54,20 @@ Route::delete('bivsi-klubovi/{klub}', [IgraciController::class, 'deleteClub'])->
 Route::resource('protivnicki-igraci', ProtivnickiIgraciController::class);
 
 // CRUD rute za utakmice
-Route::resource('utakmice', UtakmiceController::class);
+Route::resource('utakmice', UtakmiceController::class, [
+    'parameters' => ['utakmice' => 'utakmica']
+]);
 Route::get('utakmice/{utakmica}', [UtakmiceController::class, 'show'])->name('utakmice.show');
 
 // CRUD rute za selektore
-// Route::resource('selektori', SelektoriController::class);
 Route::resource('selektori', SelektoriController::class, [
     'parameters' => ['selektori' => 'selektor']
 ]);
 Route::post('selektori/{selektor}/dodaj-mandat', [SelektoriController::class, 'dodajMandat'])->name('selektori.dodajMandat');
 Route::delete('selektor-mandati/{mandat}', [SelektoriController::class, 'obrisiMandat'])->name('selektori.obrisiMandat');
+
+// CRUD za protivnicke selektore
+Route::resource('protivnicki-selektori', ProtivnickiSelektoriController::class)->except(['index', 'show']);
 
 // CRUD rute za stadione
 Route::resource('stadioni', StadioniController::class);
