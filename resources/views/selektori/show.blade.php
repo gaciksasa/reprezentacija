@@ -26,6 +26,10 @@
                     <div class="text-center mb-3">
                         <img src="{{ asset('storage/' . $selektor->fotografija_path) }}" alt="{{ $selektor->ime_prezime }}" class="img-fluid rounded" style="max-height: 200px;">
                     </div>
+                @else
+                <div class="text-center mb-3">
+                        <img src="{{ asset('img/no-photo.jpg')}}" alt="{{ $selektor->ime_prezime }}" class="img-fluid rounded" style="max-height: 200px;">
+                    </div>
                 @endif
                 
                 <table class="table">
@@ -64,16 +68,9 @@
                     </tr>
                     @endif
                 </table>
-                
-                @if($selektor->biografija)
-                    <div class="mt-3">
-                        <h6>Biografija</h6>
-                        <p>{{ $selektor->biografija }}</p>
-                    </div>
-                @endif
             </div>
         </div>
-        
+
         <!-- Ukupna statistika -->
         <div class="card mt-4">
             <div class="card-header">
@@ -124,6 +121,17 @@
     </div>
     
     <div class="col-md-8">
+        <!-- Biografija -->
+            @if($selektor->biografija)
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Biografija</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ $selektor->biografija }}
+                    </div>
+                </div>
+            @endif
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Mandati</h5>
