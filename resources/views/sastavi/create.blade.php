@@ -22,7 +22,11 @@
             <div class="col-md-4 text-center">
                 <div class="display-5">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
                 <div class="text-muted">{{ $utakmica->datum->format('d.m.Y') }}</div>
-                <div>{{ $utakmica->takmicenje->naziv }}</div>
+                <div>
+                    @if($utakmica->takmicenje)
+                        {{ $utakmica->takmicenje->naziv }}
+                    @endif
+                </div>
             </div>
             <div class="col-md-4">
                 <h5>{{ $utakmica->gost->naziv }}</h5>
@@ -51,7 +55,7 @@
                         @foreach($igraci as $igrac)
                             @if(!in_array($igrac->id, $postojeciIgraciIds))
                                 <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
-                                    {{ $igrac->ime }} {{ $igrac->prezime }}
+                                    {{ $igrac->prezime }} {{ $igrac->ime }} 
                                 </option>
                             @endif
                         @endforeach
