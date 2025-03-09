@@ -82,18 +82,22 @@ class DashboardController extends Controller
     
     // Najbolji strelci glavnog tima
     $strelci = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
-                       DB::raw('COUNT(golovi.id) as broj_golova'))
-              ->join('golovi', 'igraci.id', '=', 'golovi.igrac_id')
-              ->join('timovi', 'igraci.tim_id', '=', 'timovi.id')
-              ->join('utakmice', 'golovi.utakmica_id', '=', 'utakmice.id')
-              ->where('golovi.auto_gol', false)
-              ->where(function($query) use ($timIds) {
-                  $query->whereIn('igraci.tim_id', $timIds);
-              })
-              ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
-              ->orderBy('broj_golova', 'desc')
-              ->take(10)
-              ->get();
+        DB::raw('COUNT(golovi.id) as broj_golova'))
+        ->join('golovi', 'igraci.id', '=', 'golovi.igrac_id')
+        ->join('timovi', 'igraci.tim_id', '=', 'timovi.id')
+        ->join('utakmice', 'golovi.utakmica_id', '=', 'utakmice.id')
+        ->where('golovi.auto_gol', false)
+        ->where(function($query) {
+        $query->where('golovi.igrac_tip', 'regularni')
+        ->orWhereNull('golovi.igrac_tip'); // For backward compatibility with older records
+        })
+        ->where(function($query) use ($timIds) {
+        $query->whereIn('igraci.tim_id', $timIds);
+        })
+        ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
+        ->orderBy('broj_golova', 'desc')
+        ->take(10)
+        ->get();
               
     return view('dashboard', compact(
         'glavniTim',
