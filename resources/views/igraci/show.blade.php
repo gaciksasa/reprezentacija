@@ -24,7 +24,7 @@
             <div class="card-body">
                 <div class="row">
                 @if($igrac->fotografija_path)
-                <div class="mb-4">
+                <div class="mb-4 text-center">
                     <img src="{{ asset('storage/' . $igrac->fotografija_path) }}" alt="{{ $igrac->prezime }} {{ $igrac->ime }}" 
                          class="img-fluid rounded">
                 </div>
@@ -46,13 +46,15 @@
                         <td>{{ $igrac->pozicija ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <th>Datum rođenja</th>
-                        <td>{{ $igrac->datum_rodjenja ? $igrac->datum_rodjenja->format('d.m.Y') : '-' }}</td>
+                        <th>Rođen</th>
+                        <td>{{ $igrac->datum_rodjenja ? $igrac->datum_rodjenja->format('d.m.Y') : '-' }} ({{ $igrac->mesto_rodjenja ?? '-' }})</td>
                     </tr>
+                    @if ($igrac->datum_smrti)
                     <tr>
-                        <th>Mesto rođenja</th>
-                        <td>{{ $igrac->mesto_rodjenja ?? '-' }}</td>
+                        <th>Umro</th>
+                        <td>{{ $igrac->datum_smrti ? $igrac->datum_smrti->format('d.m.Y') : '-' }} ({{ $igrac->mesto_smrti ?? '-' }})</td>
                     </tr>
+                    @endif
                     <tr>
                         <th>Debitovao za reprezentaciju</th>
                         <td>{{ $igrac->debitovao_za_tim ? $igrac->debitovao_za_tim->format('d.m.Y') : '-' }}</td>
@@ -344,6 +346,7 @@
             @endif
         </div>
     </div>
+</div>
 </div>
 
 <!-- Modal za dodavanje novog kluba -->
