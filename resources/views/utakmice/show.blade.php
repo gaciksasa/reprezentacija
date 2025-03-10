@@ -113,14 +113,14 @@
                     <ul class="list-unstyled">
                         @foreach($domaciSastav as $sastav)
                             <li class="py-1 {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
+                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                 @if(!$sastav->starter) <small>(rezerva)</small> @endif
                             </li>
                         @endforeach
                         
                         @foreach($domaciProtivnickiIgraci as $igrac)
                             <li class="py-1 fw-bold">
-                                {{ $igrac->ime }} {{ $igrac->prezime }}
+                                {{ $igrac->prezime }} {{ $igrac->ime }} 
                                 @if($igrac->kapiten) <small>(C)</small> @endif
                             </li>
                         @endforeach
@@ -140,14 +140,14 @@
                     <ul class="list-unstyled">
                         @foreach($gostujuciSastav as $sastav)
                             <li class="py-1 {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                {{ $sastav->igrac->ime }} {{ $sastav->igrac->prezime }}
+                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }} 
                                 @if(!$sastav->starter) <small>(rezerva)</small> @endif
                             </li>
                         @endforeach
                         
                         @foreach($gostujuciProtivnickiIgraci as $igrac)
                             <li class="py-1 fw-bold">
-                                {{ $igrac->ime }} {{ $igrac->prezime }}
+                                {{ $igrac->prezime }} {{ $igrac->ime }} 
                                 @if($igrac->kapiten) <small>(C)</small> @endif
                             </li>
                         @endforeach

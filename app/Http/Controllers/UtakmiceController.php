@@ -87,8 +87,10 @@ class UtakmiceController extends Controller
             'izmene.igracIn', 
             'kartoni.igrac'
         ])->findOrFail($id);
+
+        $selektor = $utakmica->nasSelector();
         
-        return view('utakmice.show', compact('utakmica'));
+        return view('utakmice.show', compact('utakmica', 'selektor'));
     }
 
     /**
