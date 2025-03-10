@@ -96,7 +96,7 @@
                             @foreach($strelci as $index => $strelac)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $strelac->prezime }} {{ $strelac->ime }}</td>
+                                <td><a href="{{ route('igraci.show', $strelac->id) }}">{{ $strelac->prezime }} {{ $strelac->ime }}</a></td>
                                 <td class="text-end">{{ $strelac->broj_golova }}</td>
                             </tr>
                             @endforeach
@@ -124,7 +124,7 @@
                             @foreach($najviseNastupa as $index => $igrac)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $igrac->prezime }} {{ $igrac->ime }} </td>
+                                <td><a href="{{ route('igraci.show', $igrac->id) }}">{{ $igrac->prezime }} {{ $igrac->ime }}</a></td>
                                 <td class="text-end">{{ $igrac->broj_nastupa }}</td>
                             </tr>
                             @endforeach
