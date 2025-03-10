@@ -78,7 +78,7 @@
     </div>
 
     <div class="col-md-6 mb-4">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
                 <h5 class="card-title mb-0">Najbolji strelci</h5>
             </div>
@@ -105,9 +105,7 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6 mb-4">
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">Najviše nastupa</h5>
