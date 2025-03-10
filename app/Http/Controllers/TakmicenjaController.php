@@ -30,7 +30,7 @@ class TakmicenjaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'naziv' => 'required|string|max:255',
+            'naziv' => 'nullable|string|max:255',
             'sezona' => 'nullable|string|max:50',
             'organizator' => 'nullable|string|max:255',
         ]);

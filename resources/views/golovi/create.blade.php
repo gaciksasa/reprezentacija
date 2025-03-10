@@ -84,9 +84,9 @@
             </div>
             
             <div class="mb-3">
-                <label for="minut" class="form-label">Minut *</label>
+                <label for="minut" class="form-label">Minut</label>
                 <input type="number" class="form-control @error('minut') is-invalid @enderror" 
-                       id="minut" name="minut" value="{{ old('minut') }}" required min="1" max="120">
+                       id="minut" name="minut" value="{{ old('minut') }}" min="1" max="120">
                 @error('minut')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror

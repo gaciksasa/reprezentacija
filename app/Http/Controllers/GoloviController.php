@@ -139,7 +139,7 @@ class GoloviController extends Controller
         $validated = $request->validate([
             'utakmica_id' => 'required|exists:utakmice,id',
             'tim_id' => 'required|exists:timovi,id',
-            'minut' => 'required|integer|min:1|max:120',
+            'minut' => 'nullable|integer|min:1|max:120',
         ]);
         
         // Dodajemo obrađene podatke

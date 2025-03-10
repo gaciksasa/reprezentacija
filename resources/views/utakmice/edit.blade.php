@@ -30,7 +30,7 @@
             <div class="mb-3">
                 <label for="takmicenje" class="form-label">Takmičenje *</label>
                 <input type="text" class="form-control @error('takmicenje') is-invalid @enderror" 
-                       id="takmicenje" name="takmicenje" value="{{ old('takmicenje', $utakmica->takmicenje->naziv) }}" required>
+                    id="takmicenje" name="takmicenje" value="{{ old('takmicenje', $utakmica->takmicenje ? $utakmica->takmicenje->naziv : '') }}" required>
                 @error('takmicenje')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
