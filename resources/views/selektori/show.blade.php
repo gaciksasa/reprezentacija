@@ -27,8 +27,8 @@
                         <img src="{{ asset('storage/' . $selektor->fotografija_path) }}" alt="{{ $selektor->ime_prezime }}" class="img-fluid rounded" style="max-height: 200px;">
                     </div>
                 @else
-                <div class="text-center mb-3">
-                        <img src="{{ asset('img/no-photo.jpg')}}" alt="{{ $selektor->ime_prezime }}" class="img-fluid rounded" style="max-height: 200px;">
+                    <div class="text-center mb-3">
+                        <img src="{{ asset('img/no-photo.jpg')}}" alt="No photo" class="img-fluid rounded" style="max-height: 200px;">
                     </div>
                 @endif
                 

@@ -100,65 +100,21 @@
                 </div>
             </div>
         </div>
-    </div>
-    
+    </div>  
     <div class="col-md-8">
+        <!-- Biografija -->
         <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Klubovi u karijeri</h5>
-            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addClubModal">
-                <i class="fas fa-plus"></i> Dodaj klub
-            </button>
-        </div>
-        <div class="card-body">
-        @if($igrac->bivsiKlubovi->count() > 0)
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Klub</th>
-                        <th>Država</th>
-                        <th>Sezona</th>
-                        <th>Stepen takmičenja</th>
-                        <th>Nastupi</th>
-                        <th>Golovi</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($igrac->bivsiKlubovi->sortByDesc('id') as $klub)
-                    <tr>
-                        <td>{{ $klub->naziv }}</td>
-                        <td>{{ $klub->drzava ?? '-' }}</td>
-                        <td>{{ $klub->sezona ?? '-' }}</td>
-                        <td>{{ $klub->stepen_takmicenja ?? '-' }}</td>
-                        <td align="right">{{ $klub->broj_nastupa ?? '-' }}</td>
-                        <td align="right">{{ $klub->broj_golova ?? '-' }}</td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-danger" 
-                                    onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <form id="delete-klub-{{ $klub->id }}" action="{{ route('igraci.deleteClub', $klub) }}" method="POST" class="d-none">
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                        </td>
-                    </tr>                    
-                    @endforeach
-                    <tr>
-                        <td colspan="4">&nbsp;</td>
-                        <td align="right">{{ $igrac->bivsiKlubovi->sum('broj_nastupa') }}</td>
-                        <td align="right">{{ $igrac->bivsiKlubovi->sum('broj_golova') }}</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                </tbody>
-            </table>
-        @else
-            <p class="text-center text-muted">Nema evidentiranih klubova za ovog igrača.</p>
-        @endif
-        </div>
-    </div>
-        
+            <div class="card-header">
+                <h5 class="card-title mb-0">Biografija</h5>
+            </div>
+            <div class="card-body">
+                @if($igrac->biografija)    
+                    {{$igrac->biografija}}
+                @else
+                    <p class="text-center text-muted">Nema biografije za ovog igrača.</p>
+                @endif  
+            </div>
+        </div>  
         <!-- Kartice za utakmice i golove -->
         <div class="card mb-4">
             <div class="card-header">
@@ -332,6 +288,60 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Klubovi u karijeri</h5>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addClubModal">
+                    <i class="fas fa-plus"></i> Dodaj klub
+                </button>
+            </div>
+            <div class="card-body">
+            @if($igrac->bivsiKlubovi->count() > 0)
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Klub</th>
+                            <th>Država</th>
+                            <th>Sezona</th>
+                            <th>Stepen takmičenja</th>
+                            <th>Nastupi</th>
+                            <th>Golovi</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($igrac->bivsiKlubovi->sortByDesc('id') as $klub)
+                        <tr>
+                            <td>{{ $klub->naziv }}</td>
+                            <td>{{ $klub->drzava ?? '-' }}</td>
+                            <td>{{ $klub->sezona ?? '-' }}</td>
+                            <td>{{ $klub->stepen_takmicenja ?? '-' }}</td>
+                            <td align="right">{{ $klub->broj_nastupa ?? '-' }}</td>
+                            <td align="right">{{ $klub->broj_golova ?? '-' }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <form id="delete-klub-{{ $klub->id }}" action="{{ route('igraci.deleteClub', $klub) }}" method="POST" class="d-none">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>                    
+                        @endforeach
+                        <tr>
+                            <td colspan="4">&nbsp;</td>
+                            <td align="right">{{ $igrac->bivsiKlubovi->sum('broj_nastupa') }}</td>
+                            <td align="right">{{ $igrac->bivsiKlubovi->sum('broj_golova') }}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            @else
+            <p class="text-center text-muted">Nema evidentiranih klubova za ovog igrača.</p>
+            @endif
         </div>
     </div>
 </div>
