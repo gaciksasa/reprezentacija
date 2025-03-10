@@ -111,6 +111,31 @@ class DashboardController extends Controller
         'porazi',
         'strelci'
     ));
+
+    // Igrači sa najviše nastupa
+    $najviseNastupa = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
+        DB::raw('COUNT(sastavi.id) as broj_nastupa'))
+        ->join('sastavi', 'igraci.id', '=', 'sastavi.igrac_id')
+        ->leftJoin('timovi', 'igraci.tim_id', '=', 'timovi.id')
+        ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
+        ->orderBy('broj_nastupa', 'desc')
+        ->take(10)
+        ->get();
+
+    // Dodajte 'najviseNastupa' u compact()
+    return view('dashboard', compact(
+        'glavniTim',
+        'poslednjeUtakmice', 
+        'brojTimova', 
+        'brojIgraca', 
+        'brojUtakmica',
+        'brojUtakmicaGlavnogTima',
+        'pobede',
+        'neresene',
+        'porazi',
+        'strelci',
+        'najviseNastupa'
+    ));
 }
     
     /**

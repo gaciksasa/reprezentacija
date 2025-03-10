@@ -89,7 +89,6 @@
                             <tr>
                                 <th>#</th>
                                 <th>Igrač</th>
-                                <th>Tim</th>
                                 <th>Golovi</th>
                             </tr>
                         </thead>
@@ -97,9 +96,38 @@
                             @foreach($strelci as $index => $strelac)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $strelac->ime }} {{ $strelac->prezime }}</td>
-                                <td>{{ $strelac->tim }}</td>
-                                <td>{{ $strelac->broj_golova }}</td>
+                                <td>{{ $strelac->prezime }} {{ $strelac->ime }}</td>
+                                <td class="text-end">{{ $strelac->broj_golova }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Najviše nastupa</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Igrač</th>
+                                <th class="text-end">Nastupa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($najviseNastupa as $index => $igrac)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $igrac->prezime }} {{ $igrac->ime }} </td>
+                                <td class="text-end">{{ $igrac->broj_nastupa }}</td>
                             </tr>
                             @endforeach
                         </tbody>
