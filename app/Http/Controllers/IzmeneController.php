@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Izmena;
+use App\Models\ProtivnickaIzmena;
 use App\Models\Utakmica;
 use App\Models\Tim;
 use App\Models\Igrac;
+use App\Models\Sastav;
+use App\Models\ProtivnickiIgrac;
 use Illuminate\Http\Request;
 
 class IzmeneController extends Controller
@@ -20,12 +23,23 @@ class IzmeneController extends Controller
         if ($utakmica_id) {
             $utakmica = Utakmica::with(['domacin', 'gost'])->findOrFail($utakmica_id);
             
+            // Dohvatamo regularne izmene
             $izmene = Izmena::where('utakmica_id', $utakmica_id)
                 ->with(['tim', 'igracOut', 'igracIn'])
                 ->orderBy('minut')
                 ->get();
                 
-            return view('izmene.index', compact('utakmica', 'izmene'));
+            // Dohvatamo protivničke izmene
+            $protivnickeIzmene = ProtivnickaIzmena::where('utakmica_id', $utakmica_id)
+                ->with(['tim', 'igracOut', 'igracIn'])
+                ->orderBy('minut')
+                ->get();
+                
+            // Spajamo obe kolekcije izmena
+            $sveIzmene = $izmene->concat($protivnickeIzmene)
+                ->sortBy('minut');
+                
+            return view('izmene.index', compact('utakmica', 'sveIzmene'));
         }
         
         $utakmice = Utakmica::with(['domacin', 'gost'])
@@ -57,10 +71,41 @@ class IzmeneController extends Controller
                 ->with('error', 'Izabrani tim nije učesnik ove utakmice.');
         }
         
-        // Igrači tima koji su u sastavu ove utakmice
-        $igraci = Igrac::where('tim_id', $tim_id)->orderBy('prezime')->get();
+        // Dobavi glavni tim (Srbija i alijasi)
+        $glavniTim = Tim::glavniTim()->first();
+        $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
         
-        return view('izmene.create', compact('utakmica', 'tim', 'igraci'));
+        // Proveri da li je trenutni tim zapravo "naš" tim
+        $isNasTim = in_array($tim_id, $glavniTimIds);
+        
+        if ($isNasTim) {
+            // Za "naš" tim, dohvatamo igrače iz sastava
+            $sastavi = Sastav::where('utakmica_id', $utakmica_id)
+                    ->where('tim_id', $tim_id)
+                    ->get();
+            
+            // ID-jevi igrača u sastavu
+            $igracIds = $sastavi->pluck('igrac_id')->toArray();
+            
+            // Dohvatamo igrače
+            $igraci = Igrac::whereIn('id', $igracIds)
+                    ->orderBy('prezime')
+                    ->orderBy('ime')
+                    ->get();
+                    
+            $tipIzmene = 'regularna';
+        } else {
+            // Za protivnički tim, dohvatamo protivničke igrače
+            $igraci = ProtivnickiIgrac::where('utakmica_id', $utakmica_id)
+                    ->where('tim_id', $tim_id)
+                    ->orderBy('prezime')
+                    ->orderBy('ime')
+                    ->get();
+                    
+            $tipIzmene = 'protivnicka';
+        }
+        
+        return view('izmene.create', compact('utakmica', 'tim', 'igraci', 'tipIzmene'));
     }
 
     /**
@@ -68,63 +113,144 @@ class IzmeneController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'utakmica_id' => 'required|exists:utakmice,id',
-            'tim_id' => 'required|exists:timovi,id',
-            'igrac_out_id' => 'required|exists:igraci,id',
-            'igrac_in_id' => 'required|exists:igraci,id|different:igrac_out_id',
-            'minut' => 'required|integer|min:1|max:120',
-        ]);
+        $tipIzmene = $request->input('tip_izmene');
+        
+        if ($tipIzmene == 'regularna') {
+            // Validacija za naš tim
+            $validated = $request->validate([
+                'utakmica_id' => 'required|exists:utakmice,id',
+                'tim_id' => 'required|exists:timovi,id',
+                'igrac_out_id' => 'required|exists:igraci,id',
+                'igrac_in_id' => 'required|exists:igraci,id|different:igrac_out_id',
+                'minut' => 'required|integer|min:1|max:120',
+            ]);
+            
+            // Kreiranje izmene za naš tim
+            Izmena::create($validated);
+        } else {
+            // Validacija za protivnički tim
+            $validated = $request->validate([
+                'utakmica_id' => 'required|exists:utakmice,id',
+                'tim_id' => 'required|exists:timovi,id',
+                'igrac_out_id' => 'required|exists:protivnicki_igraci,id',
+                'igrac_in_id' => 'required|exists:protivnicki_igraci,id|different:igrac_out_id',
+                'minut' => 'required|integer|min:1|max:120',
+                'napomena' => 'nullable|string',
+            ]);
+            
+            // Kreiranje izmene za protivnički tim
+            ProtivnickaIzmena::create($validated);
+        }
 
-        Izmena::create($validated);
-
-        return redirect()->route('izmene.index', ['utakmica_id' => $validated['utakmica_id']])
+        return redirect()->route('izmene.index', ['utakmica_id' => $request->input('utakmica_id')])
             ->with('success', 'Izmena uspešno zabeležena.');
     }
 
     /**
      * Prikaz pojedinačne izmene.
      */
-    public function show(Izmena $izmena)
+    public function show($id)
     {
-        $izmena->load(['utakmica', 'tim', 'igracOut', 'igracIn']);
-        return view('izmene.show', compact('izmena'));
+        // Proveriti da li je obična ili protivnička izmena
+        $izmena = Izmena::with(['utakmica', 'tim', 'igracOut', 'igracIn'])->find($id);
+        
+        if (!$izmena) {
+            // Ako nije obična izmena, proveriti da li je protivnička
+            $izmena = ProtivnickaIzmena::with(['utakmica', 'tim', 'igracOut', 'igracIn'])->findOrFail($id);
+            $tipIzmene = 'protivnicka';
+        } else {
+            $tipIzmene = 'regularna';
+        }
+        
+        return view('izmene.show', compact('izmena', 'tipIzmene'));
     }
 
     /**
      * Prikaz forme za izmenu izmene.
      */
-    public function edit(Izmena $izmena)
+    public function edit($id)
     {
-        $izmena->load(['utakmica.domacin', 'utakmica.gost', 'tim', 'igracOut', 'igracIn']);
+        // Proveriti da li je obična ili protivnička izmena
+        $izmena = Izmena::with(['utakmica.domacin', 'utakmica.gost', 'tim', 'igracOut', 'igracIn'])->find($id);
         
-        $igraci = Igrac::where('tim_id', $izmena->tim_id)->orderBy('prezime')->get();
+        if (!$izmena) {
+            // Ako nije obična izmena, proveriti da li je protivnička
+            $izmena = ProtivnickaIzmena::with(['utakmica.domacin', 'utakmica.gost', 'tim', 'igracOut', 'igracIn'])->findOrFail($id);
+            $tipIzmene = 'protivnicka';
+            
+            // Dohvatanje protivničkih igrača
+            $igraci = ProtivnickiIgrac::where('utakmica_id', $izmena->utakmica_id)
+                    ->where('tim_id', $izmena->tim_id)
+                    ->orderBy('prezime')
+                    ->orderBy('ime')
+                    ->get();
+        } else {
+            $tipIzmene = 'regularna';
+            
+            // Dohvatanje regularnih igrača
+            $igraci = Igrac::whereIn('id', function($query) use ($izmena) {
+                $query->select('igrac_id')
+                      ->from('sastavi')
+                      ->where('utakmica_id', $izmena->utakmica_id)
+                      ->where('tim_id', $izmena->tim_id);
+            })
+            ->orderBy('prezime')
+            ->orderBy('ime')
+            ->get();
+        }
         
-        return view('izmene.edit', compact('izmena', 'igraci'));
+        return view('izmene.edit', compact('izmena', 'igraci', 'tipIzmene'));
     }
 
     /**
      * Ažuriranje izmene.
      */
-    public function update(Request $request, Izmena $izmena)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'igrac_out_id' => 'required|exists:igraci,id',
-            'igrac_in_id' => 'required|exists:igraci,id|different:igrac_out_id',
-            'minut' => 'required|integer|min:1|max:120',
-        ]);
+        $tipIzmene = $request->input('tip_izmene');
+        
+        if ($tipIzmene == 'regularna') {
+            // Validacija za naš tim
+            $validated = $request->validate([
+                'igrac_out_id' => 'required|exists:igraci,id',
+                'igrac_in_id' => 'required|exists:igraci,id|different:igrac_out_id',
+                'minut' => 'required|integer|min:1|max:120',
+            ]);
+            
+            // Pronalaženje i ažuriranje izmene za naš tim
+            $izmena = Izmena::findOrFail($id);
+            $izmena->update($validated);
+        } else {
+            // Validacija za protivnički tim
+            $validated = $request->validate([
+                'igrac_out_id' => 'required|exists:protivnicki_igraci,id',
+                'igrac_in_id' => 'required|exists:protivnicki_igraci,id|different:igrac_out_id',
+                'minut' => 'required|integer|min:1|max:120',
+                'napomena' => 'nullable|string',
+            ]);
+            
+            // Pronalaženje i ažuriranje izmene za protivnički tim
+            $izmena = ProtivnickaIzmena::findOrFail($id);
+            $izmena->update($validated);
+        }
 
-        $izmena->update($validated);
-
-        return redirect()->route('izmene.index', ['utakmica_id' => $izmena->utakmica_id])
+        return redirect()->route('izmene.index', ['utakmica_id' => $request->input('utakmica_id')])
             ->with('success', 'Izmena uspešno ažurirana.');
     }
 
     /**
      * Brisanje izmene.
      */
-    public function destroy(Izmena $izmena)
+    public function destroy($id)
     {
+        // Proveriti da li je obična ili protivnička izmena
+        $izmena = Izmena::find($id);
+        
+        if (!$izmena) {
+            // Ako nije obična izmena, proveriti da li je protivnička
+            $izmena = ProtivnickaIzmena::findOrFail($id);
+        }
+        
         $utakmica_id = $izmena->utakmica_id;
         $izmena->delete();
         

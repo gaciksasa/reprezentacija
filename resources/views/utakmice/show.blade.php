@@ -25,16 +25,18 @@
 <div class="card mb-4">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <strong>Datum:</strong> {{ $utakmica->datum->format('d.m.Y') }}
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <strong>Stadion:</strong> {{ $utakmica->stadion }}
             </div>
-            <div class="col-md-3">
+        </div>
+        <div class="row">
+            <div class="col-md-6">
                 <strong>Sudija:</strong> {{ $utakmica->sudija }}
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <strong>Publika:</strong> {{ $utakmica->publika }}
             </div>
         </div>
@@ -480,7 +482,12 @@
                 </div>
             </div>
             <div class="card-body">
-                @if($utakmica->izmene->count() > 0)
+                @php
+                    // Dobavi sve izmene (i regularne i protivničke)
+                    $sveIzmene = $utakmica->izmene->concat($utakmica->protivnickeIzmene)->sortBy('minut');
+                @endphp
+                
+                @if($sveIzmene->count() > 0)
                     <div class="table-responsive">
                         <table class="table table-sm">
                             <thead>
@@ -491,7 +498,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($utakmica->izmene->sortBy('minut') as $izmena)
+                                @foreach($sveIzmene as $izmena)
                                 <tr>
                                     <td>{{ $izmena->minut }}'</td>
                                     <td>{{ $izmena->tim->skraceni_naziv ?? $izmena->tim->naziv }}</td>

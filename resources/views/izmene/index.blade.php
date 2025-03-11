@@ -35,7 +35,8 @@
             <div class="row align-items-center">
                 <div class="col-md-4 text-md-end">
                     <h5>{{ $utakmica->domacin->naziv }}</h5>
-                </div><div class="col-md-4 text-center">
+                </div>
+                <div class="col-md-4 text-center">
                     <div class="display-5">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
                     <div class="text-muted">{{ $utakmica->datum->format('d.m.Y') }}</div>
                     <div>
@@ -56,7 +57,7 @@
             <h5 class="card-title mb-0">Lista izmena</h5>
         </div>
         <div class="card-body">
-            @if($izmene->count() > 0)
+            @if(isset($sveIzmene) && $sveIzmene->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -69,12 +70,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($izmene as $izmena)
+                            @foreach($sveIzmene as $izmena)
                             <tr>
                                 <td>{{ $izmena->minut }}'</td>
                                 <td>{{ $izmena->tim->naziv }}</td>
-                                <td>{{ $izmena->igracOut->ime }} {{ $izmena->igracOut->prezime }}</td>
-                                <td>{{ $izmena->igracIn->ime }} {{ $izmena->igracIn->prezime }}</td>
+                                <td>{{ $izmena->igracOut->ime ?? 'N/A' }} {{ $izmena->igracOut->prezime ?? '' }}</td>
+                                <td>{{ $izmena->igracIn->ime ?? 'N/A' }} {{ $izmena->igracIn->prezime ?? '' }}</td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('izmene.edit', $izmena) }}" class="btn btn-sm btn-warning">
@@ -125,7 +126,11 @@
                             <td>{{ $u->domacin->naziv }}</td>
                             <td class="text-center">{{ $u->rezultat_domacin }} - {{ $u->rezultat_gost }}</td>
                             <td>{{ $u->gost->naziv }}</td>
-                            <td>{{ $u->takmicenje->naziv }}</td>
+                            <td>
+                                @if($u->takmicenje)
+                                    {{ $u->takmicenje->naziv }}
+                                @endif
+                            </td>
                             <td>
                                 <a href="{{ route('izmene.index', ['utakmica_id' => $u->id]) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-exchange-alt"></i> Izmene

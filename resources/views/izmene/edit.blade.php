@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Dodaj izmenu')
+@section('title', 'Izmeni izmenu')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Dodaj novu izmenu</h1>
-    <a href="{{ route('izmene.index', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-secondary">
+    <h1>Izmeni izmenu</h1>
+    <a href="{{ route('izmene.index', ['utakmica_id' => $izmena->utakmica_id]) }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Nazad
     </a>
 </div>
@@ -17,19 +17,19 @@
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-md-4 text-md-end">
-                <h5>{{ $utakmica->domacin->naziv }}</h5>
+                <h5>{{ $izmena->utakmica->domacin->naziv }}</h5>
             </div>
             <div class="col-md-4 text-center">
-                <div class="display-5">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
-                <div class="text-muted">{{ $utakmica->datum->format('d.m.Y') }}</div>
+                <div class="display-5">{{ $izmena->utakmica->rezultat_domacin }} - {{ $izmena->utakmica->rezultat_gost }}</div>
+                <div class="text-muted">{{ $izmena->utakmica->datum->format('d.m.Y') }}</div>
                 <div>
-                    @if($utakmica->takmicenje)
-                        {{ $utakmica->takmicenje->naziv }}
+                    @if($izmena->utakmica->takmicenje)
+                        {{ $izmena->utakmica->takmicenje->naziv }}
                     @endif
                 </div>
             </div>
             <div class="col-md-4">
-                <h5>{{ $utakmica->gost->naziv }}</h5>
+                <h5>{{ $izmena->utakmica->gost->naziv }}</h5>
             </div>
         </div>
     </div>
@@ -37,14 +37,14 @@
 
 <div class="card">
     <div class="card-header">
-        <h5 class="card-title mb-0">Izmena za tim: {{ $tim->naziv }}</h5>
+        <h5 class="card-title mb-0">Izmeni izmenu za tim: {{ $izmena->tim->naziv }}</h5>
     </div>
     <div class="card-body">
-        <form action="{{ route('izmene.store') }}" method="POST">
+        <form action="{{ route('izmene.update', $izmena->id) }}" method="POST">
             @csrf
+            @method('PUT')
             
-            <input type="hidden" name="utakmica_id" value="{{ $utakmica->id }}">
-            <input type="hidden" name="tim_id" value="{{ $tim->id }}">
+            <input type="hidden" name="utakmica_id" value="{{ $izmena->utakmica_id }}">
             <input type="hidden" name="tip_izmene" value="{{ $tipIzmene ?? 'regularna' }}">
             
             <div class="mb-3">
@@ -53,7 +53,7 @@
                         id="igrac_out_id" name="igrac_out_id" required>
                     <option value="">-- Izaberite igrača --</option>
                     @foreach($igraci as $igrac)
-                        <option value="{{ $igrac->id }}" {{ old('igrac_out_id') == $igrac->id ? 'selected' : '' }}>
+                        <option value="{{ $igrac->id }}" {{ old('igrac_out_id', $izmena->igrac_out_id) == $igrac->id ? 'selected' : '' }}>
                             {{ $igrac->ime }} {{ $igrac->prezime }}
                         </option>
                     @endforeach
@@ -69,7 +69,7 @@
                         id="igrac_in_id" name="igrac_in_id" required>
                     <option value="">-- Izaberite igrača --</option>
                     @foreach($igraci as $igrac)
-                        <option value="{{ $igrac->id }}" {{ old('igrac_in_id') == $igrac->id ? 'selected' : '' }}>
+                        <option value="{{ $igrac->id }}" {{ old('igrac_in_id', $izmena->igrac_in_id) == $igrac->id ? 'selected' : '' }}>
                             {{ $igrac->ime }} {{ $igrac->prezime }}
                         </option>
                     @endforeach
@@ -82,7 +82,7 @@
             <div class="mb-3">
                 <label for="minut" class="form-label">Minut *</label>
                 <input type="number" class="form-control @error('minut') is-invalid @enderror" 
-                       id="minut" name="minut" value="{{ old('minut') }}" required min="1" max="120">
+                       id="minut" name="minut" value="{{ old('minut', $izmena->minut) }}" required min="1" max="120">
                 @error('minut')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -92,7 +92,7 @@
             <div class="mb-3">
                 <label for="napomena" class="form-label">Napomena</label>
                 <textarea class="form-control @error('napomena') is-invalid @enderror" 
-                          id="napomena" name="napomena" rows="2">{{ old('napomena') }}</textarea>
+                          id="napomena" name="napomena" rows="2">{{ old('napomena', $izmena->napomena ?? '') }}</textarea>
                 @error('napomena')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -100,7 +100,7 @@
             @endif
             
             <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Sačuvaj izmenu</button>
+                <button type="submit" class="btn btn-primary">Sačuvaj izmene</button>
             </div>
         </form>
     </div>
