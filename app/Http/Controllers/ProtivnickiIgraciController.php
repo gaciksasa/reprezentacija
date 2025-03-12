@@ -144,48 +144,18 @@ class ProtivnickiIgraciController extends Controller
             ->with('success', 'Protivnički igrač uspešno ažuriran.');
     }
 
+
     /**
      * Brisanje protivničkog igrača.
      */
-    public function destroy($id)
+    public function destroy(ProtivnickiIgrac $protivnickiIgrac)
     {
-        // Eksplicitno učitavamo model umesto oslanjanja na Route Model Binding
-        $protivnickiIgrac = \App\Models\ProtivnickiIgrac::find($id);
-        
-        // Logujemo šta smo dobili
-        \Log::info('Pronađen igrač za brisanje', [
-            'id' => $id,
-            'igrač' => $protivnickiIgrac ? "Pronađen (ID: {$protivnickiIgrac->id})" : "Nije pronađen"
-        ]);
-        
-        // Ako igrač ne postoji, vraćamo grešku
-        if (!$protivnickiIgrac) {
-            return back()->with('error', 'Igrač nije pronađen.');
-        }
-        
-        // Pamtimo ID utakmice pre brisanja
         $utakmica_id = $protivnickiIgrac->utakmica_id;
         
-        try {
-            // Brisanje igrača
-            $isDeleted = $protivnickiIgrac->delete();
-            
-            \Log::info('Rezultat brisanja', ['uspešno' => $isDeleted]);
-            
-            // Preusmeravanje
-            if ($isDeleted) {
-                return redirect("/utakmice/{$utakmica_id}")
-                    ->with('success', 'Protivnički igrač uspešno obrisan.');
-            } else {
-                return back()->with('error', 'Došlo je do greške prilikom brisanja igrača.');
-            }
-        } catch (\Exception $e) {
-            \Log::error('Greška pri brisanju', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            return back()->with('error', 'Greška: ' . $e->getMessage());
-        }
+        // Delete the opponent player
+        $protivnickiIgrac->delete();
+        
+        return redirect()->route('utakmice.show', $utakmica_id)
+            ->with('success', 'Protivnički igrač uspešno obrisan.');
     }
 }
