@@ -43,9 +43,9 @@
     </div>
 </div>
 
-<!-- Glavni prikaz utakmice -->
+<!-- Sastavi -->
 <div class="card mb-4">
-<div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0"></h5>
         <div class="btn-group">
             @php
@@ -80,11 +80,11 @@
     <div class="card-body">
         <div class="row py-4 align-items-center">
             <div class="col-4 text-center">
-                <a href="{{ route('timovi.show', $utakmica->domacin) }}">
+                <a href="{{ route('timovi.show', $utakmica->domacin) }}" class="text-decoration-none">
                     @if($utakmica->domacin && $utakmica->domacin->grb_url)
                         <img src="{{ asset('storage/grbovi/' . $utakmica->domacin->grb_url) }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
                     @endif
-                    <h4>{{ $utakmica->domacin->naziv }}</h4>
+                    <h4><span class="text-danger fw-bold">{{ $utakmica->domacin->naziv }}</span></h4>
                 </a>
             </div>
             <div class="col-4 text-center">
@@ -94,11 +94,11 @@
                 </div>
             </div>
             <div class="col-4 text-center">
-                <a href="{{ route('timovi.show', $utakmica->gost) }}">
+                <a href="{{ route('timovi.show', $utakmica->gost) }}" class="text-decoration-none">
                     @if($utakmica->gost && $utakmica->gost->grb_url)
                         <img src="{{ asset('storage/grbovi/' . $utakmica->gost->grb_url) }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
                     @endif
-                    <h4>{{ $utakmica->gost->naziv }}</h4>
+                    <h4><span class="text-danger fw-bold">{{ $utakmica->gost->naziv }}</span></h4>
                 </a>
             </div>
         </div>
@@ -114,16 +114,36 @@
                 @if($imaDomacihIgraca)
                     <ul class="list-unstyled">
                         @foreach($domaciSastav as $sastav)
-                            <li class="py-1 {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
-                                @if(!$sastav->starter) <small>(rezerva)</small> @endif
+                            <li class="py-1">
+                                <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
+                                    <span class="text-danger {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
+                                        {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
+                                        @if(!$sastav->starter) <small>(rezerva)</small> @endif
+                                    </span>
+                                </a>
+                                <form action="{{ route('sastavi.destroy', $sastav) }}" method="POST" class="d-inline ms-2">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
                             </li>
                         @endforeach
                         
                         @foreach($domaciProtivnickiIgraci as $igrac)
-                            <li class="py-1 fw-bold">
-                                {{ $igrac->prezime }} {{ $igrac->ime }} 
-                                @if($igrac->kapiten) <small>(C)</small> @endif
+                            <li class="py-1">
+                                <span class="fw-bold">
+                                    {{ $igrac->prezime }} {{ $igrac->ime }} 
+                                    @if($igrac->kapiten) <small>(C)</small> @endif
+                                </span>
+                                <form action="{{ route('protivnicki-igraci.destroy', $igrac) }}" method="POST" class="d-inline ms-2">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
                             </li>
                         @endforeach
                     </ul>
@@ -141,16 +161,36 @@
                 @if($imaGostujucihIgraca)
                     <ul class="list-unstyled">
                         @foreach($gostujuciSastav as $sastav)
-                            <li class="py-1 {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }} 
-                                @if(!$sastav->starter) <small>(rezerva)</small> @endif
+                            <li class="py-1">
+                                <form action="{{ route('sastavi.destroy', $sastav) }}" method="POST" class="d-inline me-2">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                                <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
+                                    <span class="text-danger {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
+                                        {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }} 
+                                        @if(!$sastav->starter) <small>(rezerva)</small> @endif
+                                    </span>
+                                </a>
                             </li>
                         @endforeach
                         
                         @foreach($gostujuciProtivnickiIgraci as $igrac)
-                            <li class="py-1 fw-bold">
-                                {{ $igrac->prezime }} {{ $igrac->ime }} 
-                                @if($igrac->kapiten) <small>(C)</small> @endif
+                            <li class="py-1">
+                                <form action="{{ route('protivnicki-igraci.destroy', $igrac) }}" method="POST" class="d-inline me-2">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                                <span class="fw-bold">
+                                    {{ $igrac->prezime }} {{ $igrac->ime }} 
+                                    @if($igrac->kapiten) <small>(C)</small> @endif
+                                </span>
                             </li>
                         @endforeach
                     </ul>
@@ -198,8 +238,8 @@
                                 @endif
                                 <div>
                                     <h5 class="mb-1">
-                                        <a href="{{ route('selektori.show', $selektor->selektor) }}">
-                                            {{ $selektor->selektor->ime_prezime }}
+                                        <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
+                                            <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
                                         </a>
                                         @if($selektor->v_d_status)
                                             <span class="badge bg-warning text-dark">v.d.</span>
@@ -278,8 +318,8 @@
                                 @endif
                                 <div>
                                     <h5 class="mb-1">
-                                        <a href="{{ route('selektori.show', $selektor->selektor) }}">
-                                            {{ $selektor->selektor->ime_prezime }}
+                                        <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
+                                            <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
                                         </a>
                                         @if($selektor->v_d_status)
                                             <span class="badge bg-warning text-dark">v.d.</span>
@@ -307,11 +347,12 @@
                                             onclick="document.getElementById('delete-selektor-{{ $gostSelektor->id }}').submit()">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                    <form id="delete-selektor-{{ $gostSelektor->id }}" 
-                                          action="{{ route('protivnicki-selektori.destroy', $gostSelektor->id) }}" 
-                                          method="POST" class="d-none">
+                                    <form action="{{ url('protivnicki-igraci/'.$igrac->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -383,11 +424,11 @@
                                         @endphp
                                         @if($protivnickiIgrac)
                                             @if($gol->penal)
-                                                <strong>{{ $protivnickiIgrac->ime }} {{ $protivnickiIgrac->prezime }}</strong> (p)
+                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong> (p)
                                             @elseif($gol->auto_gol)
-                                                <strong>{{ $protivnickiIgrac->ime }} {{ $protivnickiIgrac->prezime }}</strong> (ag)
+                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong> (ag)
                                             @else
-                                                <strong>{{ $protivnickiIgrac->ime }} {{ $protivnickiIgrac->prezime }}</strong>
+                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong>
                                             @endif
                                         @else
                                             <strong>Nepoznat igrač</strong>
@@ -395,13 +436,17 @@
                                     @else
                                         {{-- Prikazujemo regularnog igrača --}}
                                         @if($gol->igrac)
-                                            @if($gol->penal)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
-                                            @elseif($gol->auto_gol)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
-                                            @else
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
-                                            @endif
+                                            <a href="{{ route('igraci.show', $gol->igrac->id) }}" class="text-decoration-none">
+                                                <span class="text-danger fw-bold">
+                                                    @if($gol->penal)
+                                                        <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong> (p)
+                                                    @elseif($gol->auto_gol)
+                                                        <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong> (ag)
+                                                    @else
+                                                        <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong>
+                                                    @endif
+                                                </span>
+                                            </a>
                                         @else
                                             <strong>Nepoznat igrač</strong>
                                         @endif
@@ -429,11 +474,11 @@
                                         @endphp
                                         @if($protivnickiIgrac)
                                             @if($gol->penal)
-                                                <strong>{{ $protivnickiIgrac->ime }} {{ $protivnickiIgrac->prezime }}</strong> (p)
+                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong> (p)
                                             @elseif($gol->auto_gol)
-                                                <strong>{{ $protivnickiIgrac->ime }} {{ $protivnickiIgrac->prezime }}</strong> (ag)
+                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong> (ag)
                                             @else
-                                                <strong>{{ $protivnickiIgrac->ime }} {{ $protivnickiIgrac->prezime }}</strong>
+                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong>
                                             @endif
                                         @else
                                             <strong>Nepoznat igrač</strong>
@@ -442,11 +487,11 @@
                                         {{-- Prikazujemo regularnog igrača --}}
                                         @if($gol->igrac)
                                             @if($gol->penal)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (p)
+                                                <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong> (p)
                                             @elseif($gol->auto_gol)
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong> (ag)
+                                                <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong> (ag)
                                             @else
-                                                <strong>{{ $gol->igrac->ime }} {{ $gol->igrac->prezime }}</strong>
+                                                <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong>
                                             @endif
                                         @else
                                             <strong>Nepoznat igrač</strong>
@@ -466,107 +511,101 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <!-- Izmene -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Izmene</h5>
-                <div class="btn-group">
-                    <a href="{{ route('izmene.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Domaćin
-                    </a>
-                    <a href="{{ route('izmene.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Gost
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                @php
-                    // Dobavi sve izmene (i regularne i protivničke)
-                    $sveIzmene = $utakmica->izmene->concat($utakmica->protivnickeIzmene)->sortBy('minut');
-                @endphp
-                
-                @if($sveIzmene->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Min</th>
-                                    <th>Tim</th>
-                                    <th>Izmena</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($sveIzmene as $izmena)
-                                <tr>
-                                    <td>{{ $izmena->minut }}'</td>
-                                    <td>{{ $izmena->tim->skraceni_naziv ?? $izmena->tim->naziv }}</td>
-                                    <td>
-                                        <i class="fas fa-arrow-right text-success"></i> {{ $izmena->igracIn->ime }} {{ $izmena->igracIn->prezime }}<br>
-                                        <i class="fas fa-arrow-left text-danger"></i> {{ $izmena->igracOut->ime }} {{ $izmena->igracOut->prezime }}
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <p class="text-center text-muted">Nema evidentiranih izmena za ovu utakmicu.</p>
-                @endif
-            </div>
+<!-- Izmene -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Izmene</h5>
+        <div class="btn-group">
+            <a href="{{ route('izmene.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Domaćin
+            </a>
+            <a href="{{ route('izmene.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Gost
+            </a>
         </div>
     </div>
+    <div class="card-body">
+        @php
+            // Dobavi sve izmene (i regularne i protivničke)
+            $sveIzmene = $utakmica->izmene->concat($utakmica->protivnickeIzmene)->sortBy('minut');
+        @endphp
+        
+        @if($sveIzmene->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Min</th>
+                            <th>Tim</th>
+                            <th>Izmena</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($sveIzmene as $izmena)
+                        <tr>
+                            <td>{{ $izmena->minut }}'</td>
+                            <td>{{ $izmena->tim->skraceni_naziv ?? $izmena->tim->naziv }}</td>
+                            <td>
+                                <i class="fas fa-arrow-right text-success"></i> {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}<br>
+                                <i class="fas fa-arrow-left text-danger"></i> {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <p class="text-center text-muted">Nema evidentiranih izmena za ovu utakmicu.</p>
+        @endif
+    </div>
+</div>
 
-    <div class="col-md-6">
-        <!-- Kartoni -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Kartoni</h5>
-                <div class="btn-group">
-                    <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Domaćin
-                    </a>
-                    <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus"></i> Gost
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                @if($utakmica->kartoni->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Min</th>
-                                    <th>Tim</th>
-                                    <th>Igrač</th>
-                                    <th>Karton</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($utakmica->kartoni->sortBy('minut') as $karton)
-                                <tr>
-                                    <td>{{ $karton->minut }}'</td>
-                                    <td>{{ $karton->tim->skraceni_naziv ?? $karton->tim->naziv }}</td>
-                                    <td>{{ $karton->igrac->ime }} {{ $karton->igrac->prezime }}</td>
-                                    <td>
-                                        @if($karton->tip == 'zuti')
-                                            <span class="badge bg-warning">Žuti</span>
-                                        @else
-                                            <span class="badge bg-danger">Crveni</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <p class="text-center text-muted">Nema evidentiranih kartona za ovu utakmicu.</p>
-                @endif
-            </div>
+<!-- Kartoni -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Kartoni</h5>
+        <div class="btn-group">
+            <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Domaćin
+            </a>
+            <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Gost
+            </a>
         </div>
+    </div>
+    <div class="card-body">
+        @if($utakmica->kartoni->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Min</th>
+                            <th>Tim</th>
+                            <th>Igrač</th>
+                            <th>Karton</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($utakmica->kartoni->sortBy('minut') as $karton)
+                        <tr>
+                            <td>{{ $karton->minut }}'</td>
+                            <td>{{ $karton->tim->skraceni_naziv ?? $karton->tim->naziv }}</td>
+                            <td>{{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}</td>
+                            <td>
+                                @if($karton->tip == 'zuti')
+                                    <span class="badge bg-warning">Žuti</span>
+                                @else
+                                    <span class="badge bg-danger">Crveni</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <p class="text-center text-muted">Nema evidentiranih kartona za ovu utakmicu.</p>
+        @endif
     </div>
 </div>
 @endsection

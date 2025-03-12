@@ -147,17 +147,45 @@ class ProtivnickiIgraciController extends Controller
     /**
      * Brisanje protivničkog igrača.
      */
-    public function destroy(ProtivnickiIgrac $protivnickiIgrac)
+    public function destroy($id)
     {
+        // Eksplicitno učitavamo model umesto oslanjanja na Route Model Binding
+        $protivnickiIgrac = \App\Models\ProtivnickiIgrac::find($id);
+        
+        // Logujemo šta smo dobili
+        \Log::info('Pronađen igrač za brisanje', [
+            'id' => $id,
+            'igrač' => $protivnickiIgrac ? "Pronađen (ID: {$protivnickiIgrac->id})" : "Nije pronađen"
+        ]);
+        
+        // Ako igrač ne postoji, vraćamo grešku
+        if (!$protivnickiIgrac) {
+            return back()->with('error', 'Igrač nije pronađen.');
+        }
+        
+        // Pamtimo ID utakmice pre brisanja
         $utakmica_id = $protivnickiIgrac->utakmica_id;
-        $tim_id = $protivnickiIgrac->tim_id;
         
-        $protivnickiIgrac->delete();
-        
-        return redirect()->route('protivnicki-igraci.index', [
-                'utakmica_id' => $utakmica_id, 
-                'tim_id' => $tim_id
-            ])
-            ->with('success', 'Protivnički igrač uspešno obrisan.');
+        try {
+            // Brisanje igrača
+            $isDeleted = $protivnickiIgrac->delete();
+            
+            \Log::info('Rezultat brisanja', ['uspešno' => $isDeleted]);
+            
+            // Preusmeravanje
+            if ($isDeleted) {
+                return redirect("/utakmice/{$utakmica_id}")
+                    ->with('success', 'Protivnički igrač uspešno obrisan.');
+            } else {
+                return back()->with('error', 'Došlo je do greške prilikom brisanja igrača.');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Greška pri brisanju', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->with('error', 'Greška: ' . $e->getMessage());
+        }
     }
 }

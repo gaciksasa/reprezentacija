@@ -174,10 +174,23 @@ class SastaviController extends Controller
      */
     public function destroy(Sastav $sastav)
     {
+        // Zapamtimo ID utakmice pre brisanja
         $utakmica_id = $sastav->utakmica_id;
-        $sastav->delete();
         
-        return redirect()->route('sastavi.index', ['utakmica_id' => $utakmica_id])
-            ->with('success', 'Igrač uspešno uklonjen iz sastava.');
+        // Pokušaj brisanja
+        try {
+            $sastav->delete();
+            
+            // Koristimo direktan URL umesto imenovanog ruta
+            return redirect("/utakmice/{$utakmica_id}")
+                ->with('success', 'Igrač uspešno uklonjen iz sastava.');
+        } catch (\Exception $e) {
+            \Log::error('Greška pri brisanju sastava', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->with('error', 'Greška pri brisanju: ' . $e->getMessage());
+        }
     }
 }
