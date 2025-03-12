@@ -137,7 +137,7 @@
                                     {{ $igrac->prezime }} {{ $igrac->ime }} 
                                     @if($igrac->kapiten) <small>(C)</small> @endif
                                 </span>
-                                <form action="{{ route('protivnicki-igraci.destroy', $igrac) }}" method="POST" class="d-inline ms-2">
+                                <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
@@ -162,7 +162,7 @@
                     <ul class="list-unstyled">
                         @foreach($gostujuciSastav as $sastav)
                             <li class="py-1">
-                                <form action="{{ route('sastavi.destroy', $sastav) }}" method="POST" class="d-inline me-2">
+                            <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
@@ -180,13 +180,13 @@
                         
                         @foreach($gostujuciProtivnickiIgraci as $igrac)
                             <li class="py-1">
-                                <form action="{{ route('protivnicki-igraci.destroy', $igrac) }}" method="POST" class="d-inline me-2">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </form>
+                            <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-2">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
                                 <span class="fw-bold">
                                     {{ $igrac->prezime }} {{ $igrac->ime }} 
                                     @if($igrac->kapiten) <small>(C)</small> @endif

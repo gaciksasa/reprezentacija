@@ -148,13 +148,18 @@ class ProtivnickiIgraciController extends Controller
     /**
      * Brisanje protivničkog igrača.
      */
-    public function destroy(ProtivnickiIgrac $protivnickiIgrac)
+    public function destroy($id)
     {
+        // Find the opponent player record by ID
+        $protivnickiIgrac = ProtivnickiIgrac::findOrFail($id);
+        
+        // Store match ID before deletion
         $utakmica_id = $protivnickiIgrac->utakmica_id;
         
-        // Delete the opponent player
+        // Delete the record
         $protivnickiIgrac->delete();
         
+        // Redirect back to match page
         return redirect()->route('utakmice.show', $utakmica_id)
             ->with('success', 'Protivnički igrač uspešno obrisan.');
     }
