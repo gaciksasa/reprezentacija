@@ -47,31 +47,29 @@
                     </tr>
                     <tr>
                         <th>Rođen</th>
-                        <td>{{ $igrac->datum_rodjenja ? $igrac->datum_rodjenja->format('d.m.Y') : '-' }} ({{ $igrac->mesto_rodjenja ?? '-' }})</td>
+                        <td>{{ $igrac->datum_rodjenja ? $igrac->datum_rodjenja->format('d.m.Y') : '-' }}<br>{{ $igrac->mesto_rodjenja ?? '-' }}</td>
                     </tr>
                     @if ($igrac->datum_smrti)
                     <tr>
                         <th>Umro</th>
-                        <td>{{ $igrac->datum_smrti ? $igrac->datum_smrti->format('d.m.Y') : '-' }} ({{ $igrac->mesto_smrti ?? '-' }})</td>
+                        <td>{{ $igrac->datum_smrti ? $igrac->datum_smrti->format('d.m.Y') : '-' }}<br>{{ $igrac->mesto_smrti ?? '-' }}</td>
                     </tr>
                     @endif
                     <tr>
-                        <th>Debitovao za reprezentaciju</th>
-                        <td>{{ $igrac->debitovao_za_tim ? $igrac->debitovao_za_tim->format('d.m.Y') : '-' }}</td>
+                        <th>Debitovao</th>
+                        <td>{{ $igrac->debitovao_datum ? $igrac->debitovao_datum->format('d.m.Y') : '-' }}</td>
                     </tr>
+                    @if(isset($igrac->trenutniKlub) && $igrac->trenutniKlub)
                     <tr>
                         <th>Trenutni klub</th>
                         <td>
-                            @if(isset($igrac->trenutniKlub) && $igrac->trenutniKlub)
-                                {{ $igrac->trenutniKlub->klub }}
-                                @if($igrac->trenutniKlub->drzava_kluba)
-                                    <small>({{ $igrac->trenutniKlub->drzava_kluba }})</small>
-                                @endif
-                            @else
-                                -
+                            {{ $igrac->trenutniKlub->klub }}
+                            @if($igrac->trenutniKlub->drzava_kluba)
+                                <small>({{ $igrac->trenutniKlub->drzava_kluba }})</small>
                             @endif
                         </td>
                     </tr>
+                    @endif
                 </table>
             </div>
             </div>
@@ -147,15 +145,15 @@
                                     <thead>
                                         <tr>
                                             <th>Datum</th>
-                                            <th>Utakmica</th>
                                             <th>Takmičenje</th>
-                                            <th>Status</th>
+                                            <th>Utakmica</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($igrac->sastavi->sortByDesc('utakmica.datum') as $sastav)
                                         <tr>
                                             <td>{{ $sastav->utakmica ? $sastav->utakmica->datum->format('d.m.Y') : '-' }}</td>
+                                            <td>{{ $sastav->utakmica && $sastav->utakmica->takmicenje ? $sastav->utakmica->takmicenje->naziv : '-' }}</td>
                                             <td>
                                                 @if($sastav->utakmica)
                                                     <a href="{{ route('utakmice.show', $sastav->utakmica) }}">
@@ -169,14 +167,6 @@
                                                     </a>
                                                 @else
                                                     -
-                                                @endif
-                                            </td>
-                                            <td>{{ $sastav->utakmica && $sastav->utakmica->takmicenje ? $sastav->utakmica->takmicenje->naziv : '-' }}</td>
-                                            <td>
-                                                @if($sastav->starter)
-                                                    <span class="badge bg-success">Starter</span>
-                                                @else
-                                                    <span class="badge bg-secondary">Rezerva</span>
                                                 @endif
                                             </td>
                                         </tr>

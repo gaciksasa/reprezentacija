@@ -133,7 +133,9 @@ class IgraciController extends Controller
 
         // Handle file upload if there's a photo
         if ($request->hasFile('fotografija')) {
-            $path = $request->file('fotografija')->store('igraci', 'public');
+            $file = $request->file('fotografija');
+            $filename = strtolower($validated['prezime'] . '_' . $validated['ime']) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('igraci', $filename, 'public');
             $validated['fotografija_path'] = $path;
         }
 
@@ -211,7 +213,9 @@ class IgraciController extends Controller
                 Storage::disk('public')->delete($igrac->fotografija_path);
             }
             
-            $path = $request->file('fotografija')->store('igraci', 'public');
+            $file = $request->file('fotografija');
+            $filename = strtolower($validated['prezime'] . '_' . $validated['ime']) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('igraci', $filename, 'public');
             $validated['fotografija_path'] = $path;
         }
 
