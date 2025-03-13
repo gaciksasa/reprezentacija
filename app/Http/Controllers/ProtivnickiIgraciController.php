@@ -85,18 +85,28 @@ class ProtivnickiIgraciController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ime' => 'required|string|max:255',
-            'prezime' => 'required|string|max:255',
+            'ime_prezime' => 'required|string|max:255',
             'utakmica_id' => 'required|exists:utakmice,id',
             'tim_id' => 'required|exists:timovi,id',
             'kapiten' => 'boolean',
         ]);
         
+        // Razdvajanje imena i prezimena (prvo ime, sve ostalo prezime)
+        $imePrezime = explode(' ', $validated['ime_prezime'], 2);
+        $ime = $imePrezime[0];
+        $prezime = isset($imePrezime[1]) ? $imePrezime[1] : '';
+        
         // Postavljamo podrazumevanu vrednost za kapiten
-        $validated['kapiten'] = $request->has('kapiten');
+        $kapiten = $request->has('kapiten');
         
         // Kreiramo protivničkog igrača
-        $protivnickiIgrac = ProtivnickiIgrac::create($validated);
+        $protivnickiIgrac = ProtivnickiIgrac::create([
+            'ime' => $ime,
+            'prezime' => $prezime,
+            'utakmica_id' => $validated['utakmica_id'],
+            'tim_id' => $validated['tim_id'],
+            'kapiten' => $kapiten,
+        ]);
         
         if ($request->ajax()) {
             return response()->json([

@@ -60,19 +60,10 @@
             <input type="hidden" name="tim_id" value="{{ $tim->id }}">
             
             <div class="mb-3">
-                <label for="ime" class="form-label">Ime *</label>
-                <input type="text" class="form-control @error('ime') is-invalid @enderror" 
-                       id="ime" name="ime" value="{{ old('ime') }}" required>
-                @error('ime')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
-            <div class="mb-3">
-                <label for="prezime" class="form-label">Prezime *</label>
-                <input type="text" class="form-control @error('prezime') is-invalid @enderror" 
-                       id="prezime" name="prezime" value="{{ old('prezime') }}" required>
-                @error('prezime')
+                <label for="ime_prezime" class="form-label">Ime i prezime *</label>
+                <input type="text" class="form-control @error('ime_prezime') is-invalid @enderror" 
+                    id="ime_prezime" name="ime_prezime" value="{{ old('ime_prezime') }}" required >
+                @error('ime_prezime')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
