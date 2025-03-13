@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 11, 2025 at 06:45 PM
+-- Generation Time: Mar 13, 2025 at 08:17 PM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `bivsi_klubovi` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `bivsi_klubovi_igrac_id_foreign` (`igrac_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `bivsi_klubovi`
@@ -57,7 +57,12 @@ INSERT INTO `bivsi_klubovi` (`id`, `igrac_id`, `naziv`, `drzava`, `sezona`, `ste
 (11, 128, 'FK Spartak Subotica', 'SRB', '2016-17', '1', 31, 1, '2025-03-10 17:55:26', '2025-03-10 17:55:26'),
 (12, 128, 'FK Spartak Subotica', 'SRB', '2017-18', '1', 30, 0, '2025-03-10 17:56:03', '2025-03-10 17:56:03'),
 (13, 128, 'FK Spartak Subotica', 'SRB', '2018-19', '1', 0, 0, '2025-03-10 17:56:31', '2025-03-10 17:56:31'),
-(14, 859, 'HŠK Građanski (Zagreb)', NULL, NULL, NULL, NULL, NULL, '2025-03-10 20:00:44', '2025-03-10 20:00:44');
+(14, 859, 'HŠK Građanski (Zagreb)', NULL, NULL, NULL, NULL, NULL, '2025-03-10 20:00:44', '2025-03-10 20:00:44'),
+(15, 860, 'HAŠK (Zagreb)', 'JUG', NULL, NULL, NULL, NULL, '2025-03-12 20:45:19', '2025-03-12 20:45:19'),
+(16, 862, 'FK Sutjeska Nikšić', 'YUG', '1999-00', '1', 9, 3, '2025-03-12 20:47:35', '2025-03-12 20:47:35'),
+(17, 605, 'HAŠK Građanski (Zagreb)', NULL, '1918-19', '1', 3, 1, '2025-03-13 18:42:25', '2025-03-13 19:26:20'),
+(18, 605, 'HAŠK Građanski (Zagreb)', NULL, '1919', '1', 4, 4, '2025-03-13 19:09:22', '2025-03-13 19:22:16'),
+(19, 605, 'HAŠK Građanski (Zagreb)', NULL, '1920', '1', 6, 6, '2025-03-13 19:09:22', '2025-03-13 19:22:16');
 
 -- --------------------------------------------------------
 
@@ -128,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `golovi` (
   KEY `golovi_utakmica_id_foreign` (`utakmica_id`),
   KEY `golovi_igrac_id_foreign` (`igrac_id`),
   KEY `golovi_tim_id_foreign` (`tim_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `golovi`
@@ -153,7 +158,14 @@ INSERT INTO `golovi` (`id`, `utakmica_id`, `igrac_id`, `igrac_tip`, `minut`, `ti
 (20, 10, 37, 'protivnicki', NULL, 102, 0, 0, '2025-03-10 19:36:54', '2025-03-10 19:36:54'),
 (21, 10, 37, 'protivnicki', NULL, 102, 0, 0, '2025-03-10 19:37:07', '2025-03-10 19:37:07'),
 (22, 10, 164, 'regularni', NULL, 5, 0, 0, '2025-03-10 19:37:49', '2025-03-10 19:37:49'),
-(23, 10, 697, 'regularni', NULL, 5, 0, 0, '2025-03-10 19:38:02', '2025-03-10 19:38:02');
+(23, 10, 697, 'regularni', NULL, 5, 0, 0, '2025-03-10 19:38:02', '2025-03-10 19:38:02'),
+(24, 11, 47, 'protivnicki', 27, 23, 0, 0, '2025-03-11 18:55:06', '2025-03-11 18:55:06'),
+(25, 11, 47, 'protivnicki', 47, 23, 0, 0, '2025-03-11 18:55:21', '2025-03-11 18:55:21'),
+(26, 11, 46, 'protivnicki', 53, 23, 0, 0, '2025-03-11 18:55:33', '2025-03-11 18:55:33'),
+(27, 11, 47, 'protivnicki', 71, 23, 0, 0, '2025-03-11 18:55:47', '2025-03-11 18:55:47'),
+(28, 11, 46, 'protivnicki', 78, 23, 0, 0, '2025-03-11 18:56:00', '2025-03-11 18:56:00'),
+(29, 11, 47, 'protivnicki', 86, 23, 0, 0, '2025-03-11 18:56:12', '2025-03-11 18:56:12'),
+(30, 11, 891, 'regularni', 72, 5, 0, 0, '2025-03-11 18:56:24', '2025-03-11 18:56:24');
 
 -- --------------------------------------------------------
 
@@ -169,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `igraci` (
   `tim_id` int NOT NULL,
   `pozicija` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fotografija_path` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `biografija` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `biografija` text COLLATE utf8mb4_unicode_ci,
   `datum_rodjenja` date DEFAULT NULL,
   `mesto_rodjenja` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `aktivan` tinyint(1) NOT NULL DEFAULT '0',
@@ -788,7 +800,7 @@ INSERT INTO `igraci` (`id`, `prezime`, `ime`, `tim_id`, `pozicija`, `fotografija
 (602, 'Percel', 'Adolf', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 16:25:53', '2025-03-09 16:25:53'),
 (603, 'Perlić', 'Nikola', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 16:25:53', '2025-03-09 16:25:53'),
 (604, 'Perović', 'Marko', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 16:25:53', '2025-03-09 16:25:53'),
-(605, 'Perska', 'Emanuel', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 16:25:53', '2025-03-09 16:25:53'),
+(605, 'Perška', 'Emanuel', 1, 'Napad', 'igraci/perska_emanuel.png', 'Rođen 20. juna 1896. u Staroj Pazovi, poginuo 8. maja 1945. u Zagrebu.\r\n\r\nBio je prvi jugoslovenski reprezentativac koji je “nanizao” 10 utakmica za nacionalni tim u prvoj deceniji njegove aktivnosti i, nesumnjivo, spadao među naše najbolje igrače.\r\n\r\nMeđutim, njegova igračka i životna biografija iz raznih razloga verovatno nikad neće biti upotpunjena. Zna se da je poreklom bio Slovak, kasnije novinar i istoričar sporta, ali su mnogi bitni podaci ostali nepotvrđeni, iako je u pitanju jedna od prvih fudbalskih zvezda i profesionalaca na prostorima bivše Jugoslavije.\r\n\r\nPočeo je igrati u HAŠK-u. Za vreme Prvog svetskog rata kao vojnik je poslat u Austrougarsku gde je u slobodno vreme igrao za Györ. Posle prvog svetskog rata, kako se priča, nije smeo da se vrati u Jugoslaviju, jer je tokom rata bio – vojni dezerter. Zbog toga je pristupnicu za 1. HŠK Građanski potpisao 1919. godine – u Beču. Papire je doneo ondašnji član uprave “purgera” Gabi Feldbauer, a zahvaljujući velikom angažovanju onda uticajnih “modrih” – bio je pomilovan i vratio se u Zagreb.\r\n\r\nIgrao je na prvoj utakmici ondašnje Kraljevine Srba, Hrvata i Slovenaca, na olimpijskom turniru 1920. u Anversu, posle koga je, uz pomoć i znanje jezika Jovana – Jove Ružića iz beogradske SK Jugoslavije, otišao za Francusku i uz mesečnu platu od onda velikih 3.000 franaka igrao u dresu pariskog FC Generaux. U Zagreb ga je vratio onda uticajni bečki menadžer David Vajs.\r\n\r\nU najvećem delu karijere, tokom koje je ispoljavao vrlo visoku igračku klasu, nosio je dres 1. HŠK Građanski – Zagreb, sa kojim je osvajao tri nacionalna prvenstva (1923, 1926. i 1928).\r\n\r\nZa reprezentaciju Jugoslavije odigrao je 14 utakmica (1920-1927) i postigao dva gola. Debitovao je 28. avgusta 1920. protiv Čehoslovačke (0:7) na olimpijskom turniru u Anversu, a poslednji put je obukao nacionalni dres 31. jula 1928. opet protiv Čehoslovačke (1:1) u Beogradu, kada je postigao jedini gol za “Bele orlove”.\r\n\r\nPrema nekim informacijama, tokom drugog svetskog rata bio je policijski službenik i, kažu, vatreni pristalica ustaškog pokreta, što ga je, u maju 1945. – koštalo glave. Po nekim kazivanjima, tokom borbi za oslobođenje Zagreba, poginuo je u naizmeničnoj vatri, pucajući sa balkona svog doma na Zvijezdi.', '1896-06-20', 'Stara Pazova', 0, '1945-05-08', 'Zagreb', '2025-03-09 16:25:53', '2025-03-13 19:26:20'),
 (606, 'Perušić', 'Željko', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 16:25:53', '2025-03-09 16:25:53'),
 (607, 'Peruzović', 'Luka', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 16:25:53', '2025-03-09 16:25:53'),
 (608, 'Pešić', 'Aleksandar', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 16:25:53', '2025-03-09 16:25:53'),
@@ -994,7 +1006,8 @@ INSERT INTO `igraci` (`id`, `prezime`, `ime`, `tim_id`, `pozicija`, `fotografija
 (808, 'Tasić', 'Lazar', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (809, 'Tavčar', 'Stanko', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (810, 'Tešan', 'Anđelko', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
-(811, 'Tirnanić', 'Aleksandar', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
+(811, 'Tirnanić', 'Aleksandar', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30');
+INSERT INTO `igraci` (`id`, `prezime`, `ime`, `tim_id`, `pozicija`, `fotografija_path`, `biografija`, `datum_rodjenja`, `mesto_rodjenja`, `aktivan`, `datum_smrti`, `mesto_smrti`, `created_at`, `updated_at`) VALUES
 (812, 'Tomašević', 'Aleksandar', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (813, 'Tomašević', 'Kosta', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (814, 'Tomić', 'Đorđe', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
@@ -1014,8 +1027,7 @@ INSERT INTO `igraci` (`id`, `prezime`, `ime`, `tim_id`, `pozicija`, `fotografija
 (828, 'Trivić', 'Dobrivoje', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (829, 'Trivunović', 'Veseljko', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (830, 'Trobok', 'Goran', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
-(831, 'Tuce', 'Semir', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30');
-INSERT INTO `igraci` (`id`, `prezime`, `ime`, `tim_id`, `pozicija`, `fotografija_path`, `biografija`, `datum_rodjenja`, `mesto_rodjenja`, `aktivan`, `datum_smrti`, `mesto_smrti`, `created_at`, `updated_at`) VALUES
+(831, 'Tuce', 'Semir', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (832, 'Tutorić', 'Đorđe', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:39:30', '2025-03-09 17:39:30'),
 (833, 'Urbanke', 'Josip', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL),
 (834, 'Urošević', 'Slobodan', 0, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL),
@@ -1044,9 +1056,9 @@ INSERT INTO `igraci` (`id`, `prezime`, `ime`, `tim_id`, `pozicija`, `fotografija
 (857, 'Volkov', 'Vladimir', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
 (858, 'Vokri', 'Fadil', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
 (859, 'Vragović', 'Dragutin', 1, 'Sredina', 'igraci/SQzcfO8QM9RHgXxJJD0Ffb5KortqgjXXVehXBRyD.jpg', NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-10 20:03:44'),
-(860, 'Vranješ', 'Stjepan', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
+(860, 'Vrbančić', 'Stjepan', 1, 'Odbrana', NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-12 20:45:19'),
 (861, 'Vrđuka', 'Dragutin', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
-(862, 'Vrčak', 'Marijan', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
+(862, 'Vučinić', 'Mirko', 1, 'Napad', NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-12 20:47:35'),
 (863, 'Vujačić', 'Budimir', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
 (864, 'Vujadinović', 'Đorđe', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
 (865, 'Vujkov', 'Đorđe', 1, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, '2025-03-09 17:41:56', '2025-03-09 17:41:56'),
@@ -1132,7 +1144,7 @@ CREATE TABLE IF NOT EXISTS `izmene` (
   KEY `izmene_tim_id_foreign` (`tim_id`),
   KEY `izmene_igrac_out_id_foreign` (`igrac_out_id`),
   KEY `izmene_igrac_in_id_foreign` (`igrac_in_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1208,7 +1220,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `migrations`
@@ -1239,7 +1251,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (38, '2025_03_09_121508_create_selektori_table', 7),
 (39, '2025_03_09_125705_create_selektor_mandatii_table', 8),
 (40, '2025_03_09_144529_create_protivnicki_selektori_table', 9),
-(41, '2025_03_10_203217_allow_null_minut_in_golovi_table', 10);
+(41, '2025_03_10_203217_allow_null_minut_in_golovi_table', 10),
+(42, '2025_03_11_203714_create_protivnicke_izmene_table', 11),
+(43, '2025_03_13_194949_change_biografija_to_text_in_igraci_table', 12);
 
 -- --------------------------------------------------------
 
@@ -1254,6 +1268,30 @@ CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `protivnicke_izmene`
+--
+
+DROP TABLE IF EXISTS `protivnicke_izmene`;
+CREATE TABLE IF NOT EXISTS `protivnicke_izmene` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `utakmica_id` bigint UNSIGNED NOT NULL,
+  `tim_id` bigint UNSIGNED NOT NULL,
+  `igrac_out_id` bigint UNSIGNED NOT NULL,
+  `igrac_in_id` bigint UNSIGNED NOT NULL,
+  `minut` int NOT NULL,
+  `napomena` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `protivnicke_izmene_utakmica_id_foreign` (`utakmica_id`),
+  KEY `protivnicke_izmene_tim_id_foreign` (`tim_id`),
+  KEY `protivnicke_izmene_igrac_out_id_foreign` (`igrac_out_id`),
+  KEY `protivnicke_izmene_igrac_in_id_foreign` (`igrac_in_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1274,7 +1312,7 @@ CREATE TABLE IF NOT EXISTS `protivnicki_igraci` (
   PRIMARY KEY (`id`),
   KEY `protivnicki_igraci_utakmica_id_foreign` (`utakmica_id`),
   KEY `protivnicki_igraci_tim_id_foreign` (`tim_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `protivnicki_igraci`
@@ -1318,7 +1356,19 @@ INSERT INTO `protivnicki_igraci` (`id`, `ime`, `prezime`, `utakmica_id`, `tim_id
 (35, 'Hassan', 'Allouba', 10, 102, 0, '2025-03-10 19:22:54', '2025-03-10 19:22:54'),
 (36, 'Hussein', 'Hegazy', 10, 102, 1, '2025-03-10 19:23:08', '2025-03-10 19:23:08'),
 (37, 'Sayed', 'Abaza', 10, 102, 0, '2025-03-10 19:23:23', '2025-03-10 19:23:23'),
-(38, 'Zaki', 'Othman', 10, 102, 0, '2025-03-10 19:23:35', '2025-03-10 19:23:35');
+(38, 'Zaki', 'Othman', 10, 102, 0, '2025-03-10 19:23:35', '2025-03-10 19:23:35'),
+(39, 'Jaroslav', 'Cháňa', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(40, 'Karel', 'Nytl', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(41, 'Miroslav', 'Pospíšil', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(42, 'František', 'Plodr', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(43, 'Karel', 'Pešek', 11, 23, 1, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(44, 'Emil', 'Seifert', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(45, 'Josef', 'Sedláček', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(46, 'Antonín', 'Janda', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(47, 'Jan', 'Vaník', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(48, 'Josef', 'Šroubek', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(49, 'Otakar', 'Škvajn', 11, 23, 0, '2025-03-11 18:45:33', '2025-03-11 18:45:33'),
+(53, 'Rezső', 'Szulik', 27, 64, 0, '2025-03-12 20:52:00', '2025-03-12 20:52:00');
 
 -- --------------------------------------------------------
 
@@ -1338,7 +1388,7 @@ CREATE TABLE IF NOT EXISTS `protivnicki_selektori` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `protivnicki_selektori_utakmica_id_tim_id_unique` (`utakmica_id`,`tim_id`),
   KEY `protivnicki_selektori_tim_id_foreign` (`tim_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `protivnicki_selektori`
@@ -1347,7 +1397,8 @@ CREATE TABLE IF NOT EXISTS `protivnicki_selektori` (
 INSERT INTO `protivnicki_selektori` (`id`, `utakmica_id`, `tim_id`, `ime_prezime`, `napomena`, `created_at`, `updated_at`) VALUES
 (1, 2, 9, 'Stanislav Cherchesov', NULL, '2025-03-09 14:38:11', '2025-03-09 14:38:11'),
 (2, 8, 23, 'Josef Fanta', NULL, '2025-03-10 18:41:34', '2025-03-10 18:41:34'),
-(3, 10, 102, 'Hussein Hegazi', NULL, '2025-03-10 19:16:51', '2025-03-10 19:16:51');
+(3, 10, 102, 'Hussein Hegazi', NULL, '2025-03-10 19:16:51', '2025-03-10 19:16:51'),
+(4, 11, 23, 'Ferdinand Scheinost', NULL, '2025-03-11 18:46:28', '2025-03-11 18:46:28');
 
 -- --------------------------------------------------------
 
@@ -1369,7 +1420,7 @@ CREATE TABLE IF NOT EXISTS `sastavi` (
   KEY `sastavi_utakmica_id_foreign` (`utakmica_id`),
   KEY `sastavi_tim_id_foreign` (`tim_id`),
   KEY `sastavi_igrac_id_foreign` (`igrac_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `sastavi`
@@ -1397,7 +1448,30 @@ INSERT INTO `sastavi` (`id`, `utakmica_id`, `tim_id`, `igrac_id`, `starter`, `se
 (22, 10, 5, 716, 1, NULL, '2025-03-10 19:14:36', '2025-03-10 19:14:36'),
 (23, 10, 5, 164, 1, NULL, '2025-03-10 19:14:50', '2025-03-10 19:14:50'),
 (24, 10, 5, 605, 1, NULL, '2025-03-10 19:15:05', '2025-03-10 19:15:05'),
-(25, 10, 5, 697, 1, NULL, '2025-03-10 19:15:18', '2025-03-10 19:15:18');
+(25, 10, 5, 697, 1, NULL, '2025-03-10 19:15:18', '2025-03-10 19:15:18'),
+(26, 11, 5, 861, 1, NULL, '2025-03-11 18:51:45', '2025-03-11 18:51:45'),
+(27, 11, 5, 393, 1, NULL, '2025-03-11 18:52:25', '2025-03-11 18:52:25'),
+(28, 11, 5, 790, 1, NULL, '2025-03-11 18:52:37', '2025-03-11 18:52:37'),
+(29, 11, 5, 588, 1, NULL, '2025-03-11 18:53:34', '2025-03-11 18:53:34'),
+(30, 11, 5, 164, 1, NULL, '2025-03-11 18:53:45', '2025-03-11 18:53:45'),
+(31, 11, 5, 695, 1, NULL, '2025-03-11 18:53:53', '2025-03-11 18:53:53'),
+(32, 11, 5, 344, 1, NULL, '2025-03-11 18:54:02', '2025-03-11 18:54:02'),
+(33, 11, 5, 891, 1, NULL, '2025-03-11 18:54:22', '2025-03-11 18:54:22'),
+(34, 11, 5, 605, 1, NULL, '2025-03-11 18:54:30', '2025-03-11 18:54:30'),
+(35, 11, 5, 477, 1, NULL, '2025-03-11 18:54:40', '2025-03-11 18:54:40'),
+(36, 11, 5, 26, 1, NULL, '2025-03-11 18:54:47', '2025-03-11 18:54:47'),
+(39, 27, 5, 210, 1, NULL, '2025-03-12 20:42:41', '2025-03-12 20:42:41'),
+(38, 12, 5, 153, 1, NULL, '2025-03-12 16:39:14', '2025-03-12 16:39:14'),
+(40, 27, 5, 860, 1, NULL, '2025-03-12 20:49:01', '2025-03-12 20:49:01'),
+(41, 27, 5, 137, 1, NULL, '2025-03-12 20:49:12', '2025-03-12 20:49:12'),
+(42, 27, 5, 19, 1, NULL, '2025-03-12 20:49:26', '2025-03-12 20:49:26'),
+(43, 27, 5, 648, 1, NULL, '2025-03-12 20:49:36', '2025-03-12 20:49:36'),
+(44, 27, 5, 394, 1, NULL, '2025-03-12 20:49:48', '2025-03-12 20:49:48'),
+(45, 27, 5, 26, 1, NULL, '2025-03-12 20:49:59', '2025-03-12 20:49:59'),
+(46, 27, 5, 307, 1, NULL, '2025-03-12 20:50:13', '2025-03-12 20:50:13'),
+(47, 27, 5, 605, 1, NULL, '2025-03-12 20:50:36', '2025-03-12 20:50:36'),
+(48, 27, 5, 602, 1, NULL, '2025-03-12 20:50:48', '2025-03-12 20:50:48'),
+(51, 27, 5, 591, 1, NULL, '2025-03-12 22:18:56', '2025-03-12 22:18:56');
 
 -- --------------------------------------------------------
 
@@ -1420,7 +1494,7 @@ CREATE TABLE IF NOT EXISTS `selektori` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `selektori`
@@ -1430,7 +1504,9 @@ INSERT INTO `selektori` (`id`, `ime`, `prezime`, `datum_rodjenja`, `mesto_rodjen
 (1, 'Veljko', 'Ugrinić', '1885-12-28', 'Stara Gradiška', '1958-07-18', 'Zagreb', NULL, 'Veljko Ugrinić (Stara Gradiška, 28. prosinca 1885. - Zagreb, 15. srpnja 1958.) je bio hrvatski nogometni stručnjak, atletičar, poznati zagrebački športski radnik i svestrani aktivni športaš. Bio je članom športskog društva Concordije iz Zagreba.\r\n\r\nNogometom se bavio od 1903. godine. Jednim je od suosnivača PNIŠK-a. Bavio se lakom atletikom. 1906. je pobijedio na prvoj priredbi koja se je održala u Zagrebu. Natjecao se u disciplini trčanje 3000 m (trčalo se od Dubrave do Zagreba) i na 100 m.\r\n\r\nNakon što je završio Prvi svjetski rat, djeluje pri atletičarskom odjelu Concordije. 1919. je bio suosnivačem i prvim predsjednikom Lakoatletskog saveza Hrvatske i Slavonije te Jugoslavenskog lakoatletskog saveza 1921., čijim je čelnikom bio sve do 1937. godine. Od 1919. sve do 1937. bio je članom Jugoslavenskog olimpijskog odbora.\r\n\r\nKad je bio osnivan Jugoslavenski nogometni savez, na osnivačkoj sjednici bila su zastupljena nogometna središta: Beograd, Karlovac, Niš, Novi Sad, Osijek, Požega, Sisak, Skoplje, Slavonski Brod, Split, Valjevo, Varaždin i Zagreb (7 zagrebačkih klubova). Osnivačku sjednicu vodio je Hinko Würth koji je izabran za prvog predsjednika JNS-a. Prvim tajnikom Saveza postao je dr. Fran Šuklje. Priznata su nogometna pravila koja je preveo dr. Milovan Zoričić. Prof. Franjo Bučar je predviđen za predstavnika u FIFA-i, a izbornikom reprezentacije je postao Veljko Ugrinić. Vodio ju je od 1920. do 1924. godine.[1] Reprezentaciju je vodio na Olimpijskim igrama 1920., a bio je smijenjen uoči Olimpijskih igara 1924., jer su u savezu radije odlučili smijeniti trenera nego promijeniti problematične igrače. Kao trener, tri je puta pobijedio, jednom je igrao neriješeno te šest puta izgubio. Reprezentacija je pod njegovim vođenjem napredovala. Unutar samo dvije godine uspjela je pobijediti momčadi od kojih je prije dvije godine (teško) izgubila (Čehoslovačka 1920. 0:7 i 1921. 1:6, 1922. 4:3, Poljska, Rumunjska).\r\n\r\nPredsjedao je Jugoslavenskim nogometnim savezom od 1923. do 1924., naslijedivši Miroslava Petanjka. Ugrinića je na mjestu predsjednika naslijedio Hinko Würth.\r\n\r\nBio je godine bio jednim od suosnivača Balkanskih atletskih igara. 1934. je bio organizirao 5. Balkanske atletske igre u Zagrebu. Četiri godine je godine predsjedao Interbalkanskim komitetom.\r\n\r\n15. travnja 1936. je u Zagrebu održana utemeljiteljska skupština jugoslavenskog hokejskog (hockey) saveza. Na toj je sjednici za predsjednika saveza izabran Veljko Ugrinić.[2]\r\n\r\nDok je trajao travanjski rat 1941. nekoliko su ga puta uhitili i zatvorili.\r\n\r\nZadnji put se je natjecao u atletici 1947. za Omladinsko studentsko fiskulturno društvo Mladost. Osim toga, poslije rata organizirao je u Hrvatskoj streljačka natjecanja. Obnašao je razne visoke športske dužnosti, pa je potpredsjedao Fiskulturnim savezom Hrvatske, bio odbornikom Komiteta za fiskulturu Hrvatske, predsjedao je Atletskim savezom Hrvatske te je bio član inim športskim i društvenim organizacijama na razini grada Zagreba, Hrvatske te Jugoslavije.', NULL, '2025-03-09 12:06:25', '2025-03-09 13:11:58'),
 (3, 'Todor', 'Sekulić', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-09 17:49:38', '2025-03-09 17:49:38'),
 (4, 'Dušan', 'Zinaja', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-09 17:51:40', '2025-03-09 17:51:40'),
-(5, 'Ante', 'Pandaković', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-09 18:24:48', '2025-03-09 18:24:48');
+(5, 'Ante', 'Pandaković', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-09 18:24:48', '2025-03-09 18:24:48'),
+(6, 'Boško', 'Simonović', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-12 19:57:51', '2025-03-12 19:57:51'),
+(7, 'Branislav', 'Veljković', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-12 20:07:53', '2025-03-12 20:07:53');
 
 -- --------------------------------------------------------
 
@@ -1452,18 +1528,19 @@ CREATE TABLE IF NOT EXISTS `selektor_mandati` (
   PRIMARY KEY (`id`),
   KEY `selektor_mandati_selektor_id_foreign` (`selektor_id`),
   KEY `selektor_mandati_tim_id_foreign` (`tim_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `selektor_mandati`
 --
 
 INSERT INTO `selektor_mandati` (`id`, `selektor_id`, `tim_id`, `pocetak_mandata`, `kraj_mandata`, `v_d_status`, `napomena`, `created_at`, `updated_at`) VALUES
-(1, 2, 5, '1924-10-02', NULL, 0, NULL, '2025-03-09 12:06:49', '2025-03-09 12:06:49'),
+(7, 7, 5, '1933-04-03', '1933-11-06', 0, NULL, '2025-03-12 20:07:53', '2025-03-12 20:07:53'),
 (2, 1, 5, '1920-08-28', '1924-02-10', 0, NULL, '2025-03-09 12:13:16', '2025-03-09 12:13:16'),
 (3, 3, 5, '1924-05-26', '1924-05-26', 0, NULL, '2025-03-09 17:49:38', '2025-03-09 17:49:38'),
 (4, 4, 5, '1924-09-28', '1925-11-04', 0, NULL, '2025-03-09 17:51:40', '2025-03-09 17:51:40'),
-(5, 5, 5, '1926-05-30', '1930-01-26', 0, NULL, '2025-03-09 18:24:48', '2025-03-09 18:24:48');
+(5, 5, 5, '1926-05-30', '1930-01-26', 0, NULL, '2025-03-09 18:24:48', '2025-03-09 18:24:48'),
+(6, 6, 5, '1930-04-13', '1932-10-09', 0, NULL, '2025-03-12 19:57:51', '2025-03-12 19:57:51');
 
 -- --------------------------------------------------------
 
@@ -1489,9 +1566,7 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('Ewlh4h77PlhNjhWPRzKr5nRrQUYNblRay4HcUWzx', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMk1oWkhpdmVrZkJEWDMzWjZYclZDNzhMR2h5T1F3dXVyN0NyaTU5MyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDc6Imh0dHA6Ly9sb2NhbGhvc3QvcmVwcmV6ZW50YWNpamEvcHVibGljL2lncmFjaS80Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1741626782),
-('JxWJQso1wycKxsXCRR4CuMsCCynv202qSL2AyZ8x', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiR2Q0cTdSTHFHSXhyRDBoUGFxcTZHdUlDdDFyZnJJRVpkN0x5UEJvUCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NTQ6Imh0dHA6Ly9sb2NhbGhvc3QvcmVwcmV6ZW50YWNpamEvcHVibGljL3V0YWttaWNlP3BhZ2U9MiI7fX0=', 1741718408),
-('J9w1SPlR8sRvSCHeNQtP3TdkWzHB0HCGGiaolB5S', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNWFpeWpMcmxISmxZZXpiSEw5enpIdGltbkp5cFpyUnBqUzRXY2R0ciI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NTA6Imh0dHA6Ly9sb2NhbGhvc3QvcmVwcmV6ZW50YWNpamEvcHVibGljL3V0YWttaWNlLzEwIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1741637405);
+('pQw0O8ZTVi8MAlnlmWhXlVFcEuzzPuxzAxfcKPlo', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiOHd5dllNcVlVSFpLMzBBUUxlYk1BSXJXM1RrV1dkSDhpbExIN04zSSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NTA6Imh0dHA6Ly9sb2NhbGhvc3QvcmVwcmV6ZW50YWNpamEvcHVibGljL3V0YWttaWNlLzEyIjt9fQ==', 1741896984);
 
 -- --------------------------------------------------------
 
@@ -1594,7 +1669,7 @@ INSERT INTO `timovi` (`id`, `naziv`, `skraceni_naziv`, `zastava_url`, `grb_url`,
 (11, 'Albanija', NULL, 'alb.png', 'alb.png', '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (12, 'Alžir', 'ALG', 'alg.png', 'alg.png', 'Alžir', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-09 09:46:08'),
 (13, 'Argentina', 'ARG', 'arg.png', 'arg.png', 'Argentina', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-09 16:01:09'),
-(14, 'Australija', 'AUT', 'aut.png', 'aut.png', 'Asutralija', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-09 16:01:28'),
+(14, 'Australija', 'AUS', 'aus.png', 'aus.png', 'Australija', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-13 19:51:44'),
 (16, 'Azerbejdžan', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (17, 'Belgija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
 (18, 'Bolivija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:10:19', '2025-03-08 18:10:19'),
@@ -1639,7 +1714,7 @@ INSERT INTO `timovi` (`id`, `naziv`, `skraceni_naziv`, `zastava_url`, `grb_url`,
 (61, 'Litvanija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (62, 'Luksemburg', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (63, 'Malta', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
-(64, 'Mađarska', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
+(64, 'Mađarska', 'HUN', 'hun.png', 'hun.png', 'Mađarska', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-12 20:41:20'),
 (65, 'BJR Makedonija', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (66, 'Maroko', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
 (67, 'Meksiko', NULL, NULL, NULL, '', 0, NULL, NULL, NULL, '2025-03-08 18:12:13', '2025-03-08 18:12:13'),
@@ -1723,7 +1798,7 @@ CREATE TABLE IF NOT EXISTS `utakmice` (
   KEY `utakmice_domacin_id_foreign` (`domacin_id`),
   KEY `utakmice_gost_id_foreign` (`gost_id`),
   KEY `utakmice_takmicenje_id_foreign` (`takmicenje_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `utakmice`
@@ -1735,7 +1810,7 @@ INSERT INTO `utakmice` (`id`, `datum`, `takmicenje_id`, `domacin_id`, `gost_id`,
 (3, '2020-08-10', 2, 10, 1, 'Ullevaal Stadion', 'Daniele Orsato (Ita)', 2, 0, '200', NULL, '2025-03-08 17:17:54', '2025-03-08 17:43:31'),
 (8, '1920-08-28', 3, 5, 23, 'Stadion Broodstraat, Antwerp (Bel)', 'Raphael van Praag (Bel)', 0, 7, '600', NULL, NULL, '2025-03-10 18:47:32'),
 (10, '1920-09-02', 1, 5, 102, 'Olympisch Stadion, Antwerp (Bel)', 'Raphaël Van Praag (Bel)', 2, 4, '500', NULL, NULL, '2025-03-10 19:38:02'),
-(11, '1921-10-28', NULL, 23, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(11, '1921-10-28', 1, 23, 5, 'Letná Stadium, Praha (Cze)', 'Wolf Simon Boas (Ned)', 6, 1, '10000', NULL, NULL, '2025-03-11 19:20:35'),
 (12, '1922-06-08', NULL, 5, 103, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
 (13, '1922-06-28', NULL, 5, 23, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
 (14, '1922-10-01', NULL, 5, 104, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
@@ -1750,7 +1825,8 @@ INSERT INTO `utakmice` (`id`, `datum`, `takmicenje_id`, `domacin_id`, `gost_id`,
 (23, '1926-05-30', NULL, 5, 108, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
 (24, '1926-06-13', NULL, 109, 5, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
 (25, '1926-06-28', NULL, 5, 23, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
-(26, '1926-10-05', NULL, 5, 103, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL);
+(26, '1926-10-05', NULL, 5, 103, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(27, '1927-04-10', 1, 64, 5, 'Ullüi ut, Budapest (Hun)', 'Heinrich Retschury (Aut)', 0, 0, '6000', NULL, '2025-03-12 20:10:12', '2025-03-12 20:42:06');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
