@@ -134,7 +134,12 @@ class IgraciController extends Controller
         // Handle file upload if there's a photo
         if ($request->hasFile('fotografija')) {
             $file = $request->file('fotografija');
-            $filename = strtolower($validated['prezime'] . '_' . $validated['ime']) . '.' . $file->getClientOriginalExtension();
+            
+            // Zamena dijakritičkih znakova
+            $prezime = $this->latinicizeCharacters($validated['prezime']);
+            $ime = $this->latinicizeCharacters($validated['ime']);
+            
+            $filename = strtolower($prezime . '_' . $ime) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('igraci', $filename, 'public');
             $validated['fotografija_path'] = $path;
         }
@@ -214,7 +219,12 @@ class IgraciController extends Controller
             }
             
             $file = $request->file('fotografija');
-            $filename = strtolower($validated['prezime'] . '_' . $validated['ime']) . '.' . $file->getClientOriginalExtension();
+            
+            // Zamena dijakritičkih znakova
+            $prezime = $this->latinicizeCharacters($validated['prezime']);
+            $ime = $this->latinicizeCharacters($validated['ime']);
+            
+            $filename = strtolower($prezime . '_' . $ime) . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('igraci', $filename, 'public');
             $validated['fotografija_path'] = $path;
         }
@@ -330,5 +340,18 @@ class IgraciController extends Controller
         
         return redirect()->route('igraci.show', $igrac_id)
             ->with('success', 'Klub uspešno obrisan.');
+    }
+
+    private function latinicizeCharacters($text) {
+        $replacements = [
+            'Ž' => 'Z', 'ž' => 'z',
+            'Đ' => 'DJ', 'đ' => 'dj',
+            'Š' => 'S', 'š' => 's',
+            'Č' => 'C', 'č' => 'c',
+            'Ć' => 'C', 'ć' => 'c',
+            ' ' => '_'
+        ];
+        
+        return str_replace(array_keys($replacements), array_values($replacements), $text);
     }
 }

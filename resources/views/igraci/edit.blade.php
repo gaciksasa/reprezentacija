@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Izmeni igrača: {{ $igrac->ime }} {{ $igrac->prezime }}</h1>
-    <a href="{{ route('igraci.index') }}" class="btn btn-secondary">
+    <a href="{{ route('igraci.show', $igrac) }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Nazad
     </a>
 </div>
