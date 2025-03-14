@@ -129,8 +129,8 @@
                 <div class="bivsi-klub-row mb-4">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Naziv kluba *</label>
-                            <input type="text" class="form-control" name="bivsi_klubovi[0][naziv]" required>
+                            <label class="form-label">Naziv kluba</label>
+                            <input type="text" class="form-control" name="bivsi_klubovi[0][naziv]">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Država kluba</label>
@@ -138,21 +138,19 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Sezona</label>
                             <input type="text" class="form-control" name="bivsi_klubovi[0][sezona]" placeholder="npr. 1989-90">
                         </div>
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Stepen takmičenja</label>
                             <input type="text" class="form-control" name="bivsi_klubovi[0][stepen_takmicenja]">
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Broj nastupa</label>
                             <input type="number" class="form-control" name="bivsi_klubovi[0][broj_nastupa]" min="0">
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Broj golova</label>
                             <input type="number" class="form-control" name="bivsi_klubovi[0][broj_golova]" min="0">
                         </div>

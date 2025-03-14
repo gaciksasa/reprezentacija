@@ -150,7 +150,7 @@ class IgraciController extends Controller
         // Process bivsi klubovi
         if ($request->has('bivsi_klubovi')) {
             foreach ($request->bivsi_klubovi as $klub) {
-                if (!empty($klub['naziv'])) { // Only add if klub name is provided
+                if (isset($klub['naziv']) && !empty($klub['naziv'])) { // Check if naziv exists AND is not empty
                     $igrac->bivsiKlubovi()->create([
                         'naziv' => $klub['naziv'],
                         'drzava' => $klub['drzava'] ?? null,
@@ -241,7 +241,7 @@ class IgraciController extends Controller
             $existingIds = [];
             
             foreach ($request->bivsi_klubovi as $index => $klubData) {
-                if (!empty($klubData['naziv'])) {
+                if (isset($klubData['naziv']) && !empty($klubData['naziv'])) {
                     if (isset($klubData['id'])) {
                         // Update existing club
                         $klub = BivsiKlub::find($klubData['id']);
