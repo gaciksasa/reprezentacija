@@ -71,41 +71,40 @@ class IzmeneController extends Controller
                 ->with('error', 'Izabrani tim nije učesnik ove utakmice.');
         }
         
-        // Dobavi glavni tim (Srbija i alijasi)
+        // Dobavi glavni tim za proveru
         $glavniTim = Tim::glavniTim()->first();
         $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
-        
-        // Proveri da li je trenutni tim zapravo "naš" tim
         $isNasTim = in_array($tim_id, $glavniTimIds);
         
         if ($isNasTim) {
-            // Za "naš" tim, dohvatamo igrače iz sastava
-            $sastavi = Sastav::where('utakmica_id', $utakmica_id)
-                    ->where('tim_id', $tim_id)
-                    ->get();
+            // Za naš tim, igrači koji izlaze su samo oni u sastavu za ovu utakmicu
+            $igraciKojiIzlaze = Sastav::where('utakmica_id', $utakmica_id)
+                ->where('tim_id', $tim_id)
+                ->with(['igrac' => function($query) {
+                    $query->orderBy('prezime')->orderBy('ime');
+                }])
+                ->get()
+                ->pluck('igrac');
             
-            // ID-jevi igrača u sastavu
-            $igracIds = $sastavi->pluck('igrac_id')->toArray();
-            
-            // Dohvatamo igrače
-            $igraci = Igrac::whereIn('id', $igracIds)
-                    ->orderBy('prezime')
-                    ->orderBy('ime')
-                    ->get();
-                    
-            $tipIzmene = 'regularna';
+            // Svi igrači našeg tima (za ulazak)
+            $igraciKojiUlaze = Igrac::whereIn('tim_id', $glavniTimIds)
+                ->orderBy('prezime')
+                ->orderBy('ime')
+                ->get();
         } else {
-            // Za protivnički tim, dohvatamo protivničke igrače
-            $igraci = ProtivnickiIgrac::where('utakmica_id', $utakmica_id)
-                    ->where('tim_id', $tim_id)
-                    ->orderBy('prezime')
-                    ->orderBy('ime')
-                    ->get();
-                    
-            $tipIzmene = 'protivnicka';
+            // Za protivnički tim, samo igrači u sastavu (sa u_sastavu = true)
+            $igraciKojiIzlaze = ProtivnickiIgrac::where('utakmica_id', $utakmica_id)
+                ->where('tim_id', $tim_id)
+                ->where('u_sastavu', true)
+                ->orderBy('prezime')
+                ->orderBy('ime')
+                ->get();
+            
+            // Za protivničke timove, ne trebaju nam igrači koji ulaze jer će biti uneti kao tekst
+            $igraciKojiUlaze = collect();
         }
         
-        return view('izmene.create', compact('utakmica', 'tim', 'igraci', 'tipIzmene'));
+        return view('izmene.create', compact('utakmica', 'tim', 'igraciKojiIzlaze', 'igraciKojiUlaze', 'isNasTim'));
     }
 
     /**
@@ -133,13 +132,35 @@ class IzmeneController extends Controller
                 'utakmica_id' => 'required|exists:utakmice,id',
                 'tim_id' => 'required|exists:timovi,id',
                 'igrac_out_id' => 'required|exists:protivnicki_igraci,id',
-                'igrac_in_id' => 'required|exists:protivnicki_igraci,id|different:igrac_out_id',
+                'igrac_in_ime_prezime' => 'required|string|max:255',
                 'minut' => 'required|integer|min:1|max:120',
                 'napomena' => 'nullable|string',
             ]);
             
+            // Razdvajanje imena i prezimena za igrača koji ulazi
+            $imePrezime = explode(' ', $validated['igrac_in_ime_prezime'], 2);
+            $ime = $imePrezime[0];
+            $prezime = $imePrezime[1] ?? '';
+            
+            // Kreiraj novog protivničkog igrača koji ulazi
+            $protivnickiIgracIn = ProtivnickiIgrac::create([
+                'ime' => $ime,
+                'prezime' => $prezime,
+                'utakmica_id' => $validated['utakmica_id'],
+                'tim_id' => $validated['tim_id'],
+                'kapiten' => false,
+                'u_sastavu' => false
+            ]);
+            
             // Kreiranje izmene za protivnički tim
-            ProtivnickaIzmena::create($validated);
+            ProtivnickaIzmena::create([
+                'utakmica_id' => $validated['utakmica_id'],
+                'tim_id' => $validated['tim_id'],
+                'igrac_out_id' => $validated['igrac_out_id'],
+                'igrac_in_id' => $protivnickiIgracIn->id,
+                'minut' => $validated['minut'],
+                'napomena' => $validated['napomena'] ?? null,
+            ]);
         }
 
         return redirect()->route('izmene.index', ['utakmica_id' => $request->input('utakmica_id')])

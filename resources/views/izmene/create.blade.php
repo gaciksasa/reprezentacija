@@ -45,16 +45,16 @@
             
             <input type="hidden" name="utakmica_id" value="{{ $utakmica->id }}">
             <input type="hidden" name="tim_id" value="{{ $tim->id }}">
-            <input type="hidden" name="tip_izmene" value="{{ $tipIzmene ?? 'regularna' }}">
+            <input type="hidden" name="tip_izmene" value="{{ isset($isNasTim) && $isNasTim ? 'regularna' : 'protivnicka' }}">
             
             <div class="mb-3">
                 <label for="igrac_out_id" class="form-label">Igrač koji izlazi *</label>
                 <select class="form-select @error('igrac_out_id') is-invalid @enderror" 
                         id="igrac_out_id" name="igrac_out_id" required>
                     <option value="">-- Izaberite igrača --</option>
-                    @foreach($igraci as $igrac)
+                    @foreach($igraciKojiIzlaze as $igrac)
                         <option value="{{ $igrac->id }}" {{ old('igrac_out_id') == $igrac->id ? 'selected' : '' }}>
-                            {{ $igrac->ime }} {{ $igrac->prezime }}
+                            {{ $igrac->prezime }} {{ $igrac->ime }}
                         </option>
                     @endforeach
                 </select>
@@ -65,16 +65,27 @@
             
             <div class="mb-3">
                 <label for="igrac_in_id" class="form-label">Igrač koji ulazi *</label>
-                <select class="form-select @error('igrac_in_id') is-invalid @enderror" 
-                        id="igrac_in_id" name="igrac_in_id" required>
-                    <option value="">-- Izaberite igrača --</option>
-                    @foreach($igraci as $igrac)
-                        <option value="{{ $igrac->id }}" {{ old('igrac_in_id') == $igrac->id ? 'selected' : '' }}>
-                            {{ $igrac->ime }} {{ $igrac->prezime }}
-                        </option>
-                    @endforeach
-                </select>
+                @if(isset($isNasTim) && $isNasTim)
+                    <!-- Za naš tim, prikaži dropdown sa svim igračima -->
+                    <select class="form-select @error('igrac_in_id') is-invalid @enderror" 
+                            id="igrac_in_id" name="igrac_in_id" required>
+                        <option value="">-- Izaberite igrača --</option>
+                        @foreach($igraciKojiUlaze as $igrac)
+                            <option value="{{ $igrac->id }}" {{ old('igrac_in_id') == $igrac->id ? 'selected' : '' }}>
+                                {{ $igrac->prezime }} {{ $igrac->ime }}
+                            </option>
+                        @endforeach
+                    </select>
+                @else
+                    <!-- Za protivnički tim, prikaži tekstualno polje -->
+                    <input type="text" class="form-control @error('igrac_in_ime_prezime') is-invalid @enderror" 
+                           id="igrac_in_ime_prezime" name="igrac_in_ime_prezime" value="{{ old('igrac_in_ime_prezime') }}" required 
+                           placeholder="Unesite ime i prezime igrača koji ulazi">
+                @endif
                 @error('igrac_in_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                @error('igrac_in_ime_prezime')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -88,7 +99,7 @@
                 @enderror
             </div>
             
-            @if(isset($tipIzmene) && $tipIzmene == 'protivnicka')
+            @if(!isset($isNasTim) || !$isNasTim)
             <div class="mb-3">
                 <label for="napomena" class="form-label">Napomena</label>
                 <textarea class="form-control @error('napomena') is-invalid @enderror" 

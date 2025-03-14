@@ -106,6 +106,7 @@ class ProtivnickiIgraciController extends Controller
             'utakmica_id' => $validated['utakmica_id'],
             'tim_id' => $validated['tim_id'],
             'kapiten' => $kapiten,
+            'u_sastavu' => true, // Dodaj da je u sastavu
         ]);
         
         if ($request->ajax()) {
@@ -117,7 +118,6 @@ class ProtivnickiIgraciController extends Controller
 
         return redirect()->route('utakmice.show', $validated['utakmica_id'])
             ->with('success', 'Protivnički igrač uspešno dodat.');
-        
     }
 
     /**
