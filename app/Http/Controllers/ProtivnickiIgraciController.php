@@ -114,12 +114,10 @@ class ProtivnickiIgraciController extends Controller
                 'igrac' => $protivnickiIgrac
             ]);
         }
-        
-        return redirect()->route('protivnicki-igraci.index', [
-                'utakmica_id' => $validated['utakmica_id'], 
-                'tim_id' => $validated['tim_id']
-            ])
+
+        return redirect()->route('utakmice.show', $validated['utakmica_id'])
             ->with('success', 'Protivnički igrač uspešno dodat.');
+        
     }
 
     /**

@@ -131,8 +131,8 @@ class SastaviController extends Controller
 
         Sastav::create($validated);
 
-        return redirect()->route('sastavi.index', ['utakmica_id' => $validated['utakmica_id']])
-            ->with('success', 'Igrač uspešno dodat u sastav.');
+        return redirect()->route('utakmice.show', $validated['utakmica_id'])
+            ->with('success', 'Igrač uspešno dodat.');
     }
 
     /**
