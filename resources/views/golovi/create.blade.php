@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Dodaj novi gol</h1>
-    <a href="{{ route('golovi.index', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-secondary">
+    <a href="{{ route('utakmice.show', $utakmica) }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Nazad
     </a>
 </div>
