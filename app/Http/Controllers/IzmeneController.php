@@ -264,18 +264,44 @@ class IzmeneController extends Controller
      */
     public function destroy($id)
     {
-        // Proveriti da li je obična ili protivnička izmena
+        // Prvo proveriti da li je to regularna izmena
         $izmena = Izmena::find($id);
+        $utakmica_id = null;
         
-        if (!$izmena) {
-            // Ako nije obična izmena, proveriti da li je protivnička
-            $izmena = ProtivnickaIzmena::findOrFail($id);
+        if ($izmena) {
+            // Ako je regularna izmena
+            $utakmica_id = $izmena->utakmica_id;
+            $izmena->delete();
+        } else {
+            // Ako nije regularna, proveriti da li je protivnička izmena
+            $protivnickaIzmena = ProtivnickaIzmena::find($id);
+            
+            if ($protivnickaIzmena) {
+                $utakmica_id = $protivnickaIzmena->utakmica_id;
+                
+                // Možemo opciono obrisati i igrača koji je ušao kao zamena, ako nije korišćen u drugim izmenama
+                $igracInId = $protivnickaIzmena->igrac_in_id;
+                $protivnickaIzmena->delete();
+                
+                // Provera da li igrač koji je ušao ima još izmena
+                $imaJosIzmena = ProtivnickaIzmena::where('igrac_in_id', $igracInId)
+                    ->orWhere('igrac_out_id', $igracInId)
+                    ->exists();
+                    
+                // Ako nema drugih izmena, obrišimo i igrača
+                if (!$imaJosIzmena) {
+                    ProtivnickiIgrac::find($igracInId)->delete();
+                }
+            }
         }
         
-        $utakmica_id = $izmena->utakmica_id;
-        $izmena->delete();
-        
-        return redirect()->route('izmene.index', ['utakmica_id' => $utakmica_id])
-            ->with('success', 'Izmena uspešno obrisana.');
+        if ($utakmica_id) {
+            // Redirektuj na stranicu utakmice umesto na index izmena
+            return redirect()->route('utakmice.show', $utakmica_id)
+                ->with('success', 'Izmena uspešno obrisana.');
+        } else {
+            return redirect()->route('utakmice.index')
+                ->with('error', 'Izmena nije pronađena.');
+        }
     }
 }

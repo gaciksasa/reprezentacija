@@ -541,16 +541,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($sveIzmene as $izmena)
-                        <tr>
-                            <td>{{ $izmena->minut }}'</td>
-                            <td>{{ $izmena->tim->skraceni_naziv ?? $izmena->tim->naziv }}</td>
-                            <td>
-                                <i class="fas fa-arrow-right text-success"></i> {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}<br>
-                                <i class="fas fa-arrow-left text-danger"></i> {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
-                            </td>
-                        </tr>
-                        @endforeach
+                    @foreach($sveIzmene as $izmena)
+                    <tr>
+                        <td>{{ $izmena->minut }}'</td>
+                        <td>{{ $izmena->tim->skraceni_naziv ?? $izmena->tim->naziv }}</td>
+                        <td>
+                            <i class="fas fa-arrow-right text-success"></i> {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}<br>
+                            <i class="fas fa-arrow-left text-danger"></i> {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
+                            
+                            <!-- Dodajemo dugme za brisanje -->
+                            <form action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-inline ms-2">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
                     </tbody>
                 </table>
             </div>
