@@ -350,6 +350,19 @@ class IzmeneController extends Controller
         if ($izmena) {
             // Ako je regularna izmena
             $utakmica_id = $izmena->utakmica_id;
+            $tim_id = $izmena->tim_id;
+            
+            // Ukloni igrača koji ulazi iz sastava ako nije starter
+            $sastav = Sastav::where('utakmica_id', $utakmica_id)
+                ->where('tim_id', $tim_id)
+                ->where('igrac_id', $izmena->igrac_in_id)
+                ->where('starter', false)
+                ->first();
+                
+            if ($sastav) {
+                $sastav->delete();
+            }
+            
             $izmena->delete();
         } else {
             // Ako nije regularna, proveriti da li je protivnička izmena
@@ -358,24 +371,17 @@ class IzmeneController extends Controller
             if ($protivnickaIzmena) {
                 $utakmica_id = $protivnickaIzmena->utakmica_id;
                 
-                // Možemo opciono obrisati i igrača koji je ušao kao zamena, ako nije korišćen u drugim izmenama
-                $igracInId = $protivnickaIzmena->igrac_in_id;
-                $protivnickaIzmena->delete();
-                
-                // Provera da li igrač koji je ušao ima još izmena
-                $imaJosIzmena = ProtivnickaIzmena::where('igrac_in_id', $igracInId)
-                    ->orWhere('igrac_out_id', $igracInId)
-                    ->exists();
-                    
-                // Ako nema drugih izmena, obrišimo i igrača
-                if (!$imaJosIzmena) {
-                    ProtivnickiIgrac::find($igracInId)->delete();
+                // Označi igrača koji je ušao kao da nije u sastavu
+                $igracIn = ProtivnickiIgrac::find($protivnickaIzmena->igrac_in_id);
+                if ($igracIn) {
+                    $igracIn->update(['u_sastavu' => false]);
                 }
+                
+                $protivnickaIzmena->delete();
             }
         }
         
         if ($utakmica_id) {
-            // Redirektuj na stranicu utakmice umesto na index izmena
             return redirect()->route('utakmice.show', $utakmica_id)
                 ->with('success', 'Izmena uspešno obrisana.');
         } else {
