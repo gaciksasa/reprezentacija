@@ -51,7 +51,16 @@ class ProtivnickiKartoniController extends Controller
             'igrac_id' => 'required|exists:protivnicki_igraci,id',
             'tip' => 'required|in:zuti,crveni',
             'minut' => 'required|integer|min:1|max:120',
+            'drugi_zuti' => 'boolean',
         ]);
+
+        // Ako je označeno kao drugi žuti, automatski postavimo tip na crveni
+        if ($request->has('drugi_zuti') && $request->drugi_zuti) {
+            $validated['drugi_zuti'] = true;
+            $validated['tip'] = 'crveni';
+        } else {
+            $validated['drugi_zuti'] = false;
+        }
 
         ProtivnickiKarton::create($validated);
 

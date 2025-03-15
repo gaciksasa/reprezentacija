@@ -12,7 +12,11 @@ class ProtivnickiKarton extends Model
     protected $table = 'protivnicki_kartoni';
     
     protected $fillable = [
-        'utakmica_id', 'igrac_id', 'tim_id', 'tip', 'minut'
+        'utakmica_id', 'igrac_id', 'tim_id', 'tip', 'minut', 'drugi_zuti'
+    ];
+    
+    protected $casts = [
+        'drugi_zuti' => 'boolean',
     ];
     
     // Relacije

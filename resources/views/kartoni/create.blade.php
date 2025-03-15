@@ -76,6 +76,11 @@
                     @enderror
                 </div>
                 
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="drugi_zuti" name="drugi_zuti" {{ old('drugi_zuti') ? 'checked' : '' }}>
+                    <label class="form-check-label" for="drugi_zuti">Drugi žuti karton (automatski crveni)</label>
+                </div>
+                
                 <div class="mb-3">
                     <label for="minut" class="form-label">Minut *</label>
                     <input type="number" class="form-control @error('minut') is-invalid @enderror" 
