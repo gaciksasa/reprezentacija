@@ -107,28 +107,27 @@ class KartoniController extends Controller
             'igrac_id' => 'required',
             'tip' => 'required|in:zuti,crveni',
             'minut' => 'required|integer|min:1|max:120',
-            'drugi_zuti' => 'boolean',
         ]);
 
-        // Ako je označeno kao drugi žuti, automatski postavimo tip na crveni
-        if ($request->has('drugi_zuti') && $request->drugi_zuti) {
-            $validated['drugi_zuti'] = true;
+        // Set drugi_zuti based on checkbox presence
+        $validated['drugi_zuti'] = $request->has('drugi_zuti');
+        
+        // If it's marked as second yellow, automatically set type to red
+        if ($validated['drugi_zuti']) {
             $validated['tip'] = 'crveni';
-        } else {
-            $validated['drugi_zuti'] = false;
         }
 
-        // Provera da li se radi o protivničkom igraču
+        // Check if this is for our team or opponent team
         $glavniTim = Tim::glavniTim()->first();
         $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
         $isNasTim = in_array($validated['tim_id'], $glavniTimIds);
 
-        // Ako je protivnički tim, prvo proverimo da li je protivnički igrač
+        // If opponent team, check if it's an opponent player
         if (!$isNasTim) {
-            // Proveri da li igrac_id postoji u protivničkim igračima
+            // Check if igrac_id exists in opponent players
             $protivnickiIgrac = ProtivnickiIgrac::find($validated['igrac_id']);
             if ($protivnickiIgrac) {
-                // Sačuvaj karton za protivničkog igrača
+                // Save card for opponent player
                 $karton = new Karton([
                     'utakmica_id' => $validated['utakmica_id'],
                     'tim_id' => $validated['tim_id'],
@@ -143,7 +142,7 @@ class KartoniController extends Controller
             }
         }
 
-        // Standardno kreiranje kartona
+        // Standard card creation
         Karton::create($validated);
 
         return redirect()->route('utakmice.show', $validated['utakmica_id'])

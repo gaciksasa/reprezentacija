@@ -43,6 +43,9 @@ class ProtivnickiKartoniController extends Controller
         return view('protivnicki-kartoni.create', compact('utakmica', 'tim', 'igraci'));
     }
 
+    /**
+     * Čuvanje novog kartona.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -51,15 +54,14 @@ class ProtivnickiKartoniController extends Controller
             'igrac_id' => 'required|exists:protivnicki_igraci,id',
             'tip' => 'required|in:zuti,crveni',
             'minut' => 'required|integer|min:1|max:120',
-            'drugi_zuti' => 'boolean',
         ]);
 
-        // Ako je označeno kao drugi žuti, automatski postavimo tip na crveni
-        if ($request->has('drugi_zuti') && $request->drugi_zuti) {
-            $validated['drugi_zuti'] = true;
+        // Set drugi_zuti based on checkbox presence
+        $validated['drugi_zuti'] = $request->has('drugi_zuti');
+        
+        // If it's marked as second yellow, automatically set type to red
+        if ($validated['drugi_zuti']) {
             $validated['tip'] = 'crveni';
-        } else {
-            $validated['drugi_zuti'] = false;
         }
 
         ProtivnickiKarton::create($validated);
