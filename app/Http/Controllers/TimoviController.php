@@ -134,15 +134,43 @@ class TimoviController extends Controller
     public function show($id)
     {
         try {
-            // Eksplicitno dohvatamo tim po ID-u umesto da se oslanjamo na route model binding
+            // Get the current team
             $tim = Tim::with(['igraci', 'domaceUtakmice.takmicenje', 'domaceUtakmice.domacin', 
                             'domaceUtakmice.gost', 'gostujuceUtakmice.takmicenje', 
                             'gostujuceUtakmice.domacin', 'gostujuceUtakmice.gost'])
                     ->findOrFail($id);
-
+            
+            // Check if this is our main team or an alias
+            $glavniTim = Tim::glavniTim()->first();
+            $isOurTeam = false;
+            
+            if ($glavniTim) {
+                $nasTimIds = $glavniTim->getSviIdTimova();
+                $isOurTeam = in_array($tim->id, $nasTimIds);
+            }
+            
+            // For opponent teams, keep existing behavior
+            if (!$isOurTeam) {
+                return view('timovi.show', compact('tim'));
+            }
+            
+            // For our team or aliases, get only matches for this specific team variant
+            $domaceUtakmice = $tim->domaceUtakmice()
+                ->with(['domacin', 'gost', 'takmicenje'])
+                ->orderBy('datum', 'desc')
+                ->get();
+                
+            $gostujuceUtakmice = $tim->gostujuceUtakmice()
+                ->with(['domacin', 'gost', 'takmicenje'])
+                ->orderBy('datum', 'desc')
+                ->get();
+                
+            // Combine matches for view
+            $utakmice = $domaceUtakmice->concat($gostujuceUtakmice)->sortByDesc('datum');
+            $tim->utakmice = $utakmice;
+            
             return view('timovi.show', compact('tim'));
         } catch (\Exception $e) {
-            // U slučaju greške, preusmeravamo korisnika i prikazujemo poruku
             return redirect()->route('timovi.index')
                 ->with('error', 'Tim sa ID ' . $id . ' nije pronađen: ' . $e->getMessage());
         }
