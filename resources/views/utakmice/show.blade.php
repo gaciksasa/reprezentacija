@@ -452,7 +452,16 @@
                                         @endif
                                     @endif
                                 </div>
-                                <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                                <div>
+                                    <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                                    <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline ms-2">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         @endif
                     @endforeach
@@ -498,7 +507,16 @@
                                         @endif
                                     @endif
                                 </div>
-                                <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                                <div>
+                                    <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                                    <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline ms-2">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         @endif
                     @endforeach

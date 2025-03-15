@@ -290,16 +290,56 @@ class GoloviController extends Controller
     /**
      * Brisanje gola.
      */
-    public function destroy(Gol $gol)
+    public function destroy($id)
     {
-        $utakmica_id = $gol->utakmica_id;
-        $gol->delete();
-        
-        // Update match score
-        $this->updateUtakmicaRezultat($utakmica_id);
-        
-        return redirect()->route('utakmice.show', $utakmica_id)
-            ->with('success', 'Gol uspešno obrisan.');
+        try {
+            // Find goal by ID manually
+            $gol = Gol::findOrFail($id);
+            $utakmica_id = $gol->utakmica_id;
+            
+            // Delete the goal
+            $gol->delete();
+            
+            // Get the match
+            $utakmica = Utakmica::findOrFail($utakmica_id);
+            
+            // Count goals for home team
+            $domaciGolovi = Gol::where('utakmica_id', $utakmica_id)
+                ->where(function($query) use ($utakmica) {
+                    $query->where(function($q) use ($utakmica) {
+                        $q->where('tim_id', $utakmica->domacin_id)
+                        ->where('auto_gol', false);
+                    })->orWhere(function($q) use ($utakmica) {
+                        $q->where('tim_id', $utakmica->gost_id)
+                        ->where('auto_gol', true);
+                    });
+                })
+                ->count();
+                
+            // Count goals for away team
+            $gostiGolovi = Gol::where('utakmica_id', $utakmica_id)
+                ->where(function($query) use ($utakmica) {
+                    $query->where(function($q) use ($utakmica) {
+                        $q->where('tim_id', $utakmica->gost_id)
+                        ->where('auto_gol', false);
+                    })->orWhere(function($q) use ($utakmica) {
+                        $q->where('tim_id', $utakmica->domacin_id)
+                        ->where('auto_gol', true);
+                    });
+                })
+                ->count();
+                
+            // Update match result
+            $utakmica->rezultat_domacin = $domaciGolovi;
+            $utakmica->rezultat_gost = $gostiGolovi;
+            $utakmica->save();
+            
+            return redirect()->route('utakmice.show', $utakmica_id)
+                ->with('success', 'Gol uspešno obrisan.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Greška prilikom brisanja gola: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -314,10 +354,10 @@ class GoloviController extends Controller
             ->where(function($query) use ($utakmica) {
                 $query->where(function($q) use ($utakmica) {
                     $q->where('tim_id', $utakmica->domacin_id)
-                      ->where('auto_gol', false);
+                    ->where('auto_gol', false);
                 })->orWhere(function($q) use ($utakmica) {
                     $q->where('tim_id', $utakmica->gost_id)
-                      ->where('auto_gol', true);
+                    ->where('auto_gol', true);
                 });
             })
             ->count();
@@ -327,10 +367,10 @@ class GoloviController extends Controller
             ->where(function($query) use ($utakmica) {
                 $query->where(function($q) use ($utakmica) {
                     $q->where('tim_id', $utakmica->gost_id)
-                      ->where('auto_gol', false);
+                    ->where('auto_gol', false);
                 })->orWhere(function($q) use ($utakmica) {
                     $q->where('tim_id', $utakmica->domacin_id)
-                      ->where('auto_gol', true);
+                    ->where('auto_gol', true);
                 });
             })
             ->count();
@@ -339,5 +379,7 @@ class GoloviController extends Controller
         $utakmica->rezultat_domacin = $domaciGolovi;
         $utakmica->rezultat_gost = $gostiGolovi;
         $utakmica->save();
+        
+        return $utakmica;
     }
 }
