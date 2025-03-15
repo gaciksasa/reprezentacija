@@ -115,12 +115,12 @@
                     <ul class="list-unstyled">
                         @foreach($domaciSastav as $sastav)
                             <li class="py-1">
+                                @if($sastav->starter)
                                 <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
-                                    <span class="text-danger {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
+                                    <span class="text-danger fw-bold">
                                         {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
-                                        @if(!$sastav->starter) <small>(rezerva)</small> @endif
                                     </span>
-                                </a>
+                                </a>                               
                                 <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
@@ -128,6 +128,7 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
+                                @endif
                             </li>
                         @endforeach
                         
@@ -162,7 +163,8 @@
                     <ul class="list-unstyled">
                         @foreach($gostujuciSastav as $sastav)
                             <li class="py-1">
-                            <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
+                                @if($sastav->starter)
+                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
@@ -170,11 +172,11 @@
                                     </button>
                                 </form>
                                 <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
-                                    <span class="text-danger {{ $sastav->starter ? 'fw-bold' : 'text-muted' }}">
-                                        {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }} 
-                                        @if(!$sastav->starter) <small>(rezerva)</small> @endif
+                                    <span class="text-danger fw-bold">
+                                        {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                     </span>
                                 </a>
+                                @endif
                             </li>
                         @endforeach
                         
