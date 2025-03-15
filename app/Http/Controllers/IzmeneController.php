@@ -124,8 +124,31 @@ class IzmeneController extends Controller
                 'minut' => 'required|integer|min:1|max:120',
             ]);
             
+            // Dobavimo glavni tim i njegove alijase radi provere
+            $glavniTim = Tim::glavniTim()->first();
+            $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+            
             // Kreiranje izmene za naš tim
             Izmena::create($validated);
+            
+            // Ako je izmena za igrača našeg tima, dodajemo ga u sastav
+            if (in_array($validated['tim_id'], $glavniTimIds)) {
+                // Proveravamo da li je igrač već u sastavu za ovu utakmicu
+                $postojeciSastav = Sastav::where('utakmica_id', $validated['utakmica_id'])
+                    ->where('tim_id', $validated['tim_id'])
+                    ->where('igrac_id', $validated['igrac_in_id'])
+                    ->first();
+                    
+                // Ako nije, dodajemo ga u sastav kao rezervu (starter = false)
+                if (!$postojeciSastav) {
+                    Sastav::create([
+                        'utakmica_id' => $validated['utakmica_id'],
+                        'tim_id' => $validated['tim_id'],
+                        'igrac_id' => $validated['igrac_in_id'],
+                        'starter' => false
+                    ]);
+                }
+            }
         } else {
             // Validacija za protivnički tim
             $validated = $request->validate([
@@ -163,7 +186,7 @@ class IzmeneController extends Controller
             ]);
         }
 
-        return redirect()->route('izmene.index', ['utakmica_id' => $request->input('utakmica_id')])
+        return redirect()->route('utakmice.show', $request->input('utakmica_id'))
             ->with('success', 'Izmena uspešno zabeležena.');
     }
 
@@ -241,8 +264,42 @@ class IzmeneController extends Controller
                 'minut' => 'required|integer|min:1|max:120',
             ]);
             
-            // Pronalaženje i ažuriranje izmene za naš tim
+            // Pronalaženje izmene za naš tim
             $izmena = Izmena::findOrFail($id);
+            $utakmica_id = $izmena->utakmica_id;
+            $tim_id = $izmena->tim_id;
+            
+            // Ako se menja igrač koji ulazi, ažuriramo sastav
+            if ($izmena->igrac_in_id != $validated['igrac_in_id']) {
+                // Proveravamo da li stari igrač (koji je ulazio) već ima zapis u sastavu
+                $stariIgracSastav = Sastav::where('utakmica_id', $utakmica_id)
+                    ->where('tim_id', $tim_id)
+                    ->where('igrac_id', $izmena->igrac_in_id)
+                    ->first();
+                
+                // Ako ima zapis u sastavu i samo je kao rezerva (nije starter), uklanjamo ga
+                if ($stariIgracSastav && !$stariIgracSastav->starter) {
+                    $stariIgracSastav->delete();
+                }
+                
+                // Proveravamo da li novi igrač već ima zapis u sastavu
+                $noviIgracSastav = Sastav::where('utakmica_id', $utakmica_id)
+                    ->where('tim_id', $tim_id)
+                    ->where('igrac_id', $validated['igrac_in_id'])
+                    ->first();
+                
+                // Ako nema zapis u sastavu, dodajemo ga kao rezervu
+                if (!$noviIgracSastav) {
+                    Sastav::create([
+                        'utakmica_id' => $utakmica_id,
+                        'tim_id' => $tim_id,
+                        'igrac_id' => $validated['igrac_in_id'],
+                        'starter' => false
+                    ]);
+                }
+            }
+            
+            // Ažuriranje izmene
             $izmena->update($validated);
         } else {
             // Validacija za protivnički tim
@@ -255,10 +312,29 @@ class IzmeneController extends Controller
             
             // Pronalaženje i ažuriranje izmene za protivnički tim
             $izmena = ProtivnickaIzmena::findOrFail($id);
+            $utakmica_id = $izmena->utakmica_id;
+            $tim_id = $izmena->tim_id;
+            
+            // Ako se menja igrač koji ulazi, ažuriramo status u_sastavu
+            if ($izmena->igrac_in_id != $validated['igrac_in_id']) {
+                // Stari igrač koji ulazi više nije u sastavu
+                $stariIgrac = ProtivnickiIgrac::find($izmena->igrac_in_id);
+                if ($stariIgrac) {
+                    $stariIgrac->update(['u_sastavu' => false]);
+                }
+                
+                // Novi igrač koji ulazi dodajemo u sastav
+                $noviIgrac = ProtivnickiIgrac::find($validated['igrac_in_id']);
+                if ($noviIgrac) {
+                    $noviIgrac->update(['u_sastavu' => true]);
+                }
+            }
+            
+            // Ažuriranje izmene
             $izmena->update($validated);
         }
 
-        return redirect()->route('izmene.index', ['utakmica_id' => $request->input('utakmica_id')])
+        return redirect()->route('izmene.index', ['utakmica_id' => $izmena->utakmica_id])
             ->with('success', 'Izmena uspešno ažurirana.');
     }
 
