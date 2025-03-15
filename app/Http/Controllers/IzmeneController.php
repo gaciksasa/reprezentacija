@@ -199,7 +199,11 @@ class IzmeneController extends Controller
             $izmena = ProtivnickaIzmena::with(['utakmica.domacin', 'utakmica.gost', 'tim', 'igracOut', 'igracIn'])->findOrFail($id);
             $tipIzmene = 'protivnicka';
             
-            // Dohvatanje protivničkih igrača
+            // Dobavi glavni tim za proveru
+            $glavniTim = Tim::glavniTim()->first();
+            $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+            
+            // Dohvatanje svih protivničkih igrača za ovaj tim na utakmici
             $igraci = ProtivnickiIgrac::where('utakmica_id', $izmena->utakmica_id)
                     ->where('tim_id', $izmena->tim_id)
                     ->orderBy('prezime')
@@ -208,16 +212,15 @@ class IzmeneController extends Controller
         } else {
             $tipIzmene = 'regularna';
             
-            // Dohvatanje regularnih igrača
-            $igraci = Igrac::whereIn('id', function($query) use ($izmena) {
-                $query->select('igrac_id')
-                      ->from('sastavi')
-                      ->where('utakmica_id', $izmena->utakmica_id)
-                      ->where('tim_id', $izmena->tim_id);
-            })
-            ->orderBy('prezime')
-            ->orderBy('ime')
-            ->get();
+            // Dobavi glavni tim za proveru
+            $glavniTim = Tim::glavniTim()->first();
+            $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+            
+            // Za naš tim, dohvati sve igrače repke (ne samo sastav za tu utakmicu)
+            $igraci = Igrac::whereIn('tim_id', $glavniTimIds)
+                    ->orderBy('prezime')
+                    ->orderBy('ime')
+                    ->get();
         }
         
         return view('izmene.edit', compact('izmena', 'igraci', 'tipIzmene'));

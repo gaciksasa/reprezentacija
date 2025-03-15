@@ -13,6 +13,7 @@ use App\Http\Controllers\SastaviController;
 use App\Http\Controllers\SelektoriController;
 use App\Http\Controllers\ProtivnickiSelektoriController;
 use App\Http\Controllers\ProtivnickiIgraciController;
+use App\Http\Controllers\ProtivnickeIzmeneController;
 use App\Http\Controllers\GoloviController;
 use App\Http\Controllers\IzmeneController;
 use App\Http\Controllers\KartoniController;
@@ -90,3 +91,8 @@ Route::resource('izmene', IzmeneController::class);
 
 // CRUD rute za kartone
 Route::resource('kartoni', KartoniController::class);
+
+// Rute za protivničke izmene
+Route::get('protivnicke-izmene/{id}/edit', [ProtivnickeIzmeneController::class, 'edit'])->name('protivnicke-izmene.edit');
+Route::put('protivnicke-izmene/{id}', [ProtivnickeIzmeneController::class, 'update'])->name('protivnicke-izmene.update');
+Route::delete('protivnicke-izmene/{id}', [ProtivnickeIzmeneController::class, 'destroy'])->name('protivnicke-izmene.destroy');

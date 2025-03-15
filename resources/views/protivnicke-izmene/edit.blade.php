@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Izmeni izmenu')
+@section('title', 'Izmeni protivničku izmenu')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Izmeni izmenu</h1>
+    <h1>Izmeni protivničku izmenu</h1>
     <a href="{{ route('utakmice.show', $izmena->utakmica) }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Nazad
     </a>
@@ -37,15 +37,12 @@
 
 <div class="card">
     <div class="card-header">
-        <h5 class="card-title mb-0">Izmeni izmenu za tim: {{ $izmena->tim->naziv }}</h5>
+        <h5 class="card-title mb-0">Izmeni protivničku izmenu za tim: {{ $izmena->tim->naziv }}</h5>
     </div>
     <div class="card-body">
-        <form action="{{ route('izmene.update', $izmena->id) }}" method="POST">
+        <form action="{{ url('protivnicke-izmene/'.$izmena->id) }}" method="POST">
             @csrf
             @method('PUT')
-            
-            <input type="hidden" name="utakmica_id" value="{{ $izmena->utakmica_id }}">
-            <input type="hidden" name="tip_izmene" value="{{ $tipIzmene ?? 'regularna' }}">
             
             <div class="mb-3">
                 <label for="igrac_out_id" class="form-label">Igrač koji izlazi *</label>
@@ -88,16 +85,14 @@
                 @enderror
             </div>
             
-            @if(isset($tipIzmene) && $tipIzmene == 'protivnicka')
             <div class="mb-3">
                 <label for="napomena" class="form-label">Napomena</label>
                 <textarea class="form-control @error('napomena') is-invalid @enderror" 
-                          id="napomena" name="napomena" rows="2">{{ old('napomena', $izmena->napomena ?? '') }}</textarea>
+                          id="napomena" name="napomena" rows="2">{{ old('napomena', $izmena->napomena) }}</textarea>
                 @error('napomena')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            @endif
             
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Sačuvaj izmene</button>

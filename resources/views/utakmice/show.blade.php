@@ -525,47 +525,190 @@
         </div>
     </div>
     <div class="card-body">
-        @php
-            // Dobavi sve izmene (i regularne i protivničke)
-            $sveIzmene = $utakmica->izmene->concat($utakmica->protivnickeIzmene)->sortBy('minut');
-        @endphp
+        <ul class="nav nav-tabs" id="izmeneTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="domaci-tab" data-bs-toggle="tab" data-bs-target="#domaci-izmene" type="button" role="tab" aria-controls="domaci-izmene" aria-selected="true">
+                    {{ $utakmica->domacin->naziv }}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gostujuci-tab" data-bs-toggle="tab" data-bs-target="#gostujuci-izmene" type="button" role="tab" aria-controls="gostujuci-izmene" aria-selected="false">
+                    {{ $utakmica->gost->naziv }}
+                </button>
+            </li>
+        </ul>
         
-        @if($sveIzmene->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Min</th>
-                            <th>Tim</th>
-                            <th>Izmena</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($sveIzmene as $izmena)
-                    <tr>
-                        <td>{{ $izmena->minut }}'</td>
-                        <td>{{ $izmena->tim->skraceni_naziv ?? $izmena->tim->naziv }}</td>
-                        <td>
-                            <i class="fas fa-arrow-right text-success"></i> {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}<br>
-                            <i class="fas fa-arrow-left text-danger"></i> {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
-                            
-                            <!-- Dodajemo dugme za brisanje -->
-                            <form action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-inline ms-2">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+        <div class="tab-content mt-3" id="izmeneTabContent">
+            <!-- Izmene domaćeg tima -->
+            <div class="tab-pane fade show active" id="domaci-izmene" role="tabpanel" aria-labelledby="domaci-tab">
+                @php
+                    // Prvo pripremamo posebne kolekcije za regularne i protivničke izmene
+                    $domaciRegularneIzmene = $utakmica->izmene->where('tim_id', $utakmica->domacin_id)->values();
+                    $domaciProtivnickeIzmene = $utakmica->protivnickeIzmene->where('tim_id', $utakmica->domacin_id)->values();
+                @endphp
+
+                @if($domaciRegularneIzmene->count() > 0 || $domaciProtivnickeIzmene->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Min</th>
+                                    <th>Igrač koji ulazi</th>
+                                    <th>Igrač koji izlazi</th>
+                                    <th>Akcije</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($domaciRegularneIzmene->sortBy('minut') as $izmena)
+                                <tr>
+                                    <td>{{ $izmena->minut }}'</td>
+                                    <td>
+                                        <i class="fas fa-arrow-right text-success"></i> 
+                                        {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-arrow-left text-danger"></i> 
+                                        {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ route('izmene.edit', $izmena->id) }}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="document.getElementById('delete-regularna-izmena-{{ $izmena->id }}').submit()">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <form id="delete-regularna-izmena-{{ $izmena->id }}" action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-none">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                                
+                                @foreach($domaciProtivnickeIzmene->sortBy('minut') as $izmena)
+                                <tr>
+                                    <td>{{ $izmena->minut }}'</td>
+                                    <td>
+                                        <i class="fas fa-arrow-right text-success"></i> 
+                                        {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-arrow-left text-danger"></i> 
+                                        {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ url('protivnicke-izmene/'.$izmena->id.'/edit') }}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="document.getElementById('delete-protivnicka-izmena-{{ $izmena->id }}').submit()">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <form id="delete-protivnicka-izmena-{{ $izmena->id }}" action="{{ url('protivnicke-izmene/'.$izmena->id) }}" method="POST" class="d-none">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-center text-muted">Nema evidentiranih izmena za domaći tim.</p>
+                @endif
             </div>
-        @else
-            <p class="text-center text-muted">Nema evidentiranih izmena za ovu utakmicu.</p>
-        @endif
+            
+            <!-- Izmene gostujućeg tima -->
+            <div class="tab-pane fade" id="gostujuci-izmene" role="tabpanel" aria-labelledby="gostujuci-tab">
+                @php
+                    // Prvo pripremamo posebne kolekcije za regularne i protivničke izmene
+                    $gostRegularneIzmene = $utakmica->izmene->where('tim_id', $utakmica->gost_id)->values();
+                    $gostProtivnickeIzmene = $utakmica->protivnickeIzmene->where('tim_id', $utakmica->gost_id)->values();
+                @endphp
+
+                @if($gostRegularneIzmene->count() > 0 || $gostProtivnickeIzmene->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Min</th>
+                                    <th>Igrač koji ulazi</th>
+                                    <th>Igrač koji izlazi</th>
+                                    <th>Akcije</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($gostRegularneIzmene->sortBy('minut') as $izmena)
+                                <tr>
+                                    <td>{{ $izmena->minut }}'</td>
+                                    <td>
+                                        <i class="fas fa-arrow-right text-success"></i> 
+                                        {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-arrow-left text-danger"></i> 
+                                        {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ route('izmene.edit', $izmena->id) }}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="document.getElementById('delete-regularna-izmena-{{ $izmena->id }}').submit()">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <form id="delete-regularna-izmena-{{ $izmena->id }}" action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-none">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                                
+                                @foreach($gostProtivnickeIzmene->sortBy('minut') as $izmena)
+                                <tr>
+                                    <td>{{ $izmena->minut }}'</td>
+                                    <td>
+                                        <i class="fas fa-arrow-right text-success"></i> 
+                                        {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-arrow-left text-danger"></i> 
+                                        {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ url('protivnicke-izmene/'.$izmena->id.'/edit') }}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="document.getElementById('delete-protivnicka-izmena-{{ $izmena->id }}').submit()">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <form id="delete-protivnicka-izmena-{{ $izmena->id }}" action="{{ url('protivnicke-izmene/'.$izmena->id) }}" method="POST" class="d-none">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-center text-muted">Nema evidentiranih izmena za gostujući tim.</p>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 
