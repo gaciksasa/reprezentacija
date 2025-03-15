@@ -60,6 +60,11 @@ class Utakmica extends Model
         return $this->hasMany(ProtivnickaIzmena::class)->orderBy('minut');
     }
 
+    public function protivnickiKartoni()
+    {
+        return $this->hasMany(ProtivnickiKarton::class)->orderBy('minut');
+    }
+
     public function golovi()
     {
         return $this->hasMany(Gol::class)->orderBy('minut');

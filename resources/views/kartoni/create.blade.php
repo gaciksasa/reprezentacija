@@ -40,54 +40,69 @@
         <h5 class="card-title mb-0">Karton za tim: {{ $tim->naziv }}</h5>
     </div>
     <div class="card-body">
-        <form action="{{ route('kartoni.store') }}" method="POST">
-            @csrf
-            
-            <input type="hidden" name="utakmica_id" value="{{ $utakmica->id }}">
-            <input type="hidden" name="tim_id" value="{{ $tim->id }}">
-            
-            <div class="mb-3">
-                <label for="igrac_id" class="form-label">Igrač *</label>
-                <select class="form-select @error('igrac_id') is-invalid @enderror" 
-                        id="igrac_id" name="igrac_id" required>
-                    <option value="">-- Izaberite igrača --</option>
-                    @foreach($igraci as $igrac)
-                        <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
-                            {{ $igrac->ime }} {{ $igrac->prezime }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('igrac_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+        @if($igraci->count() > 0)
+            <form action="{{ route('kartoni.store') }}" method="POST">
+                @csrf
+                
+                <input type="hidden" name="utakmica_id" value="{{ $utakmica->id }}">
+                <input type="hidden" name="tim_id" value="{{ $tim->id }}">
+                
+                <div class="mb-3">
+                    <label for="igrac_id" class="form-label">Igrač *</label>
+                    <select class="form-select @error('igrac_id') is-invalid @enderror" 
+                            id="igrac_id" name="igrac_id" required>
+                        <option value="">-- Izaberite igrača --</option>
+                        @foreach($igraci as $igrac)
+                            <option value="{{ $igrac->id }}" {{ old('igrac_id') == $igrac->id ? 'selected' : '' }}>
+                                {{ $igrac->prezime }} {{ $igrac->ime }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('igrac_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="mb-3">
+                    <label for="tip" class="form-label">Tip kartona *</label>
+                    <select class="form-select @error('tip') is-invalid @enderror" 
+                            id="tip" name="tip" required>
+                        <option value="">-- Izaberite tip kartona --</option>
+                        <option value="zuti" {{ old('tip') == 'zuti' ? 'selected' : '' }}>Žuti karton</option>
+                        <option value="crveni" {{ old('tip') == 'crveni' ? 'selected' : '' }}>Crveni karton</option>
+                    </select>
+                    @error('tip')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="mb-3">
+                    <label for="minut" class="form-label">Minut *</label>
+                    <input type="number" class="form-control @error('minut') is-invalid @enderror" 
+                           id="minut" name="minut" value="{{ old('minut') }}" required min="1" max="120">
+                    @error('minut')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Sačuvaj karton</button>
+                </div>
+            </form>
+        @else
+            <div class="alert alert-warning">
+                <p>Nema dostupnih igrača za ovaj tim u sastavu.</p>
+                @if(isset($isNasTim) && $isNasTim)
+                    <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $tim->id]) }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus"></i> Dodaj igrača u sastav
+                    </a>
+                @else
+                    <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $tim->id]) }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus"></i> Dodaj igrača u sastav
+                    </a>
+                @endif
             </div>
-            
-            <div class="mb-3">
-                <label for="tip" class="form-label">Tip kartona *</label>
-                <select class="form-select @error('tip') is-invalid @enderror" 
-                        id="tip" name="tip" required>
-                    <option value="">-- Izaberite tip kartona --</option>
-                    <option value="zuti" {{ old('tip') == 'zuti' ? 'selected' : '' }}>Žuti karton</option>
-                    <option value="crveni" {{ old('tip') == 'crveni' ? 'selected' : '' }}>Crveni karton</option>
-                </select>
-                @error('tip')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
-            <div class="mb-3">
-                <label for="minut" class="form-label">Minut *</label>
-                <input type="number" class="form-control @error('minut') is-invalid @enderror" 
-                       id="minut" name="minut" value="{{ old('minut') }}" required min="1" max="120">
-                @error('minut')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Sačuvaj karton</button>
-            </div>
-        </form>
+        @endif
     </div>
 </div>
 @endsection

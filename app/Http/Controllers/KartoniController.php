@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Karton;
-use App\Models\Utakmica;
-use App\Models\Tim;
 use App\Models\Igrac;
+use App\Models\ProtivnickiIgrac;
+use App\Models\Tim;
+use App\Models\Utakmica;
+use App\Models\Sastav;
 use Illuminate\Http\Request;
 
 class KartoniController extends Controller
@@ -57,8 +59,39 @@ class KartoniController extends Controller
                 ->with('error', 'Izabrani tim nije učesnik ove utakmice.');
         }
         
+        // Dobavi glavni tim za proveru
+        $glavniTim = Tim::glavniTim()->first();
+        $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+        $isNasTim = in_array($tim_id, $glavniTimIds);
+        
         // Igrači tima koji su u sastavu ove utakmice
-        $igraci = Igrac::where('tim_id', $tim_id)->orderBy('prezime')->get();
+        if ($isNasTim) {
+            $sastavi = \App\Models\Sastav::where('utakmica_id', $utakmica_id)
+                ->where('tim_id', $tim_id)
+                ->get();
+                
+            $igraci = [];
+            foreach($sastavi as $sastav) {
+                $igrac = Igrac::find($sastav->igrac_id);
+                if ($igrac) {
+                    $igraci[] = $igrac;
+                }
+            }
+            $igraci = collect($igraci)->sortBy('prezime')->values();
+            
+            // Ako nema igrača u sastavu, prikaži sve igrače tima
+            if (count($igraci) == 0) {
+                $igraci = Igrac::whereIn('tim_id', $glavniTimIds)
+                    ->orderBy('prezime')
+                    ->get();
+            }
+        } else {
+            // Za protivnički tim, dohvati protivničke igrače
+            $igraci = ProtivnickiIgrac::where('utakmica_id', $utakmica_id)
+                ->where('tim_id', $tim_id)
+                ->orderBy('prezime')
+                ->get();
+        }
         
         return view('kartoni.create', compact('utakmica', 'tim', 'igraci'));
     }
@@ -71,14 +104,39 @@ class KartoniController extends Controller
         $validated = $request->validate([
             'utakmica_id' => 'required|exists:utakmice,id',
             'tim_id' => 'required|exists:timovi,id',
-            'igrac_id' => 'required|exists:igraci,id',
+            'igrac_id' => 'required',
             'tip' => 'required|in:zuti,crveni',
             'minut' => 'required|integer|min:1|max:120',
         ]);
 
+        // Provera da li se radi o protivničkom igraču
+        $glavniTim = Tim::glavniTim()->first();
+        $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+        $isNasTim = in_array($validated['tim_id'], $glavniTimIds);
+
+        // Ako je protivnički tim, prvo proverimo da li je protivnički igrač
+        if (!$isNasTim) {
+            // Proveri da li igrac_id postoji u protivničkim igračima
+            $protivnickiIgrac = ProtivnickiIgrac::find($validated['igrac_id']);
+            if ($protivnickiIgrac) {
+                // Sačuvaj karton za protivničkog igrača
+                $karton = new Karton([
+                    'utakmica_id' => $validated['utakmica_id'],
+                    'tim_id' => $validated['tim_id'],
+                    'igrac_id' => $validated['igrac_id'],
+                    'tip' => $validated['tip'],
+                    'minut' => $validated['minut'],
+                ]);
+                $karton->save();
+                return redirect()->route('utakmice.show', $validated['utakmica_id'])
+                    ->with('success', 'Karton uspešno zabeležen.');
+            }
+        }
+
+        // Standardno kreiranje kartona
         Karton::create($validated);
 
-        return redirect()->route('kartoni.index', ['utakmica_id' => $validated['utakmica_id']])
+        return redirect()->route('utakmice.show', $validated['utakmica_id'])
             ->with('success', 'Karton uspešno zabeležen.');
     }
 
@@ -123,12 +181,19 @@ class KartoniController extends Controller
     /**
      * Brisanje kartona.
      */
-    public function destroy(Karton $karton)
+    public function destroy($id)
     {
+        // Find the karton record by ID
+        $karton = Karton::findOrFail($id);
+        
+        // Store match ID before deletion
         $utakmica_id = $karton->utakmica_id;
+        
+        // Delete the record
         $karton->delete();
         
-        return redirect()->route('kartoni.index', ['utakmica_id' => $utakmica_id])
+        // Redirect back to match page
+        return redirect()->route('utakmice.show', $utakmica_id)
             ->with('success', 'Karton uspešno obrisan.');
     }
 }
