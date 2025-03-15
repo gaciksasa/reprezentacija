@@ -37,7 +37,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label for="pozicija" class="form-label">Pozicija *</label>
                     <select class="form-select @error('pozicija') is-invalid @enderror"
                         id="pozicija" name="pozicija" required>
@@ -53,7 +53,16 @@
                     @enderror
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
+                    <label for="visina" class="form-label">Visina (cm)</label>
+                    <input type="number" class="form-control @error('visina') is-invalid @enderror"
+                        id="visina" name="visina" value="{{ old('visina', $igrac->visina) }}" min="140" max="220">
+                    @error('visina')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-4 mb-3">
                     <label for="fotografija" class="form-label">Fotografija</label>
                     <input type="file" class="form-control @error('fotografija') is-invalid @enderror"
                         id="fotografija" name="fotografija">

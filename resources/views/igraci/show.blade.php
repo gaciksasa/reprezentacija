@@ -46,6 +46,10 @@
                         <td>{{ $igrac->pozicija ?? '-' }}</td>
                     </tr>
                     <tr>
+                        <th>Visina</th>
+                        <td>{{ $igrac->visina ? $igrac->visina . ' cm' : '-' }}</td>
+                    </tr>
+                    <tr>
                         <th>Rođen</th>
                         <td>{{ $igrac->datum_rodjenja ? $igrac->datum_rodjenja->format('d.m.Y') : '-' }}<br>{{ $igrac->mesto_rodjenja ?? '-' }}</td>
                     </tr>

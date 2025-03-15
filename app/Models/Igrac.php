@@ -12,7 +12,7 @@ class Igrac extends Model
     protected $table = 'igraci';
     
     protected $fillable = [
-        'ime', 'prezime', 'pozicija', 
+        'ime', 'prezime', 'pozicija', 'visina',
         'datum_rodjenja', 'mesto_rodjenja', 'datum_smrti', 'mesto_smrti',
         'biografija', 'fotografija_path', 'aktivan'
     ];
