@@ -30,58 +30,58 @@ class UtakmiceController extends Controller
        return view('utakmice.create', compact('timovi'));
    }
 
-   /**
+    /**
     * Čuvanje nove utakmice.
     */
-   public function store(Request $request)
-   {
-       $validated = $request->validate([
-           'datum' => 'required|date',
-           'takmicenje' => 'required|string|max:255',
-           'domacin_id' => 'required|exists:timovi,id',
-           'gost_id' => 'required|exists:timovi,id|different:domacin_id',
-           'stadion' => 'nullable|string|max:255',
-           'sudija' => 'nullable|string|max:255',
-           'publika' => 'nullable|string|max:255',
-           'imao_jedanaesterce' => 'boolean',
-           'jedanaesterci_domacin' => 'nullable|integer|min:0',
-           'jedanaesterci_gost' => 'nullable|integer|min:0',
-       ]);
-
-       // Create or find the competition
-       $takmicenje = Takmicenje::firstOrCreate(
-           ['naziv' => $validated['takmicenje']],
-           ['organizator' => null]
-       );
-
-       // Prepare data for creating the match
-       $utakmicaData = [
-           'datum' => $validated['datum'],
-           'takmicenje_id' => $takmicenje->id,
-           'domacin_id' => $validated['domacin_id'],
-           'gost_id' => $validated['gost_id'],
-           'stadion' => $validated['stadion'] ?? null,
-           'sudija' => $validated['sudija'] ?? null,
-           'publika' => $validated['publika'] ?? null,
-           'rezultat_domacin' => 0,
-           'rezultat_gost' => 0,
-           'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
-       ];
-
-       // Add penalty shootout data if present
-       if ($utakmicaData['imao_jedanaesterce']) {
-           $utakmicaData['jedanaesterci_domacin'] = $validated['jedanaesterci_domacin'];
-           $utakmicaData['jedanaesterci_gost'] = $validated['jedanaesterci_gost'];
-       }
-
-       // Use transaction to ensure all related data is saved successfully
-       DB::transaction(function() use ($utakmicaData) {
-           Utakmica::create($utakmicaData);
-       });
-
-       return redirect()->route('utakmice.index')
-           ->with('success', 'Utakmica uspešno kreirana.');
-   }
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'datum' => 'required|date',
+            'takmicenje' => 'required|string|max:255',
+            'domacin_id' => 'required|exists:timovi,id',
+            'gost_id' => 'required|exists:timovi,id|different:domacin_id',
+            'stadion' => 'nullable|string|max:255',
+            'sudija' => 'nullable|string|max:255',
+            'publika' => 'nullable|string|max:255',
+            'imao_jedanaesterce' => 'nullable', // Changed from boolean to nullable
+            'jedanaesterci_domacin' => 'nullable|integer|min:0',
+            'jedanaesterci_gost' => 'nullable|integer|min:0',
+        ]);
+    
+        // Create or find the competition
+        $takmicenje = Takmicenje::firstOrCreate(
+            ['naziv' => $validated['takmicenje']],
+            ['organizator' => null]
+        );
+    
+        // Prepare data for creating the match
+        $utakmicaData = [
+            'datum' => $validated['datum'],
+            'takmicenje_id' => $takmicenje->id,
+            'domacin_id' => $validated['domacin_id'],
+            'gost_id' => $validated['gost_id'],
+            'stadion' => $validated['stadion'] ?? null,
+            'sudija' => $validated['sudija'] ?? null,
+            'publika' => $validated['publika'] ?? null,
+            'rezultat_domacin' => 0,
+            'rezultat_gost' => 0,
+            'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
+        ];
+    
+        // Add penalty shootout data if present
+        if ($request->has('imao_jedanaesterce')) {
+            $utakmicaData['jedanaesterci_domacin'] = $validated['jedanaesterci_domacin'] ?? 0;
+            $utakmicaData['jedanaesterci_gost'] = $validated['jedanaesterci_gost'] ?? 0;
+        }
+    
+        // Use transaction to ensure all related data is saved successfully
+        DB::transaction(function() use ($utakmicaData) {
+            Utakmica::create($utakmicaData);
+        });
+    
+        return redirect()->route('utakmice.index')
+            ->with('success', 'Utakmica uspešno kreirana.');
+    }
 
    /**
     * Prikaz pojedinog detalja utakmice.
@@ -114,56 +114,56 @@ class UtakmiceController extends Controller
        return view('utakmice.edit', compact('utakmica', 'timovi', 'takmicenja'));
    }
 
-   /**
+    /**
     * Ažuriranje utakmice.
     */
-   public function update(Request $request, Utakmica $utakmica)
-   {
-       $validated = $request->validate([
-           'datum' => 'required|date',
-           'takmicenje' => 'required|string|max:255',
-           'domacin_id' => 'required|exists:timovi,id',
-           'gost_id' => 'required|exists:timovi,id|different:domacin_id',
-           'stadion' => 'nullable|string|max:255',
-           'sudija' => 'nullable|string|max:255',
-           'publika' => 'nullable|string|max:255',
-           'imao_jedanaesterce' => 'boolean',
-           'jedanaesterci_domacin' => 'nullable|integer|min:0',
-           'jedanaesterci_gost' => 'nullable|integer|min:0',
-       ]);
-
-       // Create or find the competition
-       $takmicenje = Takmicenje::firstOrCreate(
-           ['naziv' => $validated['takmicenje']],
-           ['organizator' => null]
-       );
-
-       // Prepare data for updating the match
-       $utakmicaData = [
-           'datum' => $validated['datum'],
-           'takmicenje_id' => $takmicenje->id,
-           'domacin_id' => $validated['domacin_id'],
-           'gost_id' => $validated['gost_id'],
-           'stadion' => $validated['stadion'] ?? null,
-           'sudija' => $validated['sudija'] ?? null,
-           'publika' => $validated['publika'] ?? null,
-           'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
-       ];
-
-       // Add penalty shootout data if present
-       if ($utakmicaData['imao_jedanaesterce']) {
-           $utakmicaData['jedanaesterci_domacin'] = $validated['jedanaesterci_domacin'];
-           $utakmicaData['jedanaesterci_gost'] = $validated['jedanaesterci_gost'];
-       } else {
-           $utakmicaData['jedanaesterci_domacin'] = null;
-           $utakmicaData['jedanaesterci_gost'] = null;
-       }
-
-       $utakmica->update($utakmicaData);
-
-       return redirect()->route('utakmice.index')
-           ->with('success', 'Utakmica uspešno ažurirana.');
-   }
+    public function update(Request $request, Utakmica $utakmica)
+    {
+        $validated = $request->validate([
+            'datum' => 'required|date',
+            'takmicenje' => 'required|string|max:255',
+            'domacin_id' => 'required|exists:timovi,id',
+            'gost_id' => 'required|exists:timovi,id|different:domacin_id',
+            'stadion' => 'nullable|string|max:255',
+            'sudija' => 'nullable|string|max:255',
+            'publika' => 'nullable|string|max:255',
+            'imao_jedanaesterce' => 'nullable', // Changed from boolean to nullable
+            'jedanaesterci_domacin' => 'nullable|integer|min:0',
+            'jedanaesterci_gost' => 'nullable|integer|min:0',
+        ]);
+    
+        // Create or find the competition
+        $takmicenje = Takmicenje::firstOrCreate(
+            ['naziv' => $validated['takmicenje']],
+            ['organizator' => null]
+        );
+    
+        // Prepare data for updating the match
+        $utakmicaData = [
+            'datum' => $validated['datum'],
+            'takmicenje_id' => $takmicenje->id,
+            'domacin_id' => $validated['domacin_id'],
+            'gost_id' => $validated['gost_id'],
+            'stadion' => $validated['stadion'] ?? null,
+            'sudija' => $validated['sudija'] ?? null,
+            'publika' => $validated['publika'] ?? null,
+            'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
+        ];
+    
+        // Add penalty shootout data if present
+        if ($request->has('imao_jedanaesterce')) {
+            $utakmicaData['jedanaesterci_domacin'] = $validated['jedanaesterci_domacin'] ?? 0;
+            $utakmicaData['jedanaesterci_gost'] = $validated['jedanaesterci_gost'] ?? 0;
+        } else {
+            $utakmicaData['jedanaesterci_domacin'] = null;
+            $utakmicaData['jedanaesterci_gost'] = null;
+        }
+    
+        $utakmica->update($utakmicaData);
+    
+        return redirect()->route('utakmice.index')
+            ->with('success', 'Utakmica uspešno ažurirana.');
+    }
 
    /**
     * Brisanje utakmice.
