@@ -74,28 +74,6 @@
                                             <i class="fas fa-edit"></i> Izmeni
                                         </a>
                                     </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('sastavi.index', ['utakmica_id' => $utakmica->id]) }}">
-                                            <i class="fas fa-users"></i> Sastavi
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('golovi.index', ['utakmica_id' => $utakmica->id]) }}">
-                                            <i class="fas fa-futbol"></i> Golovi
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('izmene.index', ['utakmica_id' => $utakmica->id]) }}">
-                                            <i class="fas fa-exchange-alt"></i> Izmene
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('kartoni.index', ['utakmica_id' => $utakmica->id]) }}">
-                                            <i class="fas fa-square"></i> Kartoni
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form action="{{ route('utakmice.destroy', $utakmica) }}" method="POST">
                                             @csrf
