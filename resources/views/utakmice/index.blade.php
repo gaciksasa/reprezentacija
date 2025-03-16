@@ -59,31 +59,21 @@
                             </a>
                         </td>
                         <td>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    Akcije
+                            <div class="btn-group">
+                                <a href="{{ route('utakmice.show', $utakmica) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ route('utakmice.edit', $utakmica) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="document.getElementById('delete-utakmica-{{ $utakmica->id }}').submit()">
+                                    <i class="fas fa-trash"></i>
                                 </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('utakmice.show', $utakmica) }}">
-                                            <i class="fas fa-eye"></i> Detalji
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('utakmice.edit', $utakmica) }}">
-                                            <i class="fas fa-edit"></i> Izmeni
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <form action="{{ route('utakmice.destroy', $utakmica) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Da li ste sigurni?')">
-                                                <i class="fas fa-trash"></i> Obriši
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
+                                <form id="delete-utakmica-{{ $utakmica->id }}" action="{{ route('utakmice.destroy', $utakmica) }}" method="POST" class="d-none">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
                             </div>
                         </td>
                     </tr>
