@@ -150,4 +150,23 @@ class Igrac extends Model
         
         return $startYear . '/' . $endYear;
     }
+
+    /**
+     * Dobavi broj nastupa igrača do zadatog datuma (uključujući taj datum)
+     * 
+     * @param \DateTime|string|null $datum
+     * @return int
+     */
+    public function getBrojNastupaDoDatuma($datum)
+    {
+        if (!$datum) {
+            return $this->broj_nastupa;
+        }
+        
+        return $this->sastavi()
+            ->whereHas('utakmica', function($query) use ($datum) {
+                $query->whereDate('datum', '<=', $datum);
+            })
+            ->count();
+    }
 }
