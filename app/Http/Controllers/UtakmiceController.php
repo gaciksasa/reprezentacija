@@ -10,206 +10,213 @@ use Illuminate\Support\Facades\DB;
 
 class UtakmiceController extends Controller
 {
-    /**
-     * Prikaz svih utakmica.
-     */
-    public function index()
-    {
-        $utakmice = Utakmica::with(['domacin', 'gost'])
-            ->orderBy('datum', 'asc')
-            ->paginate(25);
-        return view('utakmice.index', compact('utakmice'));
-    }
+   /**
+    * Prikaz svih utakmica.
+    */
+   public function index()
+   {
+       $utakmice = Utakmica::with(['domacin', 'gost'])
+           ->orderBy('datum', 'asc')
+           ->paginate(25);
+       return view('utakmice.index', compact('utakmice'));
+   }
 
-    /**
-     * Prikaz forme za kreiranje utakmice.
-     */
-    public function create()
-    {
-        $timovi = Tim::orderBy('naziv')->get();
-        return view('utakmice.create', compact('timovi'));
-    }
+   /**
+    * Prikaz forme za kreiranje utakmice.
+    */
+   public function create()
+   {
+       $timovi = Tim::orderBy('naziv')->get();
+       return view('utakmice.create', compact('timovi'));
+   }
 
-    /**
-     * Čuvanje nove utakmice.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'datum' => 'required|date',
-            'takmicenje' => 'required|string|max:255',
-            'domacin_id' => 'required|exists:timovi,id',
-            'gost_id' => 'required|exists:timovi,id|different:domacin_id',
-            'stadion' => 'nullable|string|max:255',
-            'sudija' => 'nullable|string|max:255',
-            'publika' => 'nullable|string|max:255',
-        ]);
+   /**
+    * Čuvanje nove utakmice.
+    */
+   public function store(Request $request)
+   {
+       $validated = $request->validate([
+           'datum' => 'required|date',
+           'takmicenje' => 'required|string|max:255',
+           'domacin_id' => 'required|exists:timovi,id',
+           'gost_id' => 'required|exists:timovi,id|different:domacin_id',
+           'stadion' => 'nullable|string|max:255',
+           'sudija' => 'nullable|string|max:255',
+           'publika' => 'nullable|string|max:255',
+           'imao_jedanaesterce' => 'boolean',
+           'jedanaesterci_domacin' => 'nullable|integer|min:0',
+           'jedanaesterci_gost' => 'nullable|integer|min:0',
+       ]);
 
-        $validated['imao_jedanaesterce'] = $request->has('imao_jedanaesterce');
-        if ($validated['imao_jedanaesterce']) {
-            $validated['jedanaesterci_domacin'] = $request->input('jedanaesterci_domacin');
-            $validated['jedanaesterci_gost'] = $request->input('jedanaesterci_gost');
-        }
+       // Create or find the competition
+       $takmicenje = Takmicenje::firstOrCreate(
+           ['naziv' => $validated['takmicenje']],
+           ['organizator' => null]
+       );
 
-        // Create or find the competition
-        $takmicenje = Takmicenje::firstOrCreate(
-            ['naziv' => $validated['takmicenje']],
-            ['organizator' => null]
-        );
+       // Prepare data for creating the match
+       $utakmicaData = [
+           'datum' => $validated['datum'],
+           'takmicenje_id' => $takmicenje->id,
+           'domacin_id' => $validated['domacin_id'],
+           'gost_id' => $validated['gost_id'],
+           'stadion' => $validated['stadion'] ?? null,
+           'sudija' => $validated['sudija'] ?? null,
+           'publika' => $validated['publika'] ?? null,
+           'rezultat_domacin' => 0,
+           'rezultat_gost' => 0,
+           'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
+       ];
 
-        // Prepare data for creating the match
-        $utakmicaData = [
-            'datum' => $validated['datum'],
-            'takmicenje_id' => $takmicenje->id,
-            'domacin_id' => $validated['domacin_id'],
-            'gost_id' => $validated['gost_id'],
-            'stadion' => $validated['stadion'] ?? null,
-            'sudija' => $validated['sudija'] ?? null,
-            'publika' => $validated['publika'] ?? null,
-            'rezultat_domacin' => 0,
-            'rezultat_gost' => 0
-        ];
+       // Add penalty shootout data if present
+       if ($utakmicaData['imao_jedanaesterce']) {
+           $utakmicaData['jedanaesterci_domacin'] = $validated['jedanaesterci_domacin'];
+           $utakmicaData['jedanaesterci_gost'] = $validated['jedanaesterci_gost'];
+       }
 
-        // Use transaction to ensure all related data is saved successfully
-        DB::transaction(function() use ($utakmicaData) {
-            Utakmica::create($utakmicaData);
-        });
+       // Use transaction to ensure all related data is saved successfully
+       DB::transaction(function() use ($utakmicaData) {
+           Utakmica::create($utakmicaData);
+       });
 
-        return redirect()->route('utakmice.index')
-            ->with('success', 'Utakmica uspešno kreirana.');
-    }
+       return redirect()->route('utakmice.index')
+           ->with('success', 'Utakmica uspešno kreirana.');
+   }
 
-    /**
-     * Prikaz pojedinog detalja utakmice.
-     */
-    public function show($id)
-    {
-        $utakmica = Utakmica::with([
-            'domacin', 
-            'gost', 
-            'sastavi.igrac', 
-            'golovi.igrac', 
-            'izmene.igracOut', 
-            'izmene.igracIn', 
-            'kartoni.igrac'
-        ])->findOrFail($id);
+   /**
+    * Prikaz pojedinog detalja utakmice.
+    */
+   public function show($id)
+   {
+       $utakmica = Utakmica::with([
+           'domacin', 
+           'gost', 
+           'sastavi.igrac', 
+           'golovi.igrac', 
+           'izmene.igracOut', 
+           'izmene.igracIn', 
+           'kartoni.igrac'
+       ])->findOrFail($id);
 
-        $selektor = $utakmica->nasSelector();
-        
-        return view('utakmice.show', compact('utakmica', 'selektor'));
-    }
+       $selektor = $utakmica->nasSelector();
+       
+       return view('utakmice.show', compact('utakmica', 'selektor'));
+   }
 
-    /**
-     * Prikaz forme za izmenu utakmice.
-     */
-    public function edit(Utakmica $utakmica)
-    {
-        $timovi = Tim::orderBy('naziv')->get();
-        $takmicenja = Takmicenje::orderBy('naziv')->get();
-        
-        return view('utakmice.edit', compact('utakmica', 'timovi', 'takmicenja'));
-    }
+   /**
+    * Prikaz forme za izmenu utakmice.
+    */
+   public function edit(Utakmica $utakmica)
+   {
+       $timovi = Tim::orderBy('naziv')->get();
+       $takmicenja = Takmicenje::orderBy('naziv')->get();
+       
+       return view('utakmice.edit', compact('utakmica', 'timovi', 'takmicenja'));
+   }
 
-    /**
-     * Ažuriranje utakmice.
-     */
-    public function update(Request $request, Utakmica $utakmica)
-    {
-        $validated = $request->validate([
-            'datum' => 'required|date',
-            'takmicenje' => 'required|string|max:255',
-            'domacin_id' => 'required|exists:timovi,id',
-            'gost_id' => 'required|exists:timovi,id|different:domacin_id',
-            'stadion' => 'nullable|string|max:255',
-            'sudija' => 'nullable|string|max:255',
-            'publika' => 'nullable|string|max:255',
-        ]);
+   /**
+    * Ažuriranje utakmice.
+    */
+   public function update(Request $request, Utakmica $utakmica)
+   {
+       $validated = $request->validate([
+           'datum' => 'required|date',
+           'takmicenje' => 'required|string|max:255',
+           'domacin_id' => 'required|exists:timovi,id',
+           'gost_id' => 'required|exists:timovi,id|different:domacin_id',
+           'stadion' => 'nullable|string|max:255',
+           'sudija' => 'nullable|string|max:255',
+           'publika' => 'nullable|string|max:255',
+           'imao_jedanaesterce' => 'boolean',
+           'jedanaesterci_domacin' => 'nullable|integer|min:0',
+           'jedanaesterci_gost' => 'nullable|integer|min:0',
+       ]);
 
-        $validated['imao_jedanaesterce'] = $request->has('imao_jedanaesterce');
-        if ($validated['imao_jedanaesterce']) {
-            $validated['jedanaesterci_domacin'] = $request->input('jedanaesterci_domacin');
-            $validated['jedanaesterci_gost'] = $request->input('jedanaesterci_gost');
-        } else {
-            $validated['jedanaesterci_domacin'] = null;
-            $validated['jedanaesterci_gost'] = null;
-        }
+       // Create or find the competition
+       $takmicenje = Takmicenje::firstOrCreate(
+           ['naziv' => $validated['takmicenje']],
+           ['organizator' => null]
+       );
 
-        // Create or find the competition
-        $takmicenje = Takmicenje::firstOrCreate(
-            ['naziv' => $validated['takmicenje']],
-            ['organizator' => null]
-        );
+       // Prepare data for updating the match
+       $utakmicaData = [
+           'datum' => $validated['datum'],
+           'takmicenje_id' => $takmicenje->id,
+           'domacin_id' => $validated['domacin_id'],
+           'gost_id' => $validated['gost_id'],
+           'stadion' => $validated['stadion'] ?? null,
+           'sudija' => $validated['sudija'] ?? null,
+           'publika' => $validated['publika'] ?? null,
+           'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
+       ];
 
-        // Prepare data for updating the match
-        $utakmicaData = [
-            'datum' => $validated['datum'],
-            'takmicenje_id' => $takmicenje->id,
-            'domacin_id' => $validated['domacin_id'],
-            'gost_id' => $validated['gost_id'],
-            'stadion' => $validated['stadion'] ?? null,
-            'sudija' => $validated['sudija'] ?? null,
-            'publika' => $validated['publika'] ?? null,
-        ];
+       // Add penalty shootout data if present
+       if ($utakmicaData['imao_jedanaesterce']) {
+           $utakmicaData['jedanaesterci_domacin'] = $validated['jedanaesterci_domacin'];
+           $utakmicaData['jedanaesterci_gost'] = $validated['jedanaesterci_gost'];
+       } else {
+           $utakmicaData['jedanaesterci_domacin'] = null;
+           $utakmicaData['jedanaesterci_gost'] = null;
+       }
 
-        $utakmica->update($utakmicaData);
+       $utakmica->update($utakmicaData);
 
-        return redirect()->route('utakmice.index')
-            ->with('success', 'Utakmica uspešno ažurirana.');
-    }
+       return redirect()->route('utakmice.index')
+           ->with('success', 'Utakmica uspešno ažurirana.');
+   }
 
-    /**
-     * Brisanje utakmice.
-     */
-    public function destroy(Utakmica $utakmica)
-    {
-        try {
-            $utakmica->delete();
-            return redirect()->route('utakmice.index')
-                ->with('success', 'Utakmica uspešno obrisana.');
-        } catch (\Exception $e) {
-            return redirect()->route('utakmice.index')
-                ->with('error', 'Utakmicu nije moguće obrisati jer se koristi u drugim tabelama.');
-        }
-    }
+   /**
+    * Brisanje utakmice.
+    */
+   public function destroy(Utakmica $utakmica)
+   {
+       try {
+           $utakmica->delete();
+           return redirect()->route('utakmice.index')
+               ->with('success', 'Utakmica uspešno obrisana.');
+       } catch (\Exception $e) {
+           return redirect()->route('utakmice.index')
+               ->with('error', 'Utakmicu nije moguće obrisati jer se koristi u drugim tabelama.');
+       }
+   }
 
-    /**
-     * Ažuriranje rezultata utakmice na osnovu golova.
-     * This method can be called separately to recalculate score.
-     */
-    public function updateScore(Utakmica $utakmica)
-    {
-        // Count goals for home team
-        $domacin_golovi = $utakmica->golovi()
-            ->where(function($query) use ($utakmica) {
-                $query->where(function($q) use ($utakmica) {
-                    $q->where('tim_id', $utakmica->domacin_id)
-                      ->where('auto_gol', false);
-                })->orWhere(function($q) use ($utakmica) {
-                    $q->where('tim_id', $utakmica->gost_id)
-                      ->where('auto_gol', true);
-                });
-            })
-            ->count();
-            
-        // Count goals for away team
-        $gost_golovi = $utakmica->golovi()
-            ->where(function($query) use ($utakmica) {
-                $query->where(function($q) use ($utakmica) {
-                    $q->where('tim_id', $utakmica->gost_id)
-                      ->where('auto_gol', false);
-                })->orWhere(function($q) use ($utakmica) {
-                    $q->where('tim_id', $utakmica->domacin_id)
-                      ->where('auto_gol', true);
-                });
-            })
-            ->count();
-            
-        // Update match with new calculated scores
-        $utakmica->update([
-            'rezultat_domacin' => $domacin_golovi,
-            'rezultat_gost' => $gost_golovi
-        ]);
-        
-        return $utakmica;
-    }
+   /**
+    * Ažuriranje rezultata utakmice na osnovu golova.
+    * This method can be called separately to recalculate score.
+    */
+   public function updateScore(Utakmica $utakmica)
+   {
+       // Count goals for home team
+       $domaciGolovi = Gol::where('utakmica_id', $utakmica->id)
+           ->where(function($query) use ($utakmica) {
+               $query->where(function($q) use ($utakmica) {
+                   $q->where('tim_id', $utakmica->domacin_id)
+                     ->where('auto_gol', false);
+               })->orWhere(function($q) use ($utakmica) {
+                   $q->where('tim_id', $utakmica->gost_id)
+                     ->where('auto_gol', true);
+               });
+           })
+           ->count();
+           
+       // Count goals for away team
+       $gostiGolovi = Gol::where('utakmica_id', $utakmica->id)
+           ->where(function($query) use ($utakmica) {
+               $query->where(function($q) use ($utakmica) {
+                   $q->where('tim_id', $utakmica->gost_id)
+                     ->where('auto_gol', false);
+               })->orWhere(function($q) use ($utakmica) {
+                   $q->where('tim_id', $utakmica->domacin_id)
+                     ->where('auto_gol', true);
+               });
+           })
+           ->count();
+           
+       // Update result
+       $utakmica->rezultat_domacin = $domaciGolovi;
+       $utakmica->rezultat_gost = $gostiGolovi;
+       $utakmica->save();
+       
+       return $utakmica;
+   }
 }
