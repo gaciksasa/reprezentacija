@@ -113,7 +113,7 @@
             </div>
             <div class="card-body">
                 @if($igrac->biografija)    
-                    {{$igrac->biografija}}
+                    {!! $igrac->biografija !!}
                 @else
                     <p class="text-center text-muted">Nema biografije za ovog igrača.</p>
                 @endif  

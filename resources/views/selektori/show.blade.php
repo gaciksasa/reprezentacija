@@ -128,7 +128,7 @@
                         <h5 class="card-title mb-0">Biografija</h5>
                     </div>
                     <div class="card-body">
-                        {{ $selektor->biografija }}
+                        {!! $selektor->biografija !!}
                     </div>
                 </div>
             @endif
