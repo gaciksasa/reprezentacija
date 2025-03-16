@@ -172,3 +172,98 @@
     </div>
 </div>
 @endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configure date inputs to use dd.mm.yyyy format
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        
+        dateInputs.forEach(function(input) {
+            // Create a text input to replace the date input
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            textInput.name = input.name;
+            textInput.id = input.id;
+            textInput.className = input.className;
+            textInput.placeholder = 'dd.mm.yyyy';
+            textInput.required = input.required;
+            
+            // Copy any existing value, converting from yyyy-mm-dd to dd.mm.yyyy
+            if (input.value) {
+                const dateParts = input.value.split('-');
+                if (dateParts.length === 3) {
+                    textInput.value = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+                }
+            }
+            
+            // Add event listener to format input and convert back to yyyy-mm-dd for form submission
+            textInput.addEventListener('blur', function() {
+                const value = this.value;
+                if (value) {
+                    // Check if the input matches the dd.mm.yyyy format
+                    const dateRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
+                    const match = value.match(dateRegex);
+                    
+                    if (match) {
+                        const day = match[1].padStart(2, '0');
+                        const month = match[2].padStart(2, '0');
+                        const year = match[3];
+                        
+                        // Format for display
+                        this.value = `${day}.${month}.${year}`;
+                        
+                        // Create hidden input for form submission in yyyy-mm-dd format
+                        let hiddenInput = document.getElementById(`${this.id}_hidden`);
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = this.name;
+                            hiddenInput.id = `${this.id}_hidden`;
+                            this.parentNode.appendChild(hiddenInput);
+                            
+                            // Change the name of the text input so it doesn't conflict
+                            this.name = `${this.name}_display`;
+                        }
+                        
+                        hiddenInput.value = `${year}-${month}-${day}`;
+                    }
+                }
+            });
+            
+            // Replace the date input with the text input
+            input.parentNode.replaceChild(textInput, input);
+        });
+        
+        // Intercept form submission to validate date format
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const dateInputs = document.querySelectorAll('input[name$="_display"]');
+            let valid = true;
+            
+            dateInputs.forEach(function(input) {
+                if (input.value) {
+                    const dateRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
+                    if (!dateRegex.test(input.value)) {
+                        valid = false;
+                        input.classList.add('is-invalid');
+                        
+                        // Add error message if not already present
+                        let nextElement = input.nextElementSibling;
+                        if (!nextElement || !nextElement.classList.contains('invalid-feedback')) {
+                            const errorMsg = document.createElement('div');
+                            errorMsg.className = 'invalid-feedback';
+                            errorMsg.textContent = 'Format datuma mora biti dd.mm.yyyy';
+                            input.parentNode.insertBefore(errorMsg, input.nextSibling);
+                        }
+                    }
+                }
+            });
+            
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+@endsection

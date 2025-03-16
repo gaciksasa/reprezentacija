@@ -403,17 +403,71 @@
             document.getElementById('edit_mandat_id').value = mandat.id;
             document.getElementById('edit_tim_id').value = mandat.tim_id;
             
-            // Format the dates properly
+            // Format and set dates in the dd.mm.yyyy format
+            let pocetakDatum = '';
             if (mandat.pocetak_mandata) {
-                const pocetakDatum = mandat.pocetak_mandata.split('T')[0];
-                document.getElementById('edit_pocetak_mandata').value = pocetakDatum;
+                const date = new Date(mandat.pocetak_mandata);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                pocetakDatum = `${day}.${month}.${year}`;
             }
             
+            let krajDatum = '';
             if (mandat.kraj_mandata) {
-                const krajDatum = mandat.kraj_mandata.split('T')[0];
-                document.getElementById('edit_kraj_mandata').value = krajDatum;
+                const date = new Date(mandat.kraj_mandata);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                krajDatum = `${day}.${month}.${year}`;
+            }
+            
+            // Create date input fields
+            const pocetakInput = document.getElementById('edit_pocetak_mandata');
+            const krajInput = document.getElementById('edit_kraj_mandata');
+            
+            // Convert the date fields to text fields if they aren't already
+            if (pocetakInput.type === 'date') {
+                // Create a text replacement for pocetak_mandata
+                const pocetakTextInput = document.createElement('input');
+                pocetakTextInput.type = 'text';
+                pocetakTextInput.id = 'edit_pocetak_mandata';
+                pocetakTextInput.className = pocetakInput.className;
+                pocetakTextInput.placeholder = 'dd.mm.yyyy';
+                pocetakTextInput.required = pocetakInput.required;
+                pocetakTextInput.value = pocetakDatum;
+                
+                // Add event listener for format conversion
+                pocetakTextInput.addEventListener('blur', function() {
+                    convertDateFormat(this);
+                });
+                
+                // Replace the date input
+                pocetakInput.parentNode.replaceChild(pocetakTextInput, pocetakInput);
             } else {
-                document.getElementById('edit_kraj_mandata').value = '';
+                // Just update the value if it's already a text input
+                pocetakInput.value = pocetakDatum;
+            }
+            
+            if (krajInput.type === 'date') {
+                // Create a text replacement for kraj_mandata
+                const krajTextInput = document.createElement('input');
+                krajTextInput.type = 'text';
+                krajTextInput.id = 'edit_kraj_mandata';
+                krajTextInput.className = krajInput.className;
+                krajTextInput.placeholder = 'dd.mm.yyyy';
+                krajTextInput.value = krajDatum;
+                
+                // Add event listener for format conversion
+                krajTextInput.addEventListener('blur', function() {
+                    convertDateFormat(this);
+                });
+                
+                // Replace the date input
+                krajInput.parentNode.replaceChild(krajTextInput, krajInput);
+            } else {
+                // Just update the value if it's already a text input
+                krajInput.value = krajDatum;
             }
             
             document.getElementById('edit_v_d_status').checked = Boolean(mandat.v_d_status);
@@ -426,13 +480,109 @@
             document.getElementById('edit_v_d_status').name = `mandati[${mandat.id}][v_d_status]`;
             document.getElementById('edit_napomena').name = `mandati[${mandat.id}][napomena]`;
             
-            // Update the form action to point to the selector update
-            document.getElementById('editMandatForm').action = "{{ route('selektori.update', $selektor) }}";
-            
             // Prikaži modal
             const editMandatModal = new bootstrap.Modal(document.getElementById('editMandatModal'));
             editMandatModal.show();
         }
     }
+    
+    // Helper function to convert date format
+    function convertDateFormat(inputElement) {
+        const value = inputElement.value;
+        if (value) {
+            // Check if the input matches the dd.mm.yyyy format
+            const dateRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
+            const match = value.match(dateRegex);
+            
+            if (match) {
+                const day = match[1].padStart(2, '0');
+                const month = match[2].padStart(2, '0');
+                const year = match[3];
+                
+                // Format for display
+                inputElement.value = `${day}.${month}.${year}`;
+                
+                // Create hidden input for form submission in yyyy-mm-dd format
+                let hiddenInput = document.getElementById(`${inputElement.id}_hidden`);
+                if (!hiddenInput) {
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = inputElement.name;
+                    hiddenInput.id = `${inputElement.id}_hidden`;
+                    inputElement.parentNode.appendChild(hiddenInput);
+                    
+                    // Change the name of the text input so it doesn't conflict
+                    inputElement.name = `${inputElement.name}_display`;
+                }
+                
+                hiddenInput.value = `${year}-${month}-${day}`;
+            }
+        }
+    }
+    
+    // Add date format conversion to the "Add Mandate" modal too
+    document.addEventListener('DOMContentLoaded', function() {
+        // Convert all date inputs to use dd.mm.yyyy format
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        
+        dateInputs.forEach(function(input) {
+            // Create a text input to replace the date input
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            textInput.name = input.name;
+            textInput.id = input.id;
+            textInput.className = input.className;
+            textInput.placeholder = 'dd.mm.yyyy';
+            textInput.required = input.required;
+            
+            // Copy any existing value, converting from yyyy-mm-dd to dd.mm.yyyy
+            if (input.value) {
+                const dateParts = input.value.split('-');
+                if (dateParts.length === 3) {
+                    textInput.value = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+                }
+            }
+            
+            // Add event listener to format input and convert back to yyyy-mm-dd for form submission
+            textInput.addEventListener('blur', function() {
+                convertDateFormat(this);
+            });
+            
+            // Replace the date input with the text input
+            input.parentNode.replaceChild(textInput, input);
+        });
+        
+        // Intercept both form submissions to validate date format
+        const forms = document.querySelectorAll('form');
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                const dateInputs = this.querySelectorAll('input[name$="_display"]');
+                let valid = true;
+                
+                dateInputs.forEach(function(input) {
+                    if (input.value) {
+                        const dateRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
+                        if (!dateRegex.test(input.value)) {
+                            valid = false;
+                            input.classList.add('is-invalid');
+                            
+                            // Add error message if not already present
+                            let nextElement = input.nextElementSibling;
+                            if (!nextElement || !nextElement.classList.contains('invalid-feedback')) {
+                                const errorMsg = document.createElement('div');
+                                errorMsg.className = 'invalid-feedback';
+                                errorMsg.textContent = 'Format datuma mora biti dd.mm.yyyy';
+                                input.parentNode.insertBefore(errorMsg, input.nextSibling);
+                            }
+                        }
+                    }
+                });
+                
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
 </script>
 @endsection
