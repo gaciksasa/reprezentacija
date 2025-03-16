@@ -402,15 +402,21 @@
             // Popuni formu
             document.getElementById('edit_mandat_id').value = mandat.id;
             document.getElementById('edit_tim_id').value = mandat.tim_id;
-            document.getElementById('edit_pocetak_mandata').value = mandat.pocetak_mandata.split('T')[0];
+            
+            // Format the dates properly
+            if (mandat.pocetak_mandata) {
+                const pocetakDatum = mandat.pocetak_mandata.split('T')[0];
+                document.getElementById('edit_pocetak_mandata').value = pocetakDatum;
+            }
             
             if (mandat.kraj_mandata) {
-                document.getElementById('edit_kraj_mandata').value = mandat.kraj_mandata.split('T')[0];
+                const krajDatum = mandat.kraj_mandata.split('T')[0];
+                document.getElementById('edit_kraj_mandata').value = krajDatum;
             } else {
                 document.getElementById('edit_kraj_mandata').value = '';
             }
             
-            document.getElementById('edit_v_d_status').checked = mandat.v_d_status;
+            document.getElementById('edit_v_d_status').checked = Boolean(mandat.v_d_status);
             document.getElementById('edit_napomena').value = mandat.napomena || '';
             
             // Ažurirati ime polja forme sa ID-om mandata
@@ -419,6 +425,9 @@
             document.getElementById('edit_kraj_mandata').name = `mandati[${mandat.id}][kraj_mandata]`;
             document.getElementById('edit_v_d_status').name = `mandati[${mandat.id}][v_d_status]`;
             document.getElementById('edit_napomena').name = `mandati[${mandat.id}][napomena]`;
+            
+            // Update the form action to point to the selector update
+            document.getElementById('editMandatForm').action = "{{ route('selektori.update', $selektor) }}";
             
             // Prikaži modal
             const editMandatModal = new bootstrap.Modal(document.getElementById('editMandatModal'));

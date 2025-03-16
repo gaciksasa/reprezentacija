@@ -162,18 +162,31 @@ class SelektoriController extends Controller
         // Update existing mandates if provided
         if ($request->has('mandati')) {
             foreach ($request->mandati as $id => $mandat) {
-                if (isset($mandat['_delete']) && $mandat['_delete'] == 1) {
-                    // Delete this mandate
-                    SelektorMandat::findOrFail($id)->delete();
-                } else {
-                    // Update mandate
-                    SelektorMandat::findOrFail($id)->update([
-                        'tim_id' => $mandat['tim_id'],
-                        'pocetak_mandata' => $mandat['pocetak_mandata'],
-                        'kraj_mandata' => $mandat['kraj_mandata'],
-                        'v_d_status' => isset($mandat['v_d_status']),
-                        'napomena' => $mandat['napomena'] ?? null,
-                    ]);
+                // Convert string ID to integer for comparison
+                $mandatId = (int)$id;
+                
+                // Check if the mandate exists and belongs to this selector
+                $postojeciMandat = SelektorMandat::where('id', $mandatId)
+                    ->where('selektor_id', $selektor->id)
+                    ->first();
+                    
+                if ($postojeciMandat) {
+                    if (isset($mandat['_delete']) && $mandat['_delete'] == 1) {
+                        // Delete this mandate
+                        $postojeciMandat->delete();
+                    } else {
+                        // Prepare valid data for update
+                        $mandatData = [
+                            'tim_id' => $mandat['tim_id'],
+                            'pocetak_mandata' => $mandat['pocetak_mandata'],
+                            'kraj_mandata' => !empty($mandat['kraj_mandata']) ? $mandat['kraj_mandata'] : null,
+                            'v_d_status' => isset($mandat['v_d_status']) ? true : false,
+                            'napomena' => $mandat['napomena'] ?? null,
+                        ];
+                        
+                        // Update mandate
+                        $postojeciMandat->update($mandatData);
+                    }
                 }
             }
         }
