@@ -96,6 +96,39 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="imao_jedanaesterce" name="imao_jedanaesterce" 
+                        {{ old('imao_jedanaesterce', $utakmica->imao_jedanaesterce) ? 'checked' : '' }}
+                        onchange="togglePenaltyFields()">
+                    <label class="form-check-label" for="imao_jedanaesterce">
+                        Imao jedanaesterce (penale)
+                    </label>
+                </div>
+            </div>
+
+            <div id="penalty-fields" class="row" style="{{ old('imao_jedanaesterce', $utakmica->imao_jedanaesterce) ? '' : 'display: none;' }}">
+                <div class="col-md-6 mb-3">
+                    <label for="jedanaesterci_domacin" class="form-label">Penali domaćin</label>
+                    <input type="number" class="form-control @error('jedanaesterci_domacin') is-invalid @enderror" 
+                        id="jedanaesterci_domacin" name="jedanaesterci_domacin" 
+                        value="{{ old('jedanaesterci_domacin', $utakmica->jedanaesterci_domacin) }}" min="0" max="20">
+                    @error('jedanaesterci_domacin')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="jedanaesterci_gost" class="form-label">Penali gost</label>
+                    <input type="number" class="form-control @error('jedanaesterci_gost') is-invalid @enderror" 
+                        id="jedanaesterci_gost" name="jedanaesterci_gost" 
+                        value="{{ old('jedanaesterci_gost', $utakmica->jedanaesterci_gost) }}" min="0" max="20">
+                    @error('jedanaesterci_gost')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
             
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Sačuvaj izmene</button>
@@ -125,4 +158,18 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function togglePenaltyFields() {
+        const hasShootout = document.getElementById('imao_jedanaesterce').checked;
+        document.getElementById('penalty-fields').style.display = hasShootout ? 'flex' : 'none';
+        
+        if (!hasShootout) {
+            document.getElementById('jedanaesterci_domacin').value = '';
+            document.getElementById('jedanaesterci_gost').value = '';
+        }
+    }
+</script>
 @endsection

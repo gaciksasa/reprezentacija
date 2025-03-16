@@ -45,6 +45,12 @@ class UtakmiceController extends Controller
             'publika' => 'nullable|string|max:255',
         ]);
 
+        $validated['imao_jedanaesterce'] = $request->has('imao_jedanaesterce');
+        if ($validated['imao_jedanaesterce']) {
+            $validated['jedanaesterci_domacin'] = $request->input('jedanaesterci_domacin');
+            $validated['jedanaesterci_gost'] = $request->input('jedanaesterci_gost');
+        }
+
         // Create or find the competition
         $takmicenje = Takmicenje::firstOrCreate(
             ['naziv' => $validated['takmicenje']],
@@ -118,6 +124,15 @@ class UtakmiceController extends Controller
             'sudija' => 'nullable|string|max:255',
             'publika' => 'nullable|string|max:255',
         ]);
+
+        $validated['imao_jedanaesterce'] = $request->has('imao_jedanaesterce');
+        if ($validated['imao_jedanaesterce']) {
+            $validated['jedanaesterci_domacin'] = $request->input('jedanaesterci_domacin');
+            $validated['jedanaesterci_gost'] = $request->input('jedanaesterci_gost');
+        } else {
+            $validated['jedanaesterci_domacin'] = null;
+            $validated['jedanaesterci_gost'] = null;
+        }
 
         // Create or find the competition
         $takmicenje = Takmicenje::firstOrCreate(

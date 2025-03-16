@@ -20,6 +20,9 @@ class Utakmica extends Model
         'sudija',
         'rezultat_domacin', 
         'rezultat_gost',
+        'imao_jedanaesterce',
+        'jedanaesterci_domacin',
+        'jedanaesterci_gost',
         'publika'
     ];
     
@@ -27,6 +30,9 @@ class Utakmica extends Model
         'datum' => 'date',
         'rezultat_domacin' => 'integer',
         'rezultat_gost' => 'integer',
+        'imao_jedanaesterce' => 'boolean',
+        'jedanaesterci_domacin' => 'integer',
+        'jedanaesterci_gost' => 'integer',
     ];
     
     // Relationships
@@ -142,5 +148,16 @@ class Utakmica extends Model
             })
             ->with('selektor')
             ->first();
+    }
+
+    // Atribut za formatiranje kompletnog rezultata
+    public function getKompletanRezultatAttribute()
+    {
+        if (!$this->imao_jedanaesterce) {
+            return $this->rezultat_domacin . '-' . $this->rezultat_gost;
+        }
+        
+        return $this->rezultat_domacin . '-' . $this->rezultat_gost . 
+            ' (' . $this->jedanaesterci_domacin . '-' . $this->jedanaesterci_gost . ' pen)';
     }
 }

@@ -88,9 +88,16 @@
                 </a>
             </div>
             <div class="col-4 text-center">
-                <div class="display-3 fw-bold">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
                 <div class="text-muted">
                     {{ $utakmica->poluvremenskiRezultat }}
+                </div>
+                <div class="display-3 fw-bold">
+                    {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}
+                    @if($utakmica->imao_jedanaesterce)
+                        <div class="fs-5 mt-1">
+                            ({{ $utakmica->jedanaesterci_domacin }} - {{ $utakmica->jedanaesterci_gost }} pen)
+                        </div>
+                    @endif
                 </div>
             </div>
             <div class="col-4 text-center">

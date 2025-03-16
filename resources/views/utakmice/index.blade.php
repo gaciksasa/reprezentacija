@@ -41,6 +41,11 @@
                         <td class="text-center">
                             <a href="{{ route('utakmice.show', $utakmica) }}" class="text-decoration-none">
                                 <strong>{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</strong>
+                                @if($utakmica->imao_jedanaesterce)
+                                    <small class="d-block">
+                                        ({{ $utakmica->jedanaesterci_domacin }}-{{ $utakmica->jedanaesterci_gost }} pen)
+                                    </small>
+                                @endif
                                 @if($utakmica->poluvreme_rezultat_domacin !== null && $utakmica->poluvreme_rezultat_gost !== null)
                                     <small class="text-muted d-block">
                                         ({{ $utakmica->poluvreme_rezultat_domacin }} - {{ $utakmica->poluvreme_rezultat_gost }})
