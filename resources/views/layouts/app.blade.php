@@ -1,3 +1,5 @@
+// resources/views/layouts/app.blade.php
+
 <!DOCTYPE html>
 <html lang="sr">
 <head>
@@ -10,6 +12,8 @@
     <script src="https://cdn.tiny.cloud/1/2d8d0z568l75o82jphit2mlssygij2v5xxuk0ev3ai9lv60g/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Only initialize TinyMCE for authenticated admin users
+            @if(Auth::check() && Auth::user()->is_admin)
             tinymce.init({
                 selector: 'textarea',
                 plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
@@ -18,6 +22,7 @@
                 // If you want to exclude certain textareas, you can use:
                 // selector: 'textarea:not(.no-tinymce)',
             });
+            @endif
         });
     </script>
 </head>
@@ -59,10 +64,38 @@
                         </ul>
                     </li>
                 </ul>
-                <form class="d-flex ms-auto" action="{{ route('pretraga') }}" method="GET">
+                <form class="d-flex ms-auto me-2" action="{{ route('pretraga') }}" method="GET">
                     <input class="form-control me-2" type="search" name="query" placeholder="Pretraga..." aria-label="Pretraga">
                     <button class="btn btn-outline-light" type="submit">Traži</button>
                 </form>
+                <ul class="navbar-nav">
+                    @if (Auth::check())
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                {{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @if (Auth::user()->is_admin)
+                                    <li><span class="dropdown-item text-muted">Administrator</span></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                @endif
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">Odjavi se</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">Prijava</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Registracija</a>
+                        </li>
+                    @endif
+                </ul>
             </div>
         </div>
     </nav>

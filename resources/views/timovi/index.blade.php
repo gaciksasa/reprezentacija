@@ -5,9 +5,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Bilans protiv reprezentacija od 1920 do danas</h1>
+    @if(Auth::check() && Auth::user()->is_admin)
     <a href="{{ route('timovi.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Novi tim
     </a>
+    @endif
 </div>
 
 <div class="card">
@@ -26,7 +28,9 @@
                         <th class="text-center">+/-</th>
                         <th class="text-center">g/m</th>
                         <th class="text-center">g/m</th>
+                        @if(Auth::check() && Auth::user()->is_admin)
                         <th class="text-center">Akcije</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -53,6 +57,7 @@
                         </td>
                         <td class="text-center">{{ $tim->stats['g_per_match'] }}</td>
                         <td class="text-center">{{ $tim->stats['a_per_match'] }}</td>
+                        @if(Auth::check() && Auth::user()->is_admin)
                         <td>
                             <div class="btn-group">
                                 <a href="{{ route('timovi.show', $tim) }}" class="btn btn-sm btn-info">
@@ -71,6 +76,7 @@
                                 </form>
                             </div>
                         </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
