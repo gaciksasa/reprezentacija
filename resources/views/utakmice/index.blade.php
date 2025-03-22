@@ -5,9 +5,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Utakmice</h1>
+    @if(Auth::check() && Auth::user()->hasEditAccess())
     <a href="{{ route('utakmice.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nova utakmica
     </a>
+    @endif
 </div>
 
 <div class="card">
@@ -21,7 +23,9 @@
                         <th>Domaćin</th>
                         <th>Rezultat</th>
                         <th>Gost</th>
+                        @if(Auth::check() && Auth::user()->hasEditAccess())
                         <th>Akcije</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -58,6 +62,7 @@
                                 {{ $utakmica->gost->naziv }}
                             </a>
                         </td>
+                        @if(Auth::check() && Auth::user()->hasEditAccess())
                         <td>
                             <div class="btn-group">
                                 <a href="{{ route('utakmice.show', $utakmica) }}" class="btn btn-sm btn-info">
@@ -76,6 +81,7 @@
                                 </form>
                             </div>
                         </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>

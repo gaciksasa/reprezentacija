@@ -24,7 +24,8 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');
+            // Preusmerite na početnu stranu (koja je definisana kao 'dashboard')
+            return redirect()->route('dashboard');
         }
 
         return back()->withErrors([
