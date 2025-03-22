@@ -1,5 +1,3 @@
-// resources/views/layouts/app.blade.php
-
 <!DOCTYPE html>
 <html lang="sr">
 <head>
@@ -90,9 +88,6 @@
                     @else
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">Prijava</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">Registracija</a>
                         </li>
                     @endif
                 </ul>
