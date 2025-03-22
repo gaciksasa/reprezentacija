@@ -12,9 +12,11 @@
         </td>
     </h3>
     <div>
+        @if(Auth::check() && Auth::user()->hasEditAccess())
         <a href="{{ route('utakmice.edit', $utakmica) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
         </a>
+        @endif
         <a href="{{ route('utakmice.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Nazad
         </a>
@@ -45,8 +47,8 @@
 
 <!-- Sastavi -->
 <div class="card mb-4">
+    @if(Auth::check() && Auth::user()->hasEditAccess())
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0"></h5>
         <div class="btn-group">
             @php
                 // Dobavi glavni tim (izabrani tim)
@@ -75,8 +77,9 @@
                     <i class="fas fa-plus"></i> Gost
                 </a>
             @endif
-        </div>
+        </div>    
     </div>
+    @endif
     <div class="card-body">
         <div class="row py-4 align-items-center">
             <div class="col-4 text-center">
@@ -128,24 +131,27 @@
                                     {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                     <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
                                 </span>
-                            </a>                               
-                            <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </form>
+                            </a>
+                            @if(Auth::check() && Auth::user()->hasEditAccess())                           
+                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                                @endif
                             @endif
                         </li>
                     @endforeach
                         
                         @foreach($domaciProtivnickiIgraci->where('u_sastavu', true) as $igrac)
-                            <li class="py-1">
-                                <span class="fw-bold">
-                                    {{ $igrac->prezime }} {{ $igrac->ime }} 
-                                    @if($igrac->kapiten) <small>(C)</small> @endif
-                                </span>
+                        <li class="py-1">
+                            <span class="fw-bold">
+                                {{ $igrac->prezime }} {{ $igrac->ime }} 
+                                @if($igrac->kapiten) <small>(C)</small> @endif
+                            </span>
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
@@ -153,7 +159,8 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
-                            </li>
+                            @endif
+                        </li>
                         @endforeach
                     </ul>
                 @else
@@ -172,6 +179,7 @@
                         @foreach($gostujuciSastav as $sastav)
                             <li class="py-1">
                                 @if($sastav->starter)
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
@@ -179,6 +187,7 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
+                                @endif
                                 <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
                                     <span class="text-danger fw-bold">
                                         {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
@@ -191,6 +200,7 @@
                         
                         @foreach($gostujuciProtivnickiIgraci->where('u_sastavu', true) as $igrac)
                             <li class="py-1">
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
@@ -198,6 +208,7 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
+                                @endif
                                 <span class="fw-bold">
                                     {{ $igrac->prezime }} {{ $igrac->ime }} 
                                     @if($igrac->kapiten) <small>(C)</small> @endif
@@ -234,9 +245,11 @@
                         @endphp
                         
                         @if(!$domacinJeNasTim)
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
                             <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-plus"></i> Dodaj
                             </a>
+                            @endif
                         @endif
                     </div>
                     <div class="card-body">
@@ -270,6 +283,7 @@
                                         <p class="mb-0 text-muted"><small>{{ $domacinSelektor->napomena }}</small></p>
                                     @endif
                                 </div>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <div class="btn-group">
                                     <a href="{{ route('protivnicki-selektori.edit', $domacinSelektor->id) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
@@ -285,6 +299,7 @@
                                         @method('DELETE')
                                     </form>
                                 </div>
+                                @endif
                             </div>
                         @elseif(isset($selektorIme) && $selektorIme)
                             <p class="mb-0">{{ $selektorIme }}</p>
@@ -314,9 +329,11 @@
                         @endphp
                         
                         @if(!$gostJeNasTim)
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
                             <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-plus"></i> Dodaj
                             </a>
+                            @endif
                         @endif
                     </div>
                     <div class="card-body">
@@ -350,6 +367,7 @@
                                         <p class="mb-0 text-muted"><small>{{ $gostSelektor->napomena }}</small></p>
                                     @endif
                                 </div>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <div class="btn-group">
                                     <a href="{{ route('protivnicki-selektori.edit', $gostSelektor->id) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
@@ -358,6 +376,7 @@
                                             onclick="document.getElementById('delete-selektor-{{ $gostSelektor->id }}').submit()">
                                         <i class="fas fa-trash"></i>
                                     </button>
+                                    @if(Auth::check() && Auth::user()->hasEditAccess())
                                     <form action="{{ url('protivnicki-igraci/'.$igrac->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
@@ -365,7 +384,9 @@
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
+                                @endif
                             </div>
                         @elseif(isset($selektorIme) && $selektorIme)
                             <p class="mb-0">{{ $selektorIme }}</p>
@@ -383,9 +404,11 @@
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">Golovi</h5>
+        @if(Auth::check() && Auth::user()->hasEditAccess())
         <a href="{{ route('golovi.create', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i> Dodaj
         </a>
+        @endif
     </div>
     <div class="card-body">
         @if($utakmica->golovi->count() > 0)
@@ -465,6 +488,7 @@
                                 </div>
                                 <div>
                                     <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                                    @if(Auth::check() && Auth::user()->hasEditAccess())
                                     <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline ms-2">
                                         @csrf
                                         @method('DELETE')
@@ -472,6 +496,7 @@
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </li>
                         @endif
@@ -520,6 +545,7 @@
                                 </div>
                                 <div>
                                     <span class="badge bg-primary rounded-pill">{{ $gol->trenutni_rezultat }}</span>
+                                    @if(Auth::check() && Auth::user()->hasEditAccess())
                                     <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline ms-2">
                                         @csrf
                                         @method('DELETE')
@@ -527,6 +553,7 @@
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </li>
                         @endif
@@ -544,6 +571,7 @@
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">Izmene</h5>
+        @if(Auth::check() && Auth::user()->hasEditAccess())
         <div class="btn-group">
             <a href="{{ route('izmene.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
                 <i class="fas fa-plus"></i> Domaćin
@@ -552,6 +580,7 @@
                 <i class="fas fa-plus"></i> Gost
             </a>
         </div>
+        @endif
     </div>
     <div class="card-body">
         @php
@@ -592,6 +621,7 @@
                                         @endif
                                     </span>
                                 </div>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <form action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
@@ -599,6 +629,7 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
+                                @endif
                             </li>
                         @endforeach
                     </ul>
@@ -630,6 +661,7 @@
                                         @endif
                                     </span>
                                 </div>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <form action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
@@ -637,6 +669,7 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
+                                @endif
                             </li>
                         @endforeach
                     </ul>
@@ -661,24 +694,26 @@
                $gostJeNasTim = in_array($utakmica->gost_id, $glavniTimIds);
            @endphp
            
-           @if($domacinJeNasTim)
-               <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                   <i class="fas fa-plus"></i> Domaćin
-               </a>
-           @else
-               <a href="{{ route('protivnicki-kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                   <i class="fas fa-plus"></i> Domaćin
-               </a>
-           @endif
-           
-           @if($gostJeNasTim)
-               <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                   <i class="fas fa-plus"></i> Gost
-               </a>
-           @else
-               <a href="{{ route('protivnicki-kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                   <i class="fas fa-plus"></i> Gost
-               </a>
+           @if(Auth::check() && Auth::user()->hasEditAccess())
+                @if($domacinJeNasTim)
+                    <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Domaćin
+                    </a>
+                @else
+                    <a href="{{ route('protivnicki-kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Domaćin
+                    </a>
+                @endif
+                
+                @if($gostJeNasTim)
+                    <a href="{{ route('kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Gost
+                    </a>
+                @else
+                    <a href="{{ route('protivnicki-kartoni.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Gost
+                    </a>
+                @endif
            @endif
        </div>
    </div>
@@ -719,6 +754,7 @@
                                    {{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}
                                @endif
                            </div>
+                           @if(Auth::check() && Auth::user()->hasEditAccess())
                            <form action="{{ route('kartoni.destroy', $karton->id) }}" method="POST" class="d-inline">
                                @csrf
                                @method('DELETE')
@@ -726,6 +762,7 @@
                                    <i class="fas fa-times"></i>
                                </button>
                            </form>
+                           @endif
                        </li>
                        @endforeach
                        
@@ -743,6 +780,7 @@
                                @endif
                                {{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}
                            </div>
+                           @if(Auth::check() && Auth::user()->hasEditAccess())
                            <form action="{{ route('protivnicki-kartoni.destroy', $karton->id) }}" method="POST" class="d-inline">
                                @csrf
                                @method('DELETE')
@@ -750,6 +788,7 @@
                                    <i class="fas fa-times"></i>
                                </button>
                            </form>
+                           @endif
                        </li>
                        @endforeach
                        
@@ -782,6 +821,7 @@
                                    {{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}
                                @endif
                            </div>
+                           @if(Auth::check() && Auth::user()->hasEditAccess())
                            <form action="{{ route('kartoni.destroy', $karton->id) }}" method="POST" class="d-inline">
                                @csrf
                                @method('DELETE')
@@ -789,6 +829,7 @@
                                    <i class="fas fa-times"></i>
                                </button>
                            </form>
+                           @endif
                        </li>
                        @endforeach
                        
@@ -806,6 +847,7 @@
                                @endif
                                {{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}
                            </div>
+                           @if(Auth::check() && Auth::user()->hasEditAccess())
                            <form action="{{ route('protivnicki-kartoni.destroy', $karton->id) }}" method="POST" class="d-inline">
                                @csrf
                                @method('DELETE')
@@ -813,6 +855,7 @@
                                    <i class="fas fa-times"></i>
                                </button>
                            </form>
+                           @endif
                        </li>
                        @endforeach
                        

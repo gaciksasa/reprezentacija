@@ -5,9 +5,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Reprezentativci</h1>
+    @if(Auth::check() && Auth::user()->hasEditAccess())
     <a href="{{ route('igraci.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Novi igrač
     </a>
+    @endif
 </div>
 
 <div class="card">
@@ -56,7 +58,9 @@
                         <th width="20%">Period</th>
                         <th width="10%" class="text-center">Utakmica</th>
                         <th width="10%" class="text-center">Golova</th>
+                        @if(Auth::check() && Auth::user()->hasEditAccess())
                         <th width="20%">Akcije</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -95,6 +99,7 @@
                                     @endif</td>
                             <td class="text-center">{{ $igrac->broj_nastupa }}</td>
                             <td class="text-center">{{ $igrac->broj_golova }}</td>
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
                             <td>
                                 <div class="btn-group">
                                     <a href="{{ route('igraci.show', $igrac) }}" class="btn btn-sm btn-info">
@@ -113,6 +118,7 @@
                                     </form>
                                 </div>
                             </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>

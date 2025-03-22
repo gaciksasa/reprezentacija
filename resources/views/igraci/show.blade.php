@@ -6,9 +6,11 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>{{ $igrac->prezime }} {{ $igrac->ime }}</h1>
     <div>
+        @if(Auth::check() && Auth::user()->hasEditAccess())
         <a href="{{ route('igraci.edit', $igrac) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
         </a>
+        @endif
         <a href="{{ route('igraci.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Nazad
         </a>
@@ -288,9 +290,11 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Klubovi u karijeri</h5>
+                @if(Auth::check() && Auth::user()->hasEditAccess())
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addClubModal">
                     <i class="fas fa-plus"></i> Dodaj klub
                 </button>
+                @endif
             </div>
             <div class="card-body">
             @if($igrac->bivsiKlubovi->count() > 0)
@@ -303,7 +307,7 @@
                             <th>Stepen takmičenja</th>
                             <th>Nastupi</th>
                             <th>Golovi</th>
-                            <th></th>
+                            @if(Auth::check() && Auth::user()->hasEditAccess())<th>Akcije</th>@endif
                         </tr>
                     </thead>
                     <tbody>
@@ -315,6 +319,7 @@
                             <td>{{ $klub->stepen_takmicenja ?? '-' }}</td>
                             <td align="right">{{ $klub->broj_nastupa ?? '-' }}</td>
                             <td align="right">{{ $klub->broj_golova ?? '-' }}</td>
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
                             <td>
                                 <button type="button" class="btn btn-sm btn-danger" 
                                         onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-klub-{{ $klub->id }}').submit()">
@@ -324,7 +329,9 @@
                                     @csrf
                                     @method('DELETE')
                                 </form>
+                                
                             </td>
+                            @endif
                         </tr>                    
                         @endforeach
                         <tr>
@@ -344,6 +351,7 @@
 </div>
 
 <!-- Modal za dodavanje novog kluba -->
+@if(Auth::check() && Auth::user()->hasEditAccess())
 <div class="modal fade" id="addClubModal" tabindex="-1" aria-labelledby="addClubModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -388,4 +396,5 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
