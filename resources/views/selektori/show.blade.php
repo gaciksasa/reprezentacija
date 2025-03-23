@@ -6,9 +6,11 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>{{ $selektor->prezime }} {{ $selektor->ime }}</h1>
     <div>
+        @if(Auth::check() && Auth::user()->hasEditAccess())
         <a href="{{ route('selektori.edit', $selektor) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
         </a>
+        @endif
         <a href="{{ route('selektori.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Nazad
         </a>
@@ -135,9 +137,11 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Mandati</h5>
+                @if(Auth::check() && Auth::user()->hasEditAccess())
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMandatModal">
                     <i class="fas fa-plus"></i> Dodaj mandat
                 </button>
+                @endif
             </div>
             <div class="card-body">
                 @if($selektor->mandati->count() > 0)
@@ -149,7 +153,9 @@
                                     <th>Period</th>
                                     <th>Utakmice</th>
                                     <th>Učinak</th>
+                                    @if(Auth::check() && Auth::user()->hasEditAccess())
                                     <th>Akcije</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -178,6 +184,7 @@
                                             -
                                         @endif
                                     </td>
+                                    @if(Auth::check() && Auth::user()->hasEditAccess())
                                     <td>
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-warning" 
@@ -194,6 +201,7 @@
                                             </form>
                                         </div>
                                     </td>
+                                    @endif
                                 </tr>
                                 @endforeach
                             </tbody>

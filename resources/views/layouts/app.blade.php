@@ -10,15 +10,13 @@
     <script src="https://cdn.tiny.cloud/1/2d8d0z568l75o82jphit2mlssygij2v5xxuk0ev3ai9lv60g/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Only initialize TinyMCE for authenticated admin users
-            @if(Auth::check() && Auth::user()->is_admin)
+            // Initialize TinyMCE for users with editing rights (admin or editor)
+            @if(Auth::check() && Auth::user()->hasEditAccess())
             tinymce.init({
-                selector: 'textarea',
+                selector: 'textarea:not(.no-tinymce)',
                 plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
                 height: 500,
-                // If you want to exclude certain textareas, you can use:
-                // selector: 'textarea:not(.no-tinymce)',
             });
             @endif
         });
