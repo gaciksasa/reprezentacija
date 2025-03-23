@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @yield('styles')
+    <link href="{{ asset('../resources/css/app.css') }}" rel="stylesheet">
     <script src="https://cdn.tiny.cloud/1/2d8d0z568l75o82jphit2mlssygij2v5xxuk0ev3ai9lv60g/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -111,7 +112,7 @@
         @yield('content')
     </div>
 
-    <footer class="bg-dark text-white py-4 mt-auto">
+    <footer class="bg-primary text-white py-4 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
@@ -119,7 +120,7 @@
                     <p>Baza podataka fudbalskih reprezentacija i utakmica</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p>&copy; {{ date('Y') }} Reprezentacija. Sva prava zadržana.</p>
+                    <p>&copy; {{ date('Y') }} Reprezentacija.rs. Sva prava zadržana.</p>
                 </div>
             </div>
         </div>

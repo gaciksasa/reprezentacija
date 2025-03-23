@@ -26,8 +26,8 @@
                         <th class="text-center">G</th>
                         <th class="text-center">A</th>
                         <th class="text-center">+/-</th>
-                        <th class="text-center">g/m</th>
-                        <th class="text-center">g/m</th>
+                        <th class="text-center">+/m</th>
+                        <th class="text-center">-/m</th>
                         @if(Auth::check() && Auth::user()->is_admin)
                         <th class="text-center">Akcije</th>
                         @endif

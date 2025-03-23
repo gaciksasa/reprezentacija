@@ -10,3 +10,47 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+body {
+    background-color: #edf1f6;
+}
+
+.bg-primary, .btn-primary {
+    background-color: #c80000 !important;
+    border-color: #c80000 !important;  
+}
+
+a, .nav-link {
+    color: #212529;
+    text-decoration: none;
+}
+
+a:hover, .nav-link:hover {
+    color: #c80000 !important;
+}
+
+.navbar .nav-link, .navbar .nav-link:hover {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.bg-success {
+    background-color: #0C4076 !important;
+}
+
+.bg-info {
+    color: #212529 !important;
+    background-color: #ffffff !important;
+}
+
+.btn-light {
+    border: none; 
+    background-color: rgb(211, 212, 213);
+}
+
+.btn-light:hover {
+    background-color: rgb(236, 236, 236);
+}
+
+.btn-light, .btn-light:hover {
+    color: #212529 !important;
+}

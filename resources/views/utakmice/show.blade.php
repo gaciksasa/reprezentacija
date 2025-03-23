@@ -49,6 +49,7 @@
 <div class="card mb-4">
     @if(Auth::check() && Auth::user()->hasEditAccess())
     <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Sastavi</h5>
         <div class="btn-group">
             @php
                 // Dobavi glavni tim (izabrani tim)
