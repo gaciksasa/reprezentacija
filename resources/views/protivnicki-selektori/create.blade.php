@@ -62,6 +62,7 @@
                 @enderror
             </div>
             
+            <!--
             <div class="mb-3">
                 <label for="napomena" class="form-label">Napomena</label>
                 <textarea class="form-control @error('napomena') is-invalid @enderror" 
@@ -70,6 +71,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            -->
             
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Sačuvaj selektora</button>
