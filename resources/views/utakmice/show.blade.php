@@ -50,6 +50,10 @@
     @if(Auth::check() && Auth::user()->hasEditAccess())
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">Sastavi</h5>
+        <a href="{{ route('sastavi.index', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Upravljaj sastavima
+        </a> 
+        <!--
         <div class="btn-group">
             @php
                 // Dobavi glavni tim (izabrani tim)
@@ -78,7 +82,8 @@
                     <i class="fas fa-plus"></i> Gost
                 </a>
             @endif
-        </div>    
+        </div>
+        -->   
     </div>
     @endif
     <div class="card-body">
