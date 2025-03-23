@@ -2,10 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\UtakmicaEditorController;
+use App\Http\Controllers\UtakmiceController;
 use App\Http\Controllers\TimoviController;
 use App\Http\Controllers\IgraciController;
-use App\Http\Controllers\UtakmiceController;
 use App\Http\Controllers\StadioniController;
 use App\Http\Controllers\TakmicenjaController;
 use App\Http\Controllers\SudijeController;
@@ -21,6 +20,9 @@ use App\Http\Controllers\KartoniController;
 use App\Http\Controllers\TimVarijanteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+
+use App\Http\Middleware\AdminMiddleware;
+// use App\Http\Middleware\EditorMiddleware;
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -61,12 +63,12 @@ Route::get('/sudije', [SudijeController::class, 'index'])->name('sudije.index');
 Route::get('/sudije/{sudija}', [SudijeController::class, 'show'])->name('sudije.show');
 
 // User management (admin only)
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::resource('users', UserController::class);
 });
 
-// Editor Routes (editor and admin)
-Route::middleware(['auth', 'editor'])->group(function () {
+// Editor Routes (admin only)
+Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     // CRUD for teams
     Route::get('/timovi/create', [TimoviController::class, 'create'])->name('timovi.create');
     Route::post('/timovi', [TimoviController::class, 'store'])->name('timovi.store');
@@ -93,13 +95,6 @@ Route::middleware(['auth', 'editor'])->group(function () {
     Route::get('/utakmice/{utakmica}/edit', [UtakmiceController::class, 'edit'])->name('utakmice.edit');
     Route::put('/utakmice/{utakmica}', [UtakmiceController::class, 'update'])->name('utakmice.update');
     Route::delete('/utakmice/{utakmica}', [UtakmiceController::class, 'destroy'])->name('utakmice.destroy');
-
-    // Unified Match Editor routes
-    Route::get('/utakmice/kreiranje', [UtakmicaEditorController::class, 'create'])->name('utakmice.kreiranje');
-    Route::post('/utakmice/sacuvaj', [UtakmicaEditorController::class, 'store'])->name('utakmice.sacuvaj');
-    Route::get('/utakmice/{utakmica}/editor', [UtakmicaEditorController::class, 'edit'])->name('utakmice.editor');
-    Route::put('/utakmice/{utakmica}/azuriraj', [UtakmicaEditorController::class, 'update'])->name('utakmice.azuriraj');
-    Route::get('/utakmice/ucitaj-igrace', [UtakmicaEditorController::class, 'ucitajIgrace'])->name('utakmice.ucitajIgrace');
 
     // CRUD for coaches
     Route::get('/selektori/create', [SelektoriController::class, 'create'])->name('selektori.create');
