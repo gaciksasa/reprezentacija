@@ -1,4 +1,4 @@
-<!-- @extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Sastavi')
 
@@ -95,9 +95,9 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <a href="{{ route('sastavi.edit', $sastav) }}" class="btn btn-sm btn-warning">
+                                                    <!--<a href="{{ route('sastavi.edit', $sastav) }}" class="btn btn-sm btn-warning">
                                                         <i class="fas fa-edit"></i>
-                                                    </a>
+                                                    </a>-->
                                                     <button type="button" class="btn btn-sm btn-danger" 
                                                             onclick="document.getElementById('delete-sastav-{{ $sastav->id }}').submit()">
                                                         <i class="fas fa-trash"></i>
@@ -338,4 +338,3 @@
     </div>
 @endif
 @endsection
--->
