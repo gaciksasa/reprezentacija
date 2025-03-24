@@ -205,6 +205,13 @@
                                         @if(Auth::check() && Auth::user()->hasEditAccess())
                                         <div class="handle me-2" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
                                         @endif
+                                        
+                                        <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
+                                            <span class="text-danger fw-bold">
+                                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
+                                                <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
+                                            </span>
+                                        </a>
                                         @if(Auth::check() && Auth::user()->hasEditAccess())
                                         <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
                                             @csrf
@@ -214,12 +221,6 @@
                                             </button>
                                         </form>
                                         @endif
-                                        <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
-                                            <span class="text-danger fw-bold">
-                                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
-                                                <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
-                                            </span>
-                                        </a>
                                     </div>
                                 @endif
                             </li>
@@ -230,6 +231,10 @@
                                 <div class="d-flex align-items-center">
                                     @if(Auth::check() && Auth::user()->hasEditAccess())
                                     <div class="handle me-2" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
+                                    <span class="fw-bold">
+                                        {{ $igrac->prezime }} {{ $igrac->ime }} 
+                                        @if($igrac->kapiten) <small>(C)</small> @endif
+                                    </span>
                                     <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-2">
                                         @csrf
                                         @method('DELETE')
@@ -238,10 +243,6 @@
                                         </button>
                                     </form>
                                     @endif
-                                    <span class="fw-bold">
-                                        {{ $igrac->prezime }} {{ $igrac->ime }} 
-                                        @if($igrac->kapiten) <small>(C)</small> @endif
-                                    </span>
                                 </div>
                             </li>
                         @endforeach
@@ -904,72 +905,92 @@
 
 @if(Auth::check() && Auth::user()->hasEditAccess())
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicijalizacija Sortable za domaći tim
-    const domaciSastavEl = document.getElementById('domaci-sastav-lista');
-    if (domaciSastavEl) {
-        const domaciSortable = new Sortable(domaciSastavEl, {
-            handle: '.handle',
-            animation: 150,
-            onEnd: function(evt) {
-                updateSortOrder('domaci', evt.oldIndex, evt.newIndex);
-            }
-        });
-    }
-    
-    // Inicijalizacija Sortable za gostujući tim
-    const gostujuciSastavEl = document.getElementById('gostujuci-sastav-lista');
-    if (gostujuciSastavEl) {
-        const gostujuciSortable = new Sortable(gostujuciSastavEl, {
-            handle: '.handle',
-            animation: 150,
-            onEnd: function(evt) {
-                updateSortOrder('gostujuci', evt.oldIndex, evt.newIndex);
-            }
-        });
-    }
-    
-    // Funkcija za ažuriranje redosleda
-    function updateSortOrder(timTip, oldIndex, newIndex) {
-        const listId = timTip + '-sastav-lista';
-        const items = document.querySelectorAll(`#${listId} .sortable-item`);
-        const sastavi = [];
-        
-        items.forEach((item, index) => {
-            sastavi.push({
-                id: item.dataset.id,
-                redosled: index
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicijalizacija Sortable za domaći tim
+        const domaciSastavEl = document.getElementById('domaci-sastav-lista');
+        if (domaciSastavEl) {
+            const domaciSortable = new Sortable(domaciSastavEl, {
+                handle: '.handle',
+                animation: 150,
+                onEnd: function(evt) {
+                    updateSortOrder('domaci', evt.oldIndex, evt.newIndex);
+                }
             });
-        });
+        }
         
-        // Slanje AJAX zahteva za ažuriranje redosleda
-        fetch('/sastavi/update-order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ 
-                sastavi: sastavi,
-                utakmica_id: {{ $utakmica->id }},
-                tim_tip: timTip
+        // Inicijalizacija Sortable za gostujući tim
+        const gostujuciSastavEl = document.getElementById('gostujuci-sastav-lista');
+        if (gostujuciSastavEl) {
+            const gostujuciSortable = new Sortable(gostujuciSastavEl, {
+                handle: '.handle',
+                animation: 150,
+                onEnd: function(evt) {
+                    updateSortOrder('gostujuci', evt.oldIndex, evt.newIndex);
+                }
+            });
+        }
+        
+        // Funkcija za ažuriranje redosleda
+        function updateSortOrder(timTip, oldIndex, newIndex) {
+            const listId = timTip + '-sastav-lista';
+            const items = document.querySelectorAll(`#${listId} .sortable-item`);
+            const sastavi = [];
+            
+            items.forEach((item, index) => {
+                sastavi.push({
+                    id: item.dataset.id,
+                    redosled: index
+                });
+            });
+            
+            // Dodajemo indikator da je u toku ažuriranje
+            const indicator = document.createElement('div');
+            indicator.className = 'alert alert-info position-fixed top-0 start-50 translate-middle-x mt-2';
+            indicator.style.zIndex = '9999';
+            indicator.innerHTML = 'Ažuriranje redosleda...';
+            document.body.appendChild(indicator);
+            
+            // Slanje AJAX zahteva za ažuriranje redosleda
+            fetch('{{ route("sastavi.updateOrder") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ 
+                    sastavi: sastavi,
+                    utakmica_id: {{ $utakmica->id }},
+                    tim_tip: timTip
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Redosled uspešno ažuriran');
-            } else {
-                console.error('Greška pri ažuriranju redosleda:', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Greška pri ažuriranju redosleda:', error);
-        });
-    }
-});
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    indicator.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-2';
+                    indicator.innerHTML = 'Redosled uspešno ažuriran';
+                    setTimeout(() => {
+                        indicator.remove();
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'Nepoznata greška');
+                }
+            })
+            .catch(error => {
+                console.error('Greška pri ažuriranju redosleda:', error);
+                indicator.className = 'alert alert-danger position-fixed top-0 start-50 translate-middle-x mt-2';
+                indicator.innerHTML = `Greška: ${error.message || 'Mrežna greška'}`;
+                setTimeout(() => {
+                    indicator.remove();
+                }, 3000);
+            });
+        }
+    });
 </script>
 @endsection
 @endif

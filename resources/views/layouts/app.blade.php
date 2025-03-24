@@ -7,10 +7,24 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @yield('styles')
-    <link href="{{ asset('../resources/css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="https://cdn.tiny.cloud/1/2d8d0z568l75o82jphit2mlssygij2v5xxuk0ev3ai9lv60g/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    
+    <!-- CSRF Token za Ajax pozive -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Postavi CSRF token za Ajax pozive
+            window.Laravel = {!! json_encode(['csrfToken' => csrf_token()]) !!};
+            
+            // Osiguramo da svaki Ajax zahtev sadrži CSRF token
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            
             // Initialize TinyMCE for users with editing rights (admin or editor)
             @if(Auth::check() && Auth::user()->hasEditAccess())
             tinymce.init({
@@ -126,6 +140,7 @@
         </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @yield('scripts')

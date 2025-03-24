@@ -12,7 +12,7 @@ class ProtivnickiIgrac extends Model
     protected $table = 'protivnicki_igraci';
     
     protected $fillable = [
-        'ime', 'prezime', 'utakmica_id', 'tim_id', 'kapiten', 'u_sastavu'
+        'ime', 'prezime', 'utakmica_id', 'tim_id', 'kapiten', 'u_sastavu', 'redosled'
     ];
     
     protected $casts = [

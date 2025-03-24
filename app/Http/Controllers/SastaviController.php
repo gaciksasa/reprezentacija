@@ -190,26 +190,41 @@ class SastaviController extends Controller
 
     public function updateOrder(Request $request)
     {
-        $validated = $request->validate([
-            'sastavi' => 'required|array',
-            'sastavi.*.id' => 'required',
-            'sastavi.*.redosled' => 'required|integer'
-        ]);
+        try {
+            $validated = $request->validate([
+                'sastavi' => 'required|array',
+                'sastavi.*.id' => 'required',
+                'sastavi.*.redosled' => 'required|integer',
+                'utakmica_id' => 'required|integer|exists:utakmice,id',
+                'tim_tip' => 'required|string'
+            ]);
 
-        foreach ($request->sastavi as $sastav) {
-            // Proveriti da li ID počinje sa 'p' (protivnički igrač)
-            if (is_string($sastav['id']) && strpos($sastav['id'], 'p') === 0) {
-                $igracId = substr($sastav['id'], 1); // Ukloni 'p' prefiks
-                // Ažuriramo redosled za protivničkog igrača
-                \App\Models\ProtivnickiIgrac::where('id', $igracId)
-                    ->update(['redosled' => $sastav['redosled']]);
-            } else {
-                // Ažuriramo redosled za regularnog igrača u sastavu
-                Sastav::where('id', $sastav['id'])
-                    ->update(['redosled' => $sastav['redosled']]);
+            $utakmica_id = $validated['utakmica_id'];
+
+            foreach ($request->sastavi as $sastav) {
+                // Proveriti da li ID počinje sa 'p' (protivnički igrač)
+                if (is_string($sastav['id']) && strpos($sastav['id'], 'p') === 0) {
+                    $igracId = (int)substr($sastav['id'], 1); // Ukloni 'p' prefiks i konvertuj u int
+                    
+                    // Ažuriramo redosled za protivničkog igrača
+                    \App\Models\ProtivnickiIgrac::where('id', $igracId)
+                        ->where('utakmica_id', $utakmica_id)
+                        ->update(['redosled' => $sastav['redosled']]);
+                } else {
+                    // Ažuriramo redosled za regularnog igrača u sastavu
+                    $sastavId = (int)$sastav['id'];
+                    
+                    Sastav::where('id', $sastavId)
+                        ->where('utakmica_id', $utakmica_id)
+                        ->update(['redosled' => $sastav['redosled']]);
+                }
             }
-        }
 
-        return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'message' => 'Redosled uspešno ažuriran']);
+        } catch (\Exception $e) {
+            \Log::error('Greška pri ažuriranju redosleda: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }
