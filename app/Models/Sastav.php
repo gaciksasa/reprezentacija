@@ -12,7 +12,7 @@ class Sastav extends Model
     protected $table = 'sastavi';
     
     protected $fillable = [
-        'utakmica_id', 'tim_id', 'igrac_id', 'starter', 'selektor'
+        'utakmica_id', 'tim_id', 'igrac_id', 'starter', 'selektor', 'redosled'
     ];
     
     protected $casts = [

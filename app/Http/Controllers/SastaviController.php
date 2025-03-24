@@ -187,4 +187,19 @@ class SastaviController extends Controller
         return redirect()->route('utakmice.show', $utakmica_id)
             ->with('success', 'Igrač uspešno uklonjen iz sastava.');
     }
+
+    public function updateOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'sastavi' => 'required|array',
+            'sastavi.*.id' => 'required|exists:sastavi,id',
+            'sastavi.*.redosled' => 'required|integer'
+        ]);
+
+        foreach ($request->sastavi as $sastav) {
+            Sastav::where('id', $sastav['id'])->update(['redosled' => $sastav['redosled']]);
+        }
+
+        return response()->json(['success' => true]);
+    }
 }
