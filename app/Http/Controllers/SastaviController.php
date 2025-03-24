@@ -8,6 +8,7 @@ use App\Models\Tim;
 use App\Models\Igrac;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class SastaviController extends Controller
 {
@@ -200,30 +201,40 @@ class SastaviController extends Controller
             ]);
 
             $utakmica_id = $validated['utakmica_id'];
+            $success = true;
 
             foreach ($request->sastavi as $sastav) {
-                // Proveriti da li ID počinje sa 'p' (protivnički igrač)
                 if (is_string($sastav['id']) && strpos($sastav['id'], 'p') === 0) {
-                    $igracId = (int)substr($sastav['id'], 1); // Ukloni 'p' prefiks i konvertuj u int
+                    // Handle opponent players
+                    $igracId = (int)substr($sastav['id'], 1);
                     
-                    // Ažuriramo redosled za protivničkog igrača
-                    \App\Models\ProtivnickiIgrac::where('id', $igracId)
-                        ->where('utakmica_id', $utakmica_id)
-                        ->update(['redosled' => $sastav['redosled']]);
+                    $igrac = \App\Models\ProtivnickiIgrac::find($igracId);
+                    if ($igrac) {
+                        $igrac->redosled = $sastav['redosled'];
+                        if (!$igrac->save()) {
+                            $success = false;
+                        }
+                    }
                 } else {
-                    // Ažuriramo redosled za regularnog igrača u sastavu
+                    // Handle regular players
                     $sastavId = (int)$sastav['id'];
                     
-                    Sastav::where('id', $sastavId)
-                        ->where('utakmica_id', $utakmica_id)
-                        ->update(['redosled' => $sastav['redosled']]);
+                    $sastavObj = \App\Models\Sastav::find($sastavId);
+                    if ($sastavObj) {
+                        $sastavObj->redosled = $sastav['redosled'];
+                        if (!$sastavObj->save()) {
+                            $success = false;
+                        }
+                    }
                 }
             }
 
-            return response()->json(['success' => true, 'message' => 'Redosled uspešno ažuriran']);
+            return response()->json([
+                'success' => $success,
+                'message' => $success ? 'Redosled uspešno ažuriran' : 'Došlo je do greške pri ažuriranju'
+            ]);
         } catch (\Exception $e) {
             \Log::error('Greška pri ažuriranju redosleda: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
