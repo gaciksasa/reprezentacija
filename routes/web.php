@@ -141,4 +141,6 @@ Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('protivnicki-kartoni/create', [ProtivnickiKartoniController::class, 'create'])->name('protivnicki-kartoni.create');
     Route::post('protivnicki-kartoni', [ProtivnickiKartoniController::class, 'store'])->name('protivnicki-kartoni.store');
     Route::delete('protivnicki-kartoni/{id}', [ProtivnickiKartoniController::class, 'destroy'])->name('protivnicki-kartoni.destroy');
+
+    Route::post('/sastavi/update-order', [SastaviController::class, 'updateOrder'])->name('sastavi.updateOrder');
 });

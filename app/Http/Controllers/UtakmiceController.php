@@ -91,6 +91,9 @@ class UtakmiceController extends Controller
        $utakmica = Utakmica::with([
            'domacin', 
            'gost', 
+           'sastavi' => function($query) {
+                $query->orderBy('redosled')->orderBy('starter', 'desc');
+            },
            'sastavi.igrac', 
            'golovi.igrac', 
            'izmene.igracOut', 

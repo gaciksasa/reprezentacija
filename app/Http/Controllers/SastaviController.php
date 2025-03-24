@@ -192,12 +192,22 @@ class SastaviController extends Controller
     {
         $validated = $request->validate([
             'sastavi' => 'required|array',
-            'sastavi.*.id' => 'required|exists:sastavi,id',
+            'sastavi.*.id' => 'required',
             'sastavi.*.redosled' => 'required|integer'
         ]);
 
         foreach ($request->sastavi as $sastav) {
-            Sastav::where('id', $sastav['id'])->update(['redosled' => $sastav['redosled']]);
+            // Proveriti da li ID počinje sa 'p' (protivnički igrač)
+            if (is_string($sastav['id']) && strpos($sastav['id'], 'p') === 0) {
+                $igracId = substr($sastav['id'], 1); // Ukloni 'p' prefiks
+                // Ažuriramo redosled za protivničkog igrača
+                \App\Models\ProtivnickiIgrac::where('id', $igracId)
+                    ->update(['redosled' => $sastav['redosled']]);
+            } else {
+                // Ažuriramo redosled za regularnog igrača u sastavu
+                Sastav::where('id', $sastav['id'])
+                    ->update(['redosled' => $sastav['redosled']]);
+            }
         }
 
         return response()->json(['success' => true]);
