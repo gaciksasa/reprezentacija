@@ -86,25 +86,28 @@ class UtakmiceController extends Controller
    /**
     * Prikaz pojedinog detalja utakmice.
     */
-   public function show($id)
-   {
-       $utakmica = Utakmica::with([
-           'domacin', 
-           'gost', 
-           'sastavi' => function($query) {
+    public function show($id)
+    {
+        $utakmica = Utakmica::with([
+            'domacin', 
+            'gost', 
+            'sastavi' => function($query) {
                 $query->orderBy('redosled')->orderBy('starter', 'desc');
             },
-           'sastavi.igrac', 
-           'golovi.igrac', 
-           'izmene.igracOut', 
-           'izmene.igracIn', 
-           'kartoni.igrac'
-       ])->findOrFail($id);
-
-       $selektor = $utakmica->nasSelector();
-       
-       return view('utakmice.show', compact('utakmica', 'selektor'));
-   }
+            'sastavi.igrac', 
+            'golovi.igrac', 
+            'izmene.igracOut', 
+            'izmene.igracIn', 
+            'kartoni.igrac',
+            'protivnickiIgraci' => function($query) {
+                $query->orderBy('redosled')->orderBy('prezime');
+            }
+        ])->findOrFail($id);
+    
+        $selektor = $utakmica->nasSelector();
+        
+        return view('utakmice.show', compact('utakmica', 'selektor'));
+    }
 
    /**
     * Prikaz forme za izmenu utakmice.
