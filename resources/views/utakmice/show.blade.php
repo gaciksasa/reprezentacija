@@ -52,38 +52,7 @@
         <h5 class="card-title mb-0">Sastavi</h5>
         <a href="{{ route('sastavi.index', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-primary">
             <i class="fas fa-users"></i> Upravljaj sastavima
-        </a> 
-        <!--
-        <div class="btn-group">
-            @php
-                // Dobavi glavni tim (izabrani tim)
-                $glavniTim = \App\Models\Tim::glavniTim()->first();
-                $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
-                
-                // Proveri da li je domaći tim izabrani tim
-                $domaciJeIzabraniTim = $glavniTim && (
-                    $utakmica->domacin_id == $glavniTim->id || 
-                    in_array($utakmica->domacin_id, $glavniTimIds)
-                );
-            @endphp
-
-            @if($domaciJeIzabraniTim)
-                <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Domaćin
-                </a>
-                <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Gost
-                </a>
-            @else
-                <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Domaćin
-                </a>
-                <a href="{{ route('sastavi.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Gost
-                </a>
-            @endif
-        </div>
-        -->   
+        </a>  
     </div>
     @endif
     <div class="card-body">
@@ -914,7 +883,8 @@
                 handle: '.handle',
                 animation: 150,
                 onEnd: function(evt) {
-                    updateSortOrder('domaci', evt.oldIndex, evt.newIndex);
+                    // Direktno pozovemo updateSortOrder nakon što se završi prevlačenje
+                    updateSortOrder('domaci');
                 }
             });
         }
@@ -926,30 +896,42 @@
                 handle: '.handle',
                 animation: 150,
                 onEnd: function(evt) {
-                    updateSortOrder('gostujuci', evt.oldIndex, evt.newIndex);
+                    // Direktno pozovemo updateSortOrder nakon što se završi prevlačenje
+                    updateSortOrder('gostujuci');
                 }
             });
         }
         
-        // Funkcija za ažuriranje redosleda
-        function updateSortOrder(timTip, oldIndex, newIndex) {
+        function updateSortOrder(timTip) {
             const listId = timTip + '-sastav-lista';
-            const items = document.querySelectorAll(`#${listId} .sortable-item`);
-            const sastavi = [];
+            const items = Array.from(document.querySelectorAll(`#${listId} .sortable-item`));
             
-            items.forEach((item, index) => {
-                sastavi.push({
+            // Jasno definisana konverzija u niz objekata sa novim redosledom
+            const sastavi = items.map((item, index) => {
+                return {
                     id: item.dataset.id,
                     redosled: index
-                });
+                };
             });
             
-            // Dodajemo indikator da je u toku ažuriranje
+            console.log('Ažuriranje redosleda', {
+                timTip,
+                sastavi: sastavi
+            });
+            
+            // Indikator za operaciju u toku
             const indicator = document.createElement('div');
             indicator.className = 'alert alert-info position-fixed top-0 start-50 translate-middle-x mt-2';
             indicator.style.zIndex = '9999';
             indicator.innerHTML = 'Ažuriranje redosleda...';
             document.body.appendChild(indicator);
+            
+            // Priprema podataka za slanje
+            const jsonData = {
+                sastavi: sastavi,
+                utakmica_id: {{ $utakmica->id }},
+                tim_tip: timTip
+            };
             
             // Slanje AJAX zahteva za ažuriranje redosleda
             fetch('{{ route("sastavi.updateOrder") }}', {
@@ -958,33 +940,33 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ 
-                    sastavi: sastavi,
-                    utakmica_id: {{ $utakmica->id }},
-                    tim_tip: timTip
-                })
+                body: JSON.stringify(jsonData)
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(err => { throw err; });
+                    throw new Error('Mrežna greška');
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Odgovor sa servera:', data);
+                
                 if (data.success) {
                     indicator.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-2';
                     indicator.innerHTML = 'Redosled uspešno ažuriran';
-                    setTimeout(() => {
-                        indicator.remove();
-                    }, 2000);
                 } else {
                     throw new Error(data.message || 'Nepoznata greška');
                 }
+                
+                setTimeout(() => {
+                    indicator.remove();
+                }, 2000);
             })
             .catch(error => {
                 console.error('Greška pri ažuriranju redosleda:', error);
                 indicator.className = 'alert alert-danger position-fixed top-0 start-50 translate-middle-x mt-2';
                 indicator.innerHTML = `Greška: ${error.message || 'Mrežna greška'}`;
+                
                 setTimeout(() => {
                     indicator.remove();
                 }, 3000);

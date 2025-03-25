@@ -171,4 +171,46 @@ class ProtivnickiIgraciController extends Controller
         return redirect()->route('utakmice.show', $utakmica_id)
             ->with('success', 'Protivnički igrač uspešno obrisan.');
     }
+
+    /**
+     * Ažurira redosled protivničkih igrača.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateOrder(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'protivnicki_igraci' => 'required|array',
+                'protivnicki_igraci.*.id' => 'required|integer',
+                'protivnicki_igraci.*.redosled' => 'required|integer',
+                'utakmica_id' => 'required|integer|exists:utakmice,id',
+                'tim_tip' => 'required|string'
+            ]);
+
+            $utakmica_id = $validated['utakmica_id'];
+            $updatedCount = 0;
+
+            foreach ($request->protivnicki_igraci as $igrac) {
+                $igracModel = ProtivnickiIgrac::find($igrac['id']);
+                
+                if ($igracModel) {
+                    $igracModel->redosled = $igrac['redosled'];
+                    if ($igracModel->save()) {
+                        $updatedCount++;
+                    }
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Redosled protivničkih igrača uspešno ažuriran',
+                'updated' => $updatedCount
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Greška pri ažuriranju redosleda protivničkih igrača: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

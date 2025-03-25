@@ -143,4 +143,5 @@ Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::delete('protivnicki-kartoni/{id}', [ProtivnickiKartoniController::class, 'destroy'])->name('protivnicki-kartoni.destroy');
 
     Route::post('/sastavi/update-order', [SastaviController::class, 'updateOrder'])->name('sastavi.updateOrder');
+    Route::post('/protivnicki-igraci/update-order', [ProtivnickiIgraciController::class, 'updateOrder'])->name('protivnicki-igraci.updateOrder');
 });

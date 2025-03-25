@@ -9,6 +9,7 @@ use App\Models\Igrac;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\ProtivnickiIgraciController;
 
 class SastaviController extends Controller
 {
@@ -192,6 +193,8 @@ class SastaviController extends Controller
     public function updateOrder(Request $request)
     {
         try {
+            \Log::info('Primljeni podaci:', ['request' => $request->all()]);
+            
             $validated = $request->validate([
                 'sastavi' => 'required|array',
                 'sastavi.*.id' => 'required',
@@ -201,40 +204,45 @@ class SastaviController extends Controller
             ]);
 
             $utakmica_id = $validated['utakmica_id'];
-            $success = true;
-
+            $updatedRegular = 0;
+            $updatedOpponent = 0;
+            
             foreach ($request->sastavi as $sastav) {
+                // Provera da li je ID protivničkog igrača (počinje sa 'p')
                 if (is_string($sastav['id']) && strpos($sastav['id'], 'p') === 0) {
-                    // Handle opponent players
                     $igracId = (int)substr($sastav['id'], 1);
                     
+                    // Update protivničkog igrača
                     $igrac = \App\Models\ProtivnickiIgrac::find($igracId);
                     if ($igrac) {
+                        \Log::info("Ažuriranje protivničkog igrača #{$igracId} na redosled {$sastav['redosled']}");
                         $igrac->redosled = $sastav['redosled'];
-                        if (!$igrac->save()) {
-                            $success = false;
-                        }
+                        $igrac->save();
+                        $updatedOpponent++;
                     }
                 } else {
-                    // Handle regular players
+                    // Update regularnog igrača
                     $sastavId = (int)$sastav['id'];
-                    
-                    $sastavObj = \App\Models\Sastav::find($sastavId);
-                    if ($sastavObj) {
-                        $sastavObj->redosled = $sastav['redosled'];
-                        if (!$sastavObj->save()) {
-                            $success = false;
-                        }
+                    $sastavModel = \App\Models\Sastav::find($sastavId);
+                    if ($sastavModel) {
+                        \Log::info("Ažuriranje sastavnog igrača #{$sastavId} na redosled {$sastav['redosled']}");
+                        $sastavModel->redosled = $sastav['redosled'];
+                        $sastavModel->save();
+                        $updatedRegular++;
                     }
                 }
             }
 
             return response()->json([
-                'success' => $success,
-                'message' => $success ? 'Redosled uspešno ažuriran' : 'Došlo je do greške pri ažuriranju'
+                'success' => true,
+                'message' => 'Redosled uspešno ažuriran',
+                'stats' => [
+                    'regular' => $updatedRegular,
+                    'opponent' => $updatedOpponent
+                ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Greška pri ažuriranju redosleda: ' . $e->getMessage());
+            \Log::error('Greška: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
