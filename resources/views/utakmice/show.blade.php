@@ -90,7 +90,7 @@
 
         <!-- Sastavi -->
         <div class="row py-4 align-items-center">
-            <div class="col-4 text-end">
+            <div class="col-5 col-lg-4 text-end">
                 @php
                     $domaciSastav = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)->sortByDesc('starter');
                     $domaciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->domacin_id);
@@ -102,28 +102,26 @@
                     $domacinJeNasTim = in_array($utakmica->domacin_id, $glavniTimIds);
                 @endphp
                 @if($imaDomacihIgraca)
-                    <ul class="list-unstyled" id="domaci-sastav-lista">
+                    <ul class="list-unstyled" id="domaci-sastav-lista" style="text-align: right">
                         @foreach($domaciSastav as $sastav)
                             <li class="py-1 sortable-item" data-id="{{ $sastav->id }}">
                                 @if($sastav->starter)
-                                    <div class="d-flex align-items-center">
-                                        @if(Auth::check() && Auth::user()->hasEditAccess())
-                                        <div class="handle me-2" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
-                                        @endif
+                                    <div class="d-flex align-items-center" style="justify-content: flex-end;">
                                         <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
                                             <span class="text-danger fw-bold">
                                                 {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                                 <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
                                             </span>
                                         </a>
-                                        @if(Auth::check() && Auth::user()->hasEditAccess())                           
-                                            <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
+                                        @if(Auth::check() && Auth::user()->hasEditAccess())
+                                        <div class="handle ms-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>                           
+                                        <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-4">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
                                         @endif
                                     </div>
                                 @endif
@@ -132,23 +130,21 @@
                         
                         @foreach($domaciProtivnickiIgraci->where('u_sastavu', true) as $igrac)
                             <li class="py-1 sortable-item" data-id="p{{ $igrac->id }}">
-                                <div class="d-flex align-items-center">
-                                    @if(Auth::check() && Auth::user()->hasEditAccess())
-                                    <div class="handle me-2" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
-                                    @endif
+                                <div class="d-flex align-items-center" style="justify-content: flex-end;">
                                     <span class="fw-bold">
                                         {{ $igrac->prezime }} {{ $igrac->ime }} 
                                         @if($igrac->kapiten) <small>(C)</small> @endif
                                     </span>
                                     @if(Auth::check() && Auth::user()->hasEditAccess())
-                                        <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-2">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                    @endif
+                                    <div class="handle ms-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
+                                    <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-4">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                    @endif 
                                 </div>
                             </li>
                         @endforeach
@@ -157,8 +153,8 @@
                     <p class="text-center text-muted">Nema evidentiranih igrača za domaći tim.</p>
                 @endif
             </div>
-            <div class="col-4"></div>
-            <div class="col-4">
+            <div class="col-2 col-lg-4"></div>
+            <div class="col-5 col-lg-4">
                 @php
                     $gostujuciSastav = $utakmica->sastavi->where('tim_id', $utakmica->gost_id)->sortByDesc('starter');
                     $gostujuciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->gost_id);
@@ -172,24 +168,21 @@
                                 @if($sastav->starter)
                                     <div class="d-flex align-items-center">
                                         @if(Auth::check() && Auth::user()->hasEditAccess())
-                                        <div class="handle me-2" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
-                                        @endif
-                                        
-                                        <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
-                                            <span class="text-danger fw-bold">
-                                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
-                                                <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
-                                            </span>
-                                        </a>
-                                        @if(Auth::check() && Auth::user()->hasEditAccess())
-                                        <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
+                                        <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline me-4">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
+                                        <div class="handle me-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
                                         @endif
+                                        <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
+                                            <span class="text-danger fw-bold">
+                                                {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
+                                                <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
+                                            </span>
+                                        </a>
                                     </div>
                                 @endif
                             </li>
@@ -199,19 +192,19 @@
                             <li class="py-1 sortable-item" data-id="p{{ $igrac->id }}">
                                 <div class="d-flex align-items-center">
                                     @if(Auth::check() && Auth::user()->hasEditAccess())
-                                    <div class="handle me-2" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
-                                    <span class="fw-bold">
-                                        {{ $igrac->prezime }} {{ $igrac->ime }} 
-                                        @if($igrac->kapiten) <small>(C)</small> @endif
-                                    </span>
-                                    <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline ms-2">
+                                    <form action="{{ route('protivnicki-igraci.destroy', $igrac->id) }}" method="POST" class="d-inline me-4">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </form>
+                                    <div class="handle me-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
                                     @endif
+                                    <span class="fw-bold">
+                                        {{ $igrac->prezime }} {{ $igrac->ime }} 
+                                        @if($igrac->kapiten) <small>(C)</small> @endif
+                                    </span>
                                 </div>
                             </li>
                         @endforeach
@@ -227,7 +220,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Selektor {{ $utakmica->domacin->naziv }}</h5>
+                        <h5 class="card-title mb-0">Selektor</h5>
                         <!-- Dugme za dodavanje selektora domaćeg tima -->
                         @php
                             // Proveri da li je domaćin naš tim
@@ -255,11 +248,6 @@
                     <div class="card-body">
                         @if($domacinJeNasTim && isset($selektor) && $selektor)
                             <div class="d-flex align-items-center">
-                                @if($selektor->selektor->fotografija_path)
-                                    <div class="me-3">
-                                        <img src="{{ asset('storage/' . $selektor->selektor->fotografija_path) }}" alt="{{ $selektor->selektor->ime_prezime }}" class="img-thumbnail" style="max-height: 80px">
-                                    </div>
-                                @endif
                                 <div>
                                     <h5 class="mb-1">
                                         <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
@@ -313,7 +301,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Selektor {{ $utakmica->gost->naziv }}</h5>
+                        <h5 class="card-title mb-0">Selektor</h5>
                         <!-- Dugme za dodavanje selektora gostujućeg tima -->
                         @php
                             // Proveri da li je gost naš tim
@@ -339,11 +327,6 @@
                     <div class="card-body">
                         @if($gostJeNasTim && isset($selektor) && $selektor)
                             <div class="d-flex align-items-center">
-                                @if($selektor->selektor->fotografija_path)
-                                    <div class="me-3">
-                                        <img src="{{ asset('storage/' . $selektor->selektor->fotografija_path) }}" alt="{{ $selektor->selektor->ime_prezime }}" class="img-thumbnail" style="max-height: 80px">
-                                    </div>
-                                @endif
                                 <div>
                                     <h5 class="mb-1">
                                         <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
@@ -473,11 +456,11 @@
                                             <a href="{{ route('igraci.show', $gol->igrac->id) }}" class="text-decoration-none">
                                                 <span class="text-danger fw-bold">
                                                     @if($gol->penal)
-                                                        <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong> (p)
+                                                        {{ $gol->igrac->prezime }} {{ $gol->igrac->ime }} (p)
                                                     @elseif($gol->auto_gol)
-                                                        <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong> (ag)
+                                                        {{ $gol->igrac->prezime }} {{ $gol->igrac->ime }} (ag)
                                                     @else
-                                                        <strong>{{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}</strong>
+                                                        {{ $gol->igrac->prezime }} {{ $gol->igrac->ime }}
                                                     @endif
                                                 </span>
                                             </a>
