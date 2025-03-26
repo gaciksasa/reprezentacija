@@ -133,7 +133,8 @@ class SastaviController extends Controller
 
         Sastav::create($validated);
 
-        return redirect()->route('utakmice.show', $validated['utakmica_id'])
+        // Izmenjeni deo - redirekcija na sastavi umesto na utakmicu
+        return redirect()->route('sastavi.index', ['utakmica_id' => $validated['utakmica_id']])
             ->with('success', 'Igrač uspešno dodat.');
     }
 
@@ -185,8 +186,8 @@ class SastaviController extends Controller
         // Delete the record
         $sastav->delete();
         
-        // Redirect back to match page
-        return redirect()->route('utakmice.show', $utakmica_id)
+        // Redirect back to lineup page instead of match page
+        return redirect()->route('sastavi.index', ['utakmica_id' => $utakmica_id])
             ->with('success', 'Igrač uspešno uklonjen iz sastava.');
     }
 
