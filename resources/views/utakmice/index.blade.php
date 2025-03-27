@@ -23,9 +23,7 @@
                         <th>Domaćin</th>
                         <th>Rezultat</th>
                         <th>Gost</th>
-                        @if(Auth::check() && Auth::user()->hasEditAccess())
                         <th>Akcije</th>
-                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -43,31 +41,30 @@
                             </a>
                         </td>
                         <td class="text-center">
-                            <a href="{{ route('utakmice.show', $utakmica) }}" class="text-decoration-none">
-                                <strong>{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</strong>
-                                @if($utakmica->imao_jedanaesterce)
-                                    <small class="d-block">
-                                        ({{ $utakmica->jedanaesterci_domacin }}-{{ $utakmica->jedanaesterci_gost }} pen)
-                                    </small>
-                                @endif
-                                @if($utakmica->poluvreme_rezultat_domacin !== null && $utakmica->poluvreme_rezultat_gost !== null)
-                                    <small class="text-muted d-block">
-                                        ({{ $utakmica->poluvreme_rezultat_domacin }} - {{ $utakmica->poluvreme_rezultat_gost }})
-                                    </small>
-                                @endif
-                            </a>
+                            <strong>{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</strong>
+                            @if($utakmica->imao_jedanaesterce)
+                                <small class="d-block">
+                                    ({{ $utakmica->jedanaesterci_domacin }}-{{ $utakmica->jedanaesterci_gost }} pen)
+                                </small>
+                            @endif
+                            @if($utakmica->poluvreme_rezultat_domacin !== null && $utakmica->poluvreme_rezultat_gost !== null)
+                                <small class="text-muted d-block">
+                                    ({{ $utakmica->poluvreme_rezultat_domacin }} - {{ $utakmica->poluvreme_rezultat_gost }})
+                                </small>
+                            @endif
                         </td>
                         <td>
                             <a href="{{ route('timovi.show', $utakmica->gost) }}">
                                 {{ $utakmica->gost->naziv }}
                             </a>
                         </td>
-                        @if(Auth::check() && Auth::user()->hasEditAccess())
+                        
                         <td>
                             <div class="btn-group">
                                 <a href="{{ route('utakmice.show', $utakmica) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
                                 </a>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <a href="{{ route('utakmice.edit', $utakmica) }}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -78,10 +75,10 @@
                                 <form id="delete-utakmica-{{ $utakmica->id }}" action="{{ route('utakmice.destroy', $utakmica) }}" method="POST" class="d-none">
                                     @csrf
                                     @method('DELETE')
-                                </form>
+                                </form>@endif
                             </div>
                         </td>
-                        @endif
+                        
                     </tr>
                     @empty
                     <tr>

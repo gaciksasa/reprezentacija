@@ -214,152 +214,136 @@
                 @endif
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Selektori -->
-        <div class="row mb-4">
+<!-- Selektori -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="card-title mb-0">Selektori</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title mb-0">Selektor</h3>
-                        <!-- Dugme za dodavanje selektora domaćeg tima -->
-                        @php
-                            // Proveri da li je domaćin naš tim
-                            $glavniTim = \App\Models\Tim::glavniTim()->first();
-                            $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
-                            $domacinJeNasTim = in_array($utakmica->domacin_id, $nasTimIds);
-                            
-                            // Dohvati selektora protivničkog tima ako postoji
-                            $domacinSelektor = null;
-                            if (!$domacinJeNasTim) {
-                                $domacinSelektor = \App\Models\ProtivnickiSelektor::where('utakmica_id', $utakmica->id)
-                                    ->where('tim_id', $utakmica->domacin_id)
-                                    ->first();
-                            }
-                        @endphp
+                <h3 class="mb-3">{{ $utakmica->domacin->naziv }}</h3>
+                <ul class="list-group">
+                    @php
+                        // Proveri da li je domaćin naš tim
+                        $glavniTim = \App\Models\Tim::glavniTim()->first();
+                        $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+                        $domacinJeNasTim = in_array($utakmica->domacin_id, $nasTimIds);
                         
-                        @if(!$domacinJeNasTim)
-                            @if(Auth::check() && Auth::user()->hasEditAccess())
-                            <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-plus"></i> Dodaj
-                            </a>
-                            @endif
-                        @endif
-                    </div>
-                    <div class="card-body">
-                        @if($domacinJeNasTim && isset($selektor) && $selektor)
-                            <div class="d-flex align-items-center">
-                                <div>
-                                    <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
-                                        <span>{{ $selektor->selektor->ime_prezime }}</span>
-                                    </a>
-                                    @if($selektor->v_d_status)
-                                        <span class="badge bg-warning text-dark">v.d.</span>
-                                    @endif
-                                </div>
-                            </div>
-                        @elseif(!$domacinJeNasTim && $domacinSelektor)
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span>{{ $domacinSelektor->ime_prezime }}</span>
-                                    @if($domacinSelektor->napomena)
-                                        <p class="mb-0 text-muted"><small>{{ $domacinSelektor->napomena }}</small></p>
-                                    @endif
-                                </div>
-                                @if(Auth::check() && Auth::user()->hasEditAccess())
-                                <div class="btn-group">
-                                    <a href="{{ route('protivnicki-selektori.edit', $domacinSelektor->id) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ url('protivnicki-selektori/'.$domacinSelektor->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
-
-                                </div>
+                        // Dohvati selektora protivničkog tima ako postoji
+                        $domacinSelektor = null;
+                        if (!$domacinJeNasTim) {
+                            $domacinSelektor = \App\Models\ProtivnickiSelektor::where('utakmica_id', $utakmica->id)
+                                ->where('tim_id', $utakmica->domacin_id)
+                                ->first();
+                        }
+                    @endphp
+                    
+                    <li class="list-group-item d-flex justify-content-between align-items-center border-0">
+                        <div>
+                            @if($domacinJeNasTim && isset($selektor) && $selektor)
+                                <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
+                                    <span>{{ $selektor->selektor->ime_prezime }}</span>
+                                </a>
+                                @if($selektor->v_d_status)
+                                    <span class="badge bg-warning text-dark">v.d.</span>
                                 @endif
+                            @elseif(!$domacinJeNasTim && $domacinSelektor)
+                                <span>{{ $domacinSelektor->ime_prezime }}</span>
+                                @if($domacinSelektor->napomena)
+                                    <small class="text-muted d-block">{{ $domacinSelektor->napomena }}</small>
+                                @endif
+                            @elseif(isset($selektorIme) && $selektorIme)
+                                <span>{{ $selektorIme }}</span>
+                            @else
+                                <span class="text-muted">Nema podataka o selektoru</span>
+                            @endif
+                        </div>
+                        <div>
+                            @if(!$domacinJeNasTim && $domacinSelektor && Auth::check() && Auth::user()->hasEditAccess())
+                            <div class="btn-group">
+                                <a href="{{ route('protivnicki-selektori.edit', $domacinSelektor->id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url('protivnicki-selektori/'.$domacinSelektor->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
                             </div>
-                        @elseif(isset($selektorIme) && $selektorIme)
-                            <p class="mb-0">{{ $selektorIme }}</p>
-                        @else
-                            <p class="text-muted mb-0">Nema podataka o selektoru</p>
-                        @endif
-                    </div>
-                </div>
+                            @elseif(!$domacinJeNasTim && Auth::check() && Auth::user()->hasEditAccess())
+                                <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus"></i> Dodaj
+                                </a>
+                            @endif
+                        </div>
+                    </li>
+                </ul>
             </div>
             
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title mb-0">Selektor</h3>
-                        <!-- Dugme za dodavanje selektora gostujućeg tima -->
-                        @php
-                            // Proveri da li je gost naš tim
-                            $gostJeNasTim = in_array($utakmica->gost_id, $nasTimIds);
-                            
-                            // Dohvati selektora protivničkog tima ako postoji
-                            $gostSelektor = null;
-                            if (!$gostJeNasTim) {
-                                $gostSelektor = \App\Models\ProtivnickiSelektor::where('utakmica_id', $utakmica->id)
-                                    ->where('tim_id', $utakmica->gost_id)
-                                    ->first();
-                            }
-                        @endphp
+                <h3 class="mb-3">{{ $utakmica->gost->naziv }}</h3>
+                <ul class="list-group">
+                    @php
+                        // Proveri da li je gost naš tim
+                        $gostJeNasTim = in_array($utakmica->gost_id, $nasTimIds);
                         
-                        @if(!$gostJeNasTim)
-                            @if(Auth::check() && Auth::user()->hasEditAccess())
-                            <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-plus"></i> Dodaj
-                            </a>
-                            @endif
-                        @endif
-                    </div>
-                    <div class="card-body">
-                        @if($gostJeNasTim && isset($selektor) && $selektor)
-                            <div class="d-flex align-items-center">
-                                <div>
-                                    <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
-                                        <span>{{ $selektor->selektor->ime_prezime }}</span>
-                                    </a>
-                                    @if($selektor->v_d_status)
-                                        <span class="badge bg-warning text-dark">v.d.</span>
-                                    @endif
-                                </div>
-                            </div>
-                        @elseif(!$gostJeNasTim && $gostSelektor)
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span>{{ $gostSelektor->ime_prezime }}</span>
-                                    @if($gostSelektor->napomena)
-                                        <p class="mb-0 text-muted"><small>{{ $gostSelektor->napomena }}</small></p>
-                                    @endif
-                                </div>
-                                @if(Auth::check() && Auth::user()->hasEditAccess())
-                                <div class="btn-group">
-                                    <a href="{{ route('protivnicki-selektori.edit', $gostSelektor->id) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    @if(Auth::check() && Auth::user()->hasEditAccess())
-                                    <form action="{{ url('protivnicki-selektori/'.$gostSelektor->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
-                                    @endif
-                                </div>
+                        // Dohvati selektora protivničkog tima ako postoji
+                        $gostSelektor = null;
+                        if (!$gostJeNasTim) {
+                            $gostSelektor = \App\Models\ProtivnickiSelektor::where('utakmica_id', $utakmica->id)
+                                ->where('tim_id', $utakmica->gost_id)
+                                ->first();
+                        }
+                    @endphp
+                    
+                    <li class="list-group-item d-flex justify-content-between align-items-center border-0">
+                        <div>
+                            @if($gostJeNasTim && isset($selektor) && $selektor)
+                                <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
+                                    <span>{{ $selektor->selektor->ime_prezime }}</span>
+                                </a>
+                                @if($selektor->v_d_status)
+                                    <span class="badge bg-warning text-dark">v.d.</span>
                                 @endif
+                            @elseif(!$gostJeNasTim && $gostSelektor)
+                                <span>{{ $gostSelektor->ime_prezime }}</span>
+                                @if($gostSelektor->napomena)
+                                    <small class="text-muted d-block">{{ $gostSelektor->napomena }}</small>
+                                @endif
+                            @elseif(isset($selektorIme) && $selektorIme)
+                                <span>{{ $selektorIme }}</span>
+                            @else
+                                <span class="text-muted">Nema podataka o selektoru</span>
+                            @endif
+                        </div>
+                        <div>
+                            @if(!$gostJeNasTim && $gostSelektor && Auth::check() && Auth::user()->hasEditAccess())
+                            <div class="btn-group">
+                                <a href="{{ route('protivnicki-selektori.edit', $gostSelektor->id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url('protivnicki-selektori/'.$gostSelektor->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
                             </div>
-                        @elseif(isset($selektorIme) && $selektorIme)
-                            <p class="mb-0">{{ $selektorIme }}</p>
-                        @else
-                            <p class="text-muted mb-0">Nema podataka o selektoru</p>
-                        @endif
-                    </div>
-                </div>
+                            @elseif(!$gostJeNasTim && Auth::check() && Auth::user()->hasEditAccess())
+                                <a href="{{ route('protivnicki-selektori.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->gost_id]) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus"></i> Dodaj
+                                </a>
+                            @endif
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
