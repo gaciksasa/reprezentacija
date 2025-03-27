@@ -249,24 +249,18 @@
                         @if($domacinJeNasTim && isset($selektor) && $selektor)
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <h5 class="mb-1">
-                                        <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
-                                            <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
-                                        </a>
-                                        @if($selektor->v_d_status)
-                                            <span class="badge bg-warning text-dark">v.d.</span>
-                                        @endif
-                                    </h5>
-                                    <p class="mb-0 text-muted">
-                                        <small>Period: {{ $selektor->pocetak_mandata->format('d.m.Y') }} - 
-                                        {{ $selektor->kraj_mandata ? $selektor->kraj_mandata->format('d.m.Y') : 'danas' }}</small>
-                                    </p>
+                                    <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
+                                        <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
+                                    </a>
+                                    @if($selektor->v_d_status)
+                                        <span class="badge bg-warning text-dark">v.d.</span>
+                                    @endif
                                 </div>
                             </div>
                         @elseif(!$domacinJeNasTim && $domacinSelektor)
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h5 class="mb-1">{{ $domacinSelektor->ime_prezime }}</h5>
+                                    <span class="fw-bold">{{ $domacinSelektor->ime_prezime }}</span>
                                     @if($domacinSelektor->napomena)
                                         <p class="mb-0 text-muted"><small>{{ $domacinSelektor->napomena }}</small></p>
                                     @endif
@@ -276,16 +270,14 @@
                                     <a href="{{ route('protivnicki-selektori.edit', $domacinSelektor->id) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger" 
-                                            onclick="document.getElementById('delete-selektor-{{ $domacinSelektor->id }}').submit()">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <form id="delete-selektor-{{ $domacinSelektor->id }}" 
-                                          action="{{ route('protivnicki-selektori.destroy', $domacinSelektor->id) }}" 
-                                          method="POST" class="d-none">
+                                    <form action="{{ url('protivnicki-selektori/'.$domacinSelektor->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </form>
+
                                 </div>
                                 @endif
                             </div>
@@ -328,24 +320,18 @@
                         @if($gostJeNasTim && isset($selektor) && $selektor)
                             <div class="d-flex align-items-center">
                                 <div>
-                                    <h5 class="mb-1">
-                                        <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
-                                            <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
-                                        </a>
-                                        @if($selektor->v_d_status)
-                                            <span class="badge bg-warning text-dark">v.d.</span>
-                                        @endif
-                                    </h5>
-                                    <p class="mb-0 text-muted">
-                                        <small>Period: {{ $selektor->pocetak_mandata->format('d.m.Y') }} - 
-                                        {{ $selektor->kraj_mandata ? $selektor->kraj_mandata->format('d.m.Y') : 'danas' }}</small>
-                                    </p>
+                                    <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
+                                        <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
+                                    </a>
+                                    @if($selektor->v_d_status)
+                                        <span class="badge bg-warning text-dark">v.d.</span>
+                                    @endif
                                 </div>
                             </div>
                         @elseif(!$gostJeNasTim && $gostSelektor)
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h5 class="mb-1">{{ $gostSelektor->ime_prezime }}</h5>
+                                    <span class="fw-bold">{{ $gostSelektor->ime_prezime }}</span>
                                     @if($gostSelektor->napomena)
                                         <p class="mb-0 text-muted"><small>{{ $gostSelektor->napomena }}</small></p>
                                     @endif
@@ -355,12 +341,8 @@
                                     <a href="{{ route('protivnicki-selektori.edit', $gostSelektor->id) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger" 
-                                            onclick="document.getElementById('delete-selektor-{{ $gostSelektor->id }}').submit()">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
                                     @if(Auth::check() && Auth::user()->hasEditAccess())
-                                    <form action="{{ url('protivnicki-igraci/'.$igrac->id) }}" method="POST">
+                                    <form action="{{ url('protivnicki-selektori/'.$gostSelektor->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
