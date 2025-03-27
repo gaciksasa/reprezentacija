@@ -41,7 +41,7 @@
     </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary text-light mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary text-light mb-4 py-4">
         <div class="container">
             <a class="navbar-brand h2 text-light mb-0" href="{{ route('dashboard') }}">Reprezentacija</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

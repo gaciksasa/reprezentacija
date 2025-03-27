@@ -19,7 +19,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <div class="card mb-4">
+        <div class="card mb-4 border-0">
             <div class="card-header">
                 <h5 class="card-title mb-0">Osnovni podaci</h5>
             </div>
