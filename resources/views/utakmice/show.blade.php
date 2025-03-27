@@ -4,13 +4,13 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3>
+    <h2>
         <td>
             @if($utakmica->takmicenje)
                 {{ $utakmica->takmicenje->naziv }}
             @endif
         </td>
-    </h3>
+    </h2>
     <div>
         @if(Auth::check() && Auth::user()->hasEditAccess())
         <a href="{{ route('utakmice.edit', $utakmica) }}" class="btn btn-warning">
@@ -49,7 +49,7 @@
 <div class="card mb-4">
     @if(Auth::check() && Auth::user()->hasEditAccess())
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Sastavi</h5>
+        <h2 class="card-title mb-0">Sastavi</h2>
         <a href="{{ route('sastavi.index', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-primary">
             <i class="fas fa-users"></i> Upravljaj sastavima
         </a>  
@@ -62,7 +62,7 @@
                     @if($utakmica->domacin && $utakmica->domacin->grb_url)
                         <img src="{{ asset('storage/grbovi/' . $utakmica->domacin->grb_url) }}" alt="{{ $utakmica->domacin->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
                     @endif
-                    <h4><span class="text-danger fw-bold">{{ $utakmica->domacin->naziv }}</span></h4>
+                    <h1>{{ $utakmica->domacin->naziv }}</h1>
                 </a>
             </div>
             <div class="col-4 text-center">
@@ -83,7 +83,7 @@
                     @if($utakmica->gost && $utakmica->gost->grb_url)
                         <img src="{{ asset('storage/grbovi/' . $utakmica->gost->grb_url) }}" alt="{{ $utakmica->gost->naziv }}" class="img-fluid mb-2" style="max-height: 100px;">
                     @endif
-                    <h4><span class="text-danger fw-bold">{{ $utakmica->gost->naziv }}</span></h4>
+                    <h1>{{ $utakmica->gost->naziv }}</h1>
                 </a>
             </div>
         </div>
@@ -108,7 +108,7 @@
                                 @if($sastav->starter)
                                     <div class="d-flex align-items-center" style="justify-content: flex-end;">
                                         <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
-                                            <span class="text-danger fw-bold">
+                                            <span>
                                                 {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                                 <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
                                             </span>
@@ -131,7 +131,7 @@
                         @foreach($domaciProtivnickiIgraci->where('u_sastavu', true) as $igrac)
                             <li class="py-1 sortable-item" data-id="p{{ $igrac->id }}">
                                 <div class="d-flex align-items-center" style="justify-content: flex-end;">
-                                    <span class="fw-bold">
+                                    <span>
                                         {{ $igrac->prezime }} {{ $igrac->ime }} 
                                         @if($igrac->kapiten) <small>(C)</small> @endif
                                     </span>
@@ -178,7 +178,7 @@
                                         <div class="handle me-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
                                         @endif
                                         <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
-                                            <span class="text-danger fw-bold">
+                                            <span>
                                                 {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                                 <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
                                             </span>
@@ -201,7 +201,7 @@
                                     </form>
                                     <div class="handle me-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
                                     @endif
-                                    <span class="fw-bold">
+                                    <span>
                                         {{ $igrac->prezime }} {{ $igrac->ime }} 
                                         @if($igrac->kapiten) <small>(C)</small> @endif
                                     </span>
@@ -220,7 +220,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Selektor</h5>
+                        <h3 class="card-title mb-0">Selektor</h3>
                         <!-- Dugme za dodavanje selektora domaćeg tima -->
                         @php
                             // Proveri da li je domaćin naš tim
@@ -250,7 +250,7 @@
                             <div class="d-flex align-items-center">
                                 <div>
                                     <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
-                                        <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
+                                        <span>{{ $selektor->selektor->ime_prezime }}</span>
                                     </a>
                                     @if($selektor->v_d_status)
                                         <span class="badge bg-warning text-dark">v.d.</span>
@@ -260,7 +260,7 @@
                         @elseif(!$domacinJeNasTim && $domacinSelektor)
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="fw-bold">{{ $domacinSelektor->ime_prezime }}</span>
+                                    <span>{{ $domacinSelektor->ime_prezime }}</span>
                                     @if($domacinSelektor->napomena)
                                         <p class="mb-0 text-muted"><small>{{ $domacinSelektor->napomena }}</small></p>
                                     @endif
@@ -293,7 +293,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Selektor</h5>
+                        <h3 class="card-title mb-0">Selektor</h3>
                         <!-- Dugme za dodavanje selektora gostujućeg tima -->
                         @php
                             // Proveri da li je gost naš tim
@@ -321,7 +321,7 @@
                             <div class="d-flex align-items-center">
                                 <div>
                                     <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
-                                        <span class="text-danger fw-bold">{{ $selektor->selektor->ime_prezime }}</span>
+                                        <span>{{ $selektor->selektor->ime_prezime }}</span>
                                     </a>
                                     @if($selektor->v_d_status)
                                         <span class="badge bg-warning text-dark">v.d.</span>
@@ -331,7 +331,7 @@
                         @elseif(!$gostJeNasTim && $gostSelektor)
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="fw-bold">{{ $gostSelektor->ime_prezime }}</span>
+                                    <span>{{ $gostSelektor->ime_prezime }}</span>
                                     @if($gostSelektor->napomena)
                                         <p class="mb-0 text-muted"><small>{{ $gostSelektor->napomena }}</small></p>
                                     @endif
@@ -368,7 +368,7 @@
 <!-- Golovi -->
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Golovi</h5>
+        <h2 class="card-title mb-0">Golovi</h2>
         @if(Auth::check() && Auth::user()->hasEditAccess())
         <a href="{{ route('golovi.create', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i> Dodaj
@@ -379,7 +379,7 @@
         @if($utakmica->golovi->count() > 0)
             <div class="row">
                 <div class="col-md-6">
-                    <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
+                    <h3 class="mb-3">{{ $utakmica->domacin->naziv }}</h3>
                     <ul class="list-group">
                     @php
                         // Predračunaj trenutni rezultat za svaki gol
@@ -423,20 +423,20 @@
                                         @endphp
                                         @if($protivnickiIgrac)
                                             @if($gol->penal)
-                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong> (p)
+                                                <span>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</span> (p)
                                             @elseif($gol->auto_gol)
-                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong> (ag)
+                                                <span>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</span> (ag)
                                             @else
-                                                <strong>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</strong>
+                                                <span>{{ $protivnickiIgrac->prezime }} {{ $protivnickiIgrac->ime }}</span>
                                             @endif
                                         @else
-                                            <strong>Nepoznat igrač</strong>
+                                            <span>Nepoznat igrač</span>
                                         @endif
                                     @else
                                         {{-- Prikazujemo regularnog igrača --}}
                                         @if($gol->igrac)
                                             <a href="{{ route('igraci.show', $gol->igrac->id) }}" class="text-decoration-none">
-                                                <span class="text-danger fw-bold">
+                                                <span>
                                                     @if($gol->penal)
                                                         {{ $gol->igrac->prezime }} {{ $gol->igrac->ime }} (p)
                                                     @elseif($gol->auto_gol)
@@ -447,7 +447,7 @@
                                                 </span>
                                             </a>
                                         @else
-                                            <strong>Nepoznat igrač</strong>
+                                            <span>Nepoznat igrač</span>
                                         @endif
                                     @endif
                                 </div>
@@ -469,7 +469,7 @@
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
+                    <h3 class="mb-3">{{ $utakmica->gost->naziv }}</h3>
                     <ul class="list-group">
                     {{-- Golovi gostujućeg tima i autogolovi gostujućeg tima --}}
                     @foreach($utakmica->golovi->sortBy('minut') as $gol)
@@ -535,7 +535,7 @@
 <!-- Izmene -->
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Izmene</h5>
+        <h2 class="card-title mb-0">Izmene</h2>
         @if(Auth::check() && Auth::user()->hasEditAccess())
         <div class="btn-group">
             <a href="{{ route('izmene.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $utakmica->domacin_id]) }}" class="btn btn-sm btn-primary">
@@ -560,7 +560,7 @@
         @if($sveIzmene->count() > 0)
             <div class="row">
                 <div class="col-md-6">
-                    <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
+                    <h3 class="mb-3">{{ $utakmica->domacin->naziv }}</h3>
                     <ul class="list-group">
                         @foreach($domaceIzmene as $izmena)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -600,7 +600,7 @@
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
+                    <h3 class="mb-3">{{ $utakmica->gost->naziv }}</h3>
                     <ul class="list-group">
                         @foreach($gostujuceIzmene as $izmena)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -649,7 +649,7 @@
 <!-- Kartoni -->
 <div class="card mb-4">
    <div class="card-header d-flex justify-content-between align-items-center">
-       <h5 class="card-title mb-0">Kartoni</h5>
+       <h2 class="card-title mb-0">Kartoni</h2>
        <div class="btn-group">
            @php
                // Proveri da li je domaćin naš tim
@@ -696,7 +696,7 @@
        @if($utakmica->kartoni->count() > 0 || $utakmica->protivnickiKartoni->count() > 0)
            <div class="row">
                <div class="col-md-6">
-                   <h6 class="mb-3">{{ $utakmica->domacin->naziv }}</h6>
+                   <h3 class="mb-3">{{ $utakmica->domacin->naziv }}</h3>
                    <ul class="list-group">
                        <!-- Regulatni kartoni -->
                        @foreach($domaciKartoni as $karton)
@@ -763,7 +763,7 @@
                    </ul>
                </div>
                <div class="col-md-6">
-                   <h6 class="mb-3">{{ $utakmica->gost->naziv }}</h6>
+                   <h3 class="mb-3">{{ $utakmica->gost->naziv }}</h3>
                    <ul class="list-group">
                        <!-- Regulatni kartoni -->
                        @foreach($gostujuciKartoni as $karton)

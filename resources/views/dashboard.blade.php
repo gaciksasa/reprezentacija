@@ -3,40 +3,30 @@
 @section('title', 'Početna')
 
 @section('content')
-<div class="row">
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-body">
-                <h1 class="card-title">Dobrodošli na sajt fudbalske reprezentacije Srbije</h1>
-                <p class="card-text">Baza podataka utakmica i igrača reprezentacije.</p>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-4 mb-4">
-        <div class="card bg-primary text-white">
+        <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title">Bilansi</h5>
+                <h2 class="card-title">Bilansi</h2>
                 <p class="display-4">{{ $brojTimova }}</p>
                 <a href="{{ route('timovi.index') }}" class="btn btn-light">Prikaži sve</a>
             </div>
         </div>
     </div>
     <div class="col-md-4 mb-4">
-        <div class="card bg-success text-white">
+        <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title">Reprezentativci</h5>
+                <h2 class="card-title">Reprezentativci</h2>
                 <p class="display-4">{{ $brojIgraca }}</p>
                 <a href="{{ route('igraci.index') }}" class="btn btn-light">Prikaži sve</a>
             </div>
         </div>
     </div>
     <div class="col-md-4 mb-4">
-        <div class="card bg-info text-white">
+        <div class="card">
             <div class="card-body text-center">
-                <h5 class="card-title">Utakmice</h5>
+                <h2 class="card-title">Utakmice</h2>
                 <p class="display-4">{{ $brojUtakmica }}</p>
                 <a href="{{ route('utakmice.index') }}" class="btn btn-light">Prikaži sve</a>
             </div>
@@ -48,7 +38,7 @@
     <div class="col-md-6 mb-4">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Poslednje utakmice</h5>
+                <h2 class="card-title mb-0">Poslednje utakmice</h2>
             </div>
             <div class="card-body">
                 <div class="list-group">
@@ -80,7 +70,7 @@
     <div class="col-md-6 mb-4">
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">Najbolji strelci</h5>
+                <h2 class="card-title mb-0">Najbolji strelci</h2>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -108,7 +98,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Najviše nastupa</h5>
+                <h2 class="card-title mb-0">Najviše nastupa</h2>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
