@@ -139,8 +139,8 @@
 
 <div class="mt-4">
     <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-            <h5 class="card-title mb-0">Trenutni rezultat: {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</h5>
+        <div class="card-header">
+            <h2 class="card-title mb-0">Trenutni rezultat: {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</h2>
         </div>
         <div class="card-body">
             <div class="alert alert-info">

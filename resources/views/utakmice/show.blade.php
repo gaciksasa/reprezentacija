@@ -432,6 +432,15 @@
                             @foreach($gostujuciGolovi as $gol)
                                 <li class="py-1">
                                     <div class="d-flex">
+                                        @if(Auth::check() && Auth::user()->hasEditAccess())
+                                        <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline me-2">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                        @endif
                                         <div>
                                             <span class="text-muted">{{ $gol->minut }}' </span>
                                             @if($gol->igrac_tip == 'protivnicki')
@@ -467,15 +476,6 @@
                                                 @endif
                                             @endif
                                         </div>
-                                        @if(Auth::check() && Auth::user()->hasEditAccess())
-                                        <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline ms-2">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                        @endif
                                     </div>
                                 </li>
                             @endforeach
