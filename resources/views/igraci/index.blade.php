@@ -91,7 +91,7 @@
                         <tr>
                             <td>
                                 <a href="{{ route('igraci.show', $igrac) }}" class="text-decoration-none">
-                                    <span class="text-danger fw-bold">{{ $igrac->prezime }} {{ $igrac->ime }}</span>
+                                    <span class="text-player">{{ $igrac->prezime }} {{ $igrac->ime }}</span>
                                 </a>
                             </td>
                             <td>{{ $period }} @if($igrac->aktivan)
@@ -206,9 +206,9 @@
                 // Prolazi kroz sve redove
                 igraciRedovi.forEach(red => {
                     // Proveri da li je prvi red koji ima prezime
-                    if (red.querySelector('td:first-child a .text-danger')) {
+                    if (red.querySelector('td:first-child a .text-player')) {
                         // Dohvati tekst prezimena
-                        const prezimeTekst = red.querySelector('td:first-child a .text-danger').textContent;
+                        const prezimeTekst = red.querySelector('td:first-child a .text-player').textContent;
                         // Izdvoji prezime (pre razmaka)
                         const prezime = prezimeTekst.split(' ')[0];
                         

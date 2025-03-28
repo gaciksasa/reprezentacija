@@ -21,7 +21,7 @@
     <div class="col-md-4 mb-4">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Osnovni podaci</h5>
+                <h2 class="card-title mb-0">Osnovni podaci</h2>
             </div>
             <div class="card-body">
                 @if($selektor->fotografija_path)
@@ -76,7 +76,7 @@
         <!-- Ukupna statistika -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">Ukupna statistika</h5>
+                <h2 class="card-title mb-0">Ukupna statistika</h2>
             </div>
             <div class="card-body">
                 @php
@@ -127,7 +127,7 @@
             @if($selektor->biografija)
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Biografija</h5>
+                        <h2 class="card-title mb-0">Biografija</h2>
                     </div>
                     <div class="card-body">
                         {!! $selektor->biografija !!}
@@ -136,7 +136,7 @@
             @endif
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Mandati</h5>
+                <h2 class="card-title mb-0">Mandati</h2>
                 @if(Auth::check() && Auth::user()->hasEditAccess())
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMandatModal">
                     <i class="fas fa-plus"></i> Dodaj mandat
@@ -149,7 +149,6 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Tim</th>
                                     <th>Period</th>
                                     <th>Utakmice</th>
                                     <th>Učinak</th>
@@ -164,7 +163,6 @@
                                     $statistika = $mandat->statistika;
                                 @endphp
                                 <tr>
-                                    <td>{{ $mandat->tim->naziv }}</td>
                                     <td>
                                         {{ $mandat->pocetak_mandata->format('d.m.Y') }} - 
                                         {{ $mandat->kraj_mandata ? $mandat->kraj_mandata->format('d.m.Y') : 'danas' }}
@@ -216,7 +214,7 @@
         <!-- Utakmice po mandatima -->
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Utakmice</h5>
+                <h2 class="card-title mb-0">Utakmice</h2>
             </div>
             <div class="card-body">
                 @php
@@ -239,7 +237,7 @@
                                     <th>Domaćin</th>
                                     <th>Rezultat</th>
                                     <th>Gost</th>
-                                    <th>Takmičenje</th>
+                                    <th class="d-none d-lg-table-cell">Takmičenje</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -259,7 +257,7 @@
                                         </a>
                                     </td>
                                     <td>{{ $gost->naziv ?? 'Nepoznat' }}</td>
-                                    <td>{{ $takmicenje->naziv ?? 'Nepoznato' }}</td>
+                                    <td class="d-none d-lg-table-cell">{{ $takmicenje->naziv ?? 'Nepoznato' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

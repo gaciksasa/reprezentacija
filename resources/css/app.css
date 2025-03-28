@@ -57,7 +57,7 @@
 body {
     margin: 0;
     font-family: "Roboto",sans-serif;
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 400;
     line-height: 1.5;
     color: #878d97;
@@ -1859,7 +1859,8 @@ progress {
     padding: .5rem .5rem;
     background-color: var(--bs-table-bg);
     border-bottom-width: 1px;
-    box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg)
+    box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg);
+    color: var(--bs-table-color);
 }
 
 .table>tbody {
@@ -2853,7 +2854,7 @@ textarea.form-control-lg {
 
 .btn-check:focus+.btn,.btn:focus {
     outline: 0;
-    box-shadow: 0 0 0 .25rem rgba(200,0,54,.25)
+    /* box-shadow: 0 0 0 .25rem rgba(200,0,54,.25) */
 }
 
 .btn:disabled,.btn.disabled,fieldset:disabled .btn {
@@ -2877,7 +2878,7 @@ textarea.form-control-lg {
     color: #fff;
     background-color: #aa002e;
     border-color: #a0002b;
-    box-shadow: 0 0 0 .25rem rgba(208,38,84,.5)
+    /* box-shadow: 0 0 0 .25rem rgba(208,38,84,.5)*/
 }
 
 .btn-check:checked+.btn-primary,.btn-check:active+.btn-primary,.btn-primary:active,.btn-primary.active,.show>.btn-primary.dropdown-toggle {
@@ -3182,9 +3183,9 @@ textarea.form-control-lg {
     border-color: #6c757d
 }
 
-.btn-check:focus+.btn-outline-secondary,.btn-outline-secondary:focus {
+/*.btn-check:focus+.btn-outline-secondary,.btn-outline-secondary:focus {
     box-shadow: 0 0 0 .25rem rgba(108,117,125,.5)
-}
+}*/
 
 .btn-check:checked+.btn-outline-secondary,.btn-check:active+.btn-outline-secondary,.btn-outline-secondary:active,.btn-outline-secondary.active,.btn-outline-secondary.dropdown-toggle.show {
     color: #fff;
@@ -3940,9 +3941,10 @@ textarea.form-control-lg {
 }
 
 .card-header {
-    padding: .5rem 1rem;
+    padding: .5rem 0;
     margin-bottom: 0;
-    border-bottom: 5px solid rgb(33, 37, 41)
+    border-bottom: 5px solid rgb(33, 37, 41);
+    background: none;
 }
 
 .card-header:first-child {
@@ -11594,7 +11596,7 @@ a:hover, .nav-link:hover {
     color: var(--bs-white);
     transition: 0.5s;
     z-index: 999;
-    transform: skew(18deg);
+    transform: skew(10deg);
 }
 
 .back-to-top a i {
@@ -11652,8 +11654,9 @@ a:hover, .nav-link:hover {
 .btn.btn-primary {
     color: var(--bs-white);
     border: none;
-    transform: skew(18deg);
+    transform: skew(10deg);
     transition: 0.5s;
+    border: solid 1px var(--bs-primary);
 }
 
 .btn.btn-primary span,
@@ -11665,13 +11668,12 @@ a:hover, .nav-link:hover {
 .btn.btn-primary:hover {
     background: var(--bs-white);
     color: var(--bs-dark);
-
 }
 
 .btn.btn-light {
     color: var(--bs-primary);
     border: none;
-    transform: skew(18deg);
+    transform: skew(10deg);
     transition: 0.5s;
 }
 
@@ -11690,7 +11692,7 @@ a:hover, .nav-link:hover {
 .btn.btn-dark {
     color: var(--bs-primary);
     border: none;
-    transform: skew(18deg);
+    transform: skew(10deg);
     transition: 0.5s;
 }
 
@@ -11735,7 +11737,7 @@ a:hover, .nav-link:hover {
     top: 0;
     right: -1px;
     background: var(--bs-primary);
-    transform: skew(18deg);
+    transform: skew(10deg);
 }
 
 @media (min-width: 992px) {
@@ -11867,7 +11869,7 @@ a:hover, .nav-link:hover {
     position: absolute;
     width: 60px;
     height: 60px;
-    transform: skew(18deg);
+    transform: skew(10deg);
     background: var(--bs-white);
     color: var(--bs-primary);
     font-size: 26px;
@@ -11936,7 +11938,7 @@ a:hover, .nav-link:hover {
     top: 0;
     right: 0;
     margin-right: -200px;
-    transform: skew(18deg);
+    transform: skew(10deg);
     background: rgba(200, 0, 54, .1);
 }
 
@@ -12057,7 +12059,7 @@ a:hover, .nav-link:hover {
     width: 50px;
     height: 50px;
     bottom: -122px;
-    transform: skew(18deg);
+    transform: skew(10deg);
     background: var(--bs-dark);
     color: var(--bs-white);
     font-size: 26px;
@@ -12267,7 +12269,7 @@ a:hover, .nav-link:hover {
     height: 30px;
     margin: 30px 10px 0 10px;
     background: var(--bs-dark);
-    transform: skew(18deg);
+    transform: skew(10deg);
     transition: 0.5s;
 }
 
@@ -12464,7 +12466,7 @@ a:hover, .nav-link:hover {
     width: 50px;
     height: 50px;
     top: 0;
-    transform: skew(18deg);
+    transform: skew(10deg);
     background: var(--bs-primary);
     color: var(--bs-white);
     font-size: 26px;
