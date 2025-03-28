@@ -21,7 +21,7 @@
     <div class="col-md-4">
         <div class="card mb-4 border-0">
             <div class="card-header">
-                <h5 class="card-title mb-0">Osnovni podaci</h5>
+                <h2 class="card-title mb-0">Osnovni podaci</h2>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -31,7 +31,7 @@
                          class="img-fluid rounded">
                 </div>
                 @else
-                    <div class="bg-light d-flex justify-content-center align-items-center rounded" style="width: 100%;">
+                    <div class="d-flex justify-content-center align-items-center rounded" style="width: 100%;">
                         <i class="fas fa-user fa-5x text-secondary"></i>
                     </div>
                 @endif
@@ -83,7 +83,7 @@
         
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Statistika za reprezentaciju</h5>
+                <h2 class="card-title mb-0">Statistika za reprezentaciju</h2>
             </div>
             <div class="card-body">
                 <div class="row text-center">
@@ -111,7 +111,7 @@
         <!-- Biografija -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">Biografija</h5>
+                <h2 class="card-title mb-0">Biografija</h2>
             </div>
             <div class="card-body">
                 @if($igrac->biografija)    
@@ -289,7 +289,7 @@
         </div>
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Klubovi u karijeri</h5>
+                <h2 class="card-title mb-0">Klubovi u karijeri</h2>
                 @if(Auth::check() && Auth::user()->hasEditAccess())
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addClubModal">
                     <i class="fas fa-plus"></i> Dodaj klub

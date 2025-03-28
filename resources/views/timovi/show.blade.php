@@ -242,10 +242,7 @@
         <!-- Utakmice -->
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title mb-0">Utakmice</h5>
-            </div>
-            <div class="card-body">
-                <ul class="nav nav-tabs" id="utakmiceTab" role="tablist">
+                <ul class="nav nav-tabs card-header-tabs" id="utakmiceTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="sve-tab" data-bs-toggle="tab" data-bs-target="#sve-utakmice" type="button" role="tab">
                             Sve utakmice
@@ -262,7 +259,8 @@
                         </button>
                     </li>
                 </ul>
-
+            </div>
+            <div class="card-body">
                 <div class="tab-content pt-3" id="utakmiceTabContent">
                     <div class="tab-pane fade show active" id="sve-utakmice" role="tabpanel">
                         @php
