@@ -30,7 +30,7 @@
         <!-- Kartica za bilans  -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5 class="card-title mb-0">Bilans</h5>
+                <h2 class="card-title mb-0">Bilans</h2>
             </div>
             <div class="card-body">
                 @php
@@ -190,14 +190,14 @@
                 
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th></th>
-                                <th class="text-center">Ut.</th>
-                                <th class="text-center">Pob</th>
-                                <th class="text-center">Ner</th>
-                                <th class="text-center">Por</th>
-                                <th class="text-center">Gol-raz</th>
+                                <th class="text-center">Ut</th>
+                                <th class="text-center">P</th>
+                                <th class="text-center">N</th>
+                                <th class="text-center">I</th>
+                                <th class="text-center">Gol raz.</th>
                             </tr>
                         </thead>
                         <tbody>
