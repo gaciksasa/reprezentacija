@@ -307,7 +307,9 @@
                             <th>Stepen takmičenja</th>
                             <th>Nastupi</th>
                             <th>Golovi</th>
-                            @if(Auth::check() && Auth::user()->hasEditAccess())<th>Akcije</th>@endif
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
+                            <th>Akcije</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>

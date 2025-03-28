@@ -19,7 +19,7 @@
                 <thead>
                     <tr>
                         <th>Datum</th>
-                        <th>Takmičenje</th>
+                        <th class="d-none d-lg-table-cell">Takmičenje</th>
                         <th>Domaćin</th>
                         <th>Rezultat</th>
                         <th>Gost</th>
@@ -30,7 +30,7 @@
                     @forelse($utakmice as $utakmica)
                     <tr>
                         <td>{{ $utakmica->datum->format('d.m.Y') }}</td>
-                        <td>
+                        <td class="d-none d-lg-table-cell">
                             @if($utakmica->takmicenje)
                                 {{ $utakmica->takmicenje->naziv }}
                             @endif

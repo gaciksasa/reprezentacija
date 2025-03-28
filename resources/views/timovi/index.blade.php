@@ -4,8 +4,8 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Bilans protiv reprezentacija od 1920 do danas</h1>
-    @if(Auth::check() && Auth::user()->is_admin)
+    <h1>Bilansi protiv reprezentacija od 1920 do danas</h1>
+    @if(Auth::check() && Auth::user()->hasEditAccess())
     <a href="{{ route('timovi.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Novi tim
     </a>
@@ -19,18 +19,15 @@
                 <thead>
                     <tr>
                         <th>Država</th>
-                        <th class="text-center">Ut</th>
-                        <th class="text-center">W</th>
-                        <th class="text-center">D</th>
-                        <th class="text-center">L</th>
-                        <th class="text-center">G</th>
-                        <th class="text-center">A</th>
+                        <th class="text-center">U</th>
+                        <th class="text-center">P</th>
+                        <th class="text-center">N</th>
+                        <th class="text-center">I</th>
+                        <th class="text-center">G+</th>
+                        <th class="text-center">G-</th>
                         <th class="text-center">+/-</th>
-                        <th class="text-center">+/m</th>
-                        <th class="text-center">-/m</th>
-                        @if(Auth::check() && Auth::user()->is_admin)
-                        <th class="text-center">Akcije</th>
-                        @endif
+                        <th class="text-center d-none d-lg-table-cell">+/m</th>
+                        <th class="text-center d-none d-lg-table-cell">-/m</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,28 +52,8 @@
                         <td class="text-center {{ $tim->stats['diff'] > 0 ? 'text-success' : ($tim->stats['diff'] < 0 ? 'text-danger' : '') }}">
                             {{ $tim->stats['diff'] > 0 ? '+' : '' }}{{ $tim->stats['diff'] }}
                         </td>
-                        <td class="text-center">{{ $tim->stats['g_per_match'] }}</td>
-                        <td class="text-center">{{ $tim->stats['a_per_match'] }}</td>
-                        @if(Auth::check() && Auth::user()->is_admin)
-                        <td>
-                            <div class="btn-group">
-                                <a href="{{ route('timovi.show', $tim) }}" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('timovi.edit', $tim) }}" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-danger" 
-                                        onclick="document.getElementById('delete-tim-{{ $tim->id }}').submit()">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <form id="delete-tim-{{ $tim->id }}" action="{{ route('timovi.destroy', $tim) }}" method="POST" class="d-none">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                            </div>
-                        </td>
-                        @endif
+                        <td class="text-center d-none d-lg-table-cell">{{ $tim->stats['g_per_match'] }}</td>
+                        <td class="text-center d-none d-lg-table-cell">{{ $tim->stats['a_per_match'] }}</td>
                     </tr>
                     @empty
                     <tr>
