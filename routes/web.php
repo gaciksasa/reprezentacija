@@ -22,7 +22,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 
 use App\Http\Middleware\AdminMiddleware;
-// use App\Http\Middleware\EditorMiddleware;
+use App\Http\Middleware\EditorMiddleware;
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

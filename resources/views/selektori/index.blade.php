@@ -19,7 +19,6 @@
                 <thead>
                     <tr>
                         <th>Selektor</th>
-                        <th>Tim</th>
                         <th>Period</th>
                         <th>Statistika</th>
                         @if(Auth::check() && Auth::user()->hasEditAccess())
@@ -36,13 +35,6 @@
                             </a>
                             @if($selektor->aktivan)
                                 <span class="badge bg-success">Aktivan</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($selektor->prviTim)
-                                {{ $selektor->prviTim->naziv }}
-                            @else
-                                -
                             @endif
                         </td>
                         <td>
