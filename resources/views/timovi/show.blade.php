@@ -18,7 +18,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4 mb-4">
+    <div class="col-lg-4 mb-4">
         <div class="card">
             <div class="card-body text-center">
                 @if($tim->grb_url)
@@ -226,7 +226,7 @@
         </div>
     </div>
 
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <!-- Utakmice -->
         <div class="card">
             <div class="card-header">

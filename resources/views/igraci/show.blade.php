@@ -18,8 +18,8 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4">
-        <div class="card mb-4 border-0">
+    <div class="col-lg-4">
+        <div class="card lg-4 border-0">
             <div class="card-header">
                 <h2 class="card-title mb-0">Osnovni podaci</h2>
             </div>
@@ -107,7 +107,7 @@
             </div>
         </div>
     </div>  
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <!-- Biografija -->
         <div class="card mb-4">
             <div class="card-header">

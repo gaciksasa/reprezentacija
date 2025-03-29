@@ -18,7 +18,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4 mb-4">
+    <div class="col-lg-4 mb-4">
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title mb-0">Osnovni podaci</h2>
@@ -122,7 +122,7 @@
         </div>
     </div>
     
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <!-- Biografija -->
             @if($selektor->biografija)
                 <div class="card mb-4">
