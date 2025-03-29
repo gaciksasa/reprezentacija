@@ -10,6 +10,13 @@
         <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
         </a>
+        <form action="{{ route('posts.destroy', $post) }}" method="POST" class="d-inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Da li ste sigurni da želite obrisati ovaj post?')">
+                <i class="fas fa-trash"></i> Obriši
+            </button>
+        </form>
         @endif
         <a href="{{ route('posts.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Nazad

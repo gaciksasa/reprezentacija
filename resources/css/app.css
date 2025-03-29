@@ -3953,6 +3953,7 @@ textarea.form-control-lg {
 
 .card-footer {
     padding: .5rem 1rem;
+    background: none;
     border: none;
 }
 
