@@ -40,7 +40,7 @@
                 @if($post->categories->count() > 0)
                 <div class="mb-2">
                     @foreach($post->categories as $category)
-                        <a href="{{ route('categories.show', $category) }}" class="badge bg-info text-decoration-none me-1">
+                        <a href="{{ route('categories.show', $category) }}" class="badge bg-primary text-white me-1">
                             {{ $category->name }}
                         </a>
                     @endforeach
