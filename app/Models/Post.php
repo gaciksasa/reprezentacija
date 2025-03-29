@@ -21,6 +21,7 @@ class Post extends Model
         'post_content',
         'post_title',
         'post_excerpt',
+        'featured_image',
         'post_status',
         'post_name',
         'post_modified',
@@ -57,5 +58,17 @@ class Post extends Model
     public function scopeOfType($query, $type)
     {
         return $query->where('post_type', $type);
+    }
+    
+    /**
+     * Get the featured image URL
+     */
+    public function getFeaturedImageUrlAttribute()
+    {
+        if (empty($this->featured_image)) {
+            return asset('img/no-image.png');
+        }
+        
+        return asset('storage/uploads/' . $this->featured_image);
     }
 }

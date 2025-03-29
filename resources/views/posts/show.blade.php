@@ -4,34 +4,43 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>{{ $post->post_title }}</h1>
     <div>
-        @if(Auth::check() && Auth::user()->hasEditAccess())
+        <a href="{{ route('posts.index') }}" class="btn btn-secondary mb-2">
+            <i class="fas fa-arrow-left"></i> Nazad na sve vesti
+        </a>
+        <h1 class="mt-2">{{ $post->post_title }}</h1>
+        <p class="text-muted">Objavljeno: {{ $post->post_date->format('d.m.Y H:i') }}</p>
+    </div>
+    @if(Auth::check() && Auth::user()->hasEditAccess())
+    <div>
         <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
         </a>
-        <form action="{{ route('posts.destroy', $post) }}" method="POST" class="d-inline">
+        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-inline">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Da li ste sigurni da želite obrisati ovaj post?')">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Da li ste sigurni?')">
                 <i class="fas fa-trash"></i> Obriši
             </button>
         </form>
-        @endif
-        <a href="{{ route('posts.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Nazad
-        </a>
     </div>
+    @endif
 </div>
 
-<div class="card mb-4">
+<div class="card">
     <div class="card-body">
-        <div class="mb-3 text-muted">
-            <span><i class="fas fa-calendar"></i> {{ $post->post_date->format('d.m.Y') }}</span>
-            @if($post->author)
-            <span class="ms-3"><i class="fas fa-user"></i> {{ $post->author->name }}</span>
-            @endif
+        @if($post->featured_image)
+        <div class="text-center mb-4">
+            <img src="{{ $post->featured_image_url }}" alt="{{ $post->post_title }}" class="img-fluid rounded" style="max-height: 400px;">
         </div>
+        @endif
+        
+        @if($post->post_excerpt)
+        <div class="lead mb-4">
+            {{ $post->post_excerpt }}
+        </div>
+        <hr>
+        @endif
         
         <div class="post-content">
             {!! $post->post_content !!}

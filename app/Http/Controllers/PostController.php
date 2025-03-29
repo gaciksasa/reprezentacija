@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class PostController extends Controller
@@ -38,6 +39,7 @@ class PostController extends Controller
             'post_excerpt' => 'nullable|string',
             'post_status' => 'required|string|in:publish,draft,pending,private',
             'post_type' => 'required|string|in:post,page,attachment',
+            'featured_image' => 'nullable|image|max:2048', // 2MB max
         ]);
 
         // Generate slug from title
@@ -62,6 +64,14 @@ class PostController extends Controller
         $post->post_type = $validated['post_type'];
         $post->post_name = $slug;
         $post->post_author = Auth::id() ?? 1;
+        
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            $image = $request->file('featured_image');
+            $imageName = $slug . '-' . time() . '.' . $image->extension();
+            $image->storeAs('uploads', $imageName, 'public');
+            $post->featured_image = $imageName;
+        }
         
         // Set all datetime fields
         $post->post_date = $now;
@@ -115,6 +125,7 @@ class PostController extends Controller
             'post_excerpt' => 'nullable|string',
             'post_status' => 'required|string|in:publish,draft,pending,private',
             'post_type' => 'required|string|in:post,page,attachment',
+            'featured_image' => 'nullable|image|max:2048', // 2MB max
         ]);
 
         // Current timestamp for modification dates
@@ -126,6 +137,26 @@ class PostController extends Controller
         $post->post_excerpt = $validated['post_excerpt'] ?? '';
         $post->post_status = $validated['post_status'];
         $post->post_type = $validated['post_type'];
+        
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            // Delete old image if exists
+            if ($post->featured_image) {
+                Storage::disk('public')->delete('uploads/' . $post->featured_image);
+            }
+            
+            // Upload new image
+            $image = $request->file('featured_image');
+            $imageName = $post->post_name . '-' . time() . '.' . $image->extension();
+            $image->storeAs('uploads', $imageName, 'public');
+            $post->featured_image = $imageName;
+        }
+        
+        // Handle image deletion request
+        if ($request->has('delete_featured_image') && $post->featured_image) {
+            Storage::disk('public')->delete('uploads/' . $post->featured_image);
+            $post->featured_image = null;
+        }
         
         // Update modification dates
         $post->post_modified = $now->format('Y-m-d H:i:s');
@@ -143,6 +174,12 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
+        
+        // Delete featured image if exists
+        if ($post->featured_image) {
+            Storage::disk('public')->delete('uploads/' . $post->featured_image);
+        }
+        
         $post->delete();
         return redirect()->route('posts.index')
             ->with('success', 'Post uspešno obrisan.');
