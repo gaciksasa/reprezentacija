@@ -6,22 +6,22 @@
 <!-- News Carousel -->
 <div class="card mb-4">
     <div class="card-body p-0">
-        <div id="newsCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
+        <div id="newsCarousel" class="carousel carousel-dark slide carousel-fade" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 @foreach($poslednjiPostovi as $index => $post)
                     <button type="button" data-bs-target="#newsCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}" aria-current="{{ $index == 0 ? 'true' : 'false' }}" aria-label="Slide {{ $index + 1 }}"></button>
                 @endforeach
             </div>
             <div class="carousel-inner">
-                @foreach($poslednjiPostovi as $index => $post)
-                    <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                        <img src="{{ $post->featured_image ? asset('storage/uploads/' . $post->featured_image) : asset('img/no-image.png') }}" class="d-block w-100" alt="{{ $post->post_title }}" style="max-height: 500px; object-fit: cover;">
-                        <div class="carousel-caption">
-                            <h2><a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a></h2>
-                            <p>{{ Str::limit(strip_tags($post->post_excerpt ?: $post->post_content), 100) }}</p>
-                        </div>
+            @foreach($poslednjiPostovi as $index => $post)
+                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                    <img src="{{ $post->featured_image ? asset('storage/uploads/' . $post->featured_image) : asset('img/no-image.png') }}" class="d-block w-100" alt="{{ $post->post_title }}" style="max-height: 500px; object-fit: cover;">
+                    <div class="carousel-caption">
+                        <h2><a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a></h2>
+                        <p>{{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 150) }}</p>
                     </div>
-                @endforeach
+                </div>
+            @endforeach
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
