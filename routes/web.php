@@ -20,6 +20,7 @@ use App\Http\Controllers\KartoniController;
 use App\Http\Controllers\TimVarijanteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PostController;
 
 // Login routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -74,6 +75,9 @@ Route::put('/selektori/{selektor}', [SelektoriController::class, 'update'])->nam
 Route::delete('/selektori/{selektor}', [SelektoriController::class, 'destroy'])->name('selektori.destroy');
 Route::post('selektori/{selektor}/dodaj-mandat', [SelektoriController::class, 'dodajMandat'])->name('selektori.dodajMandat');
 Route::delete('selektor-mandati/{mandat}', [SelektoriController::class, 'obrisiMandat'])->name('selektori.obrisiMandat');
+
+// CRUD for posts
+Route::resource('posts', PostController::class);
 
 // CRUD for opponent coaches
 Route::resource('protivnicki-selektori', ProtivnickiSelektoriController::class)->except(['index', 'show']);

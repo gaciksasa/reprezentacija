@@ -53,6 +53,9 @@
                         <a class="nav-link" href="{{ route('dashboard') }}">Početna</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('posts.index') }}">Vesti</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('utakmice.index') }}">Utakmice</a>
                     </li>
                     <li class="nav-item">
