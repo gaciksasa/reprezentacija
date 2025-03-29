@@ -31,7 +31,7 @@
     <div class="card-body">
         @if($post->featured_image)
         <div class="text-center mb-4">
-            <img src="{{ $post->featured_image_url }}" alt="{{ $post->post_title }}" class="img-fluid rounded" style="max-height: 400px;">
+            <img src="{{ $post->featured_image_url }}" alt="{{ $post->post_title }}" class="img-fluid rounded" style="width: 100%;">
         </div>
         @endif
         

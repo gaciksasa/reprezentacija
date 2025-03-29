@@ -6,7 +6,7 @@
 <!-- News Carousel -->
 <div class="card mb-4">
     <div class="card-body p-0">
-        <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div id="newsCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 @foreach($poslednjiPostovi as $index => $post)
                     <button type="button" data-bs-target="#newsCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}" aria-current="{{ $index == 0 ? 'true' : 'false' }}" aria-label="Slide {{ $index + 1 }}"></button>
