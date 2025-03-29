@@ -3,6 +3,37 @@
 @section('title', 'Početna')
 
 @section('content')
+<!-- News Carousel -->
+<div class="card mb-4">
+    <div class="card-body p-0">
+        <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                @foreach($poslednjiPostovi as $index => $post)
+                    <button type="button" data-bs-target="#newsCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}" aria-current="{{ $index == 0 ? 'true' : 'false' }}" aria-label="Slide {{ $index + 1 }}"></button>
+                @endforeach
+            </div>
+            <div class="carousel-inner">
+                @foreach($poslednjiPostovi as $index => $post)
+                    <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                        <img src="{{ $post->featured_image ? asset('storage/uploads/' . $post->featured_image) : asset('img/no-image.png') }}" class="d-block w-100" alt="{{ $post->post_title }}" style="max-height: 500px; object-fit: cover;">
+                        <div class="carousel-caption">
+                            <h2><a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a></h2>
+                            <p>{{ Str::limit(strip_tags($post->post_excerpt ?: $post->post_content), 100) }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Prethodni</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Sledeći</span>
+            </button>
+        </div>
+    </div>
+</div>
 
 <div class="row mt-4 mb-3">
     <div class="col-md-4 mb-2">
@@ -111,4 +142,17 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('styles')
+<style>
+.carousel-item {
+    height: 400px;
+}
+.carousel-caption {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 20px;
+}
+</style>
 @endsection
