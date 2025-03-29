@@ -12620,12 +12620,17 @@ a:hover, .nav-link:hover {
 /*** copyright end ***/
 
 .nav-tabs .nav-link {
-    color: var(--bs-primary);
+    color: var(--bs-nav-tabs-link-active-color);
     font-family: "Teko", sans-serif;
     line-height: 1;
-    font-size: 1.75rem;
+    font-size: 2rem;
+    font-weight: 500;
     margin-bottom: -5px;
     padding: 1rem 1.5rem;
+}
+
+.card-header-tabs .nav-link.active {
+    color: var(--bs-primary);
 }
 
 
