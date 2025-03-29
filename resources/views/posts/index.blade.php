@@ -24,29 +24,14 @@
             </div>
             @endif
             <div class="card-body">
-                <h5 class="card-title">{{ $post->post_title }}</h5>
+                <h3 class="card-title"><a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a></h3>
                 <p class="card-text small text-muted">
                     {{ \Carbon\Carbon::parse($post->post_date)->format('d.m.Y H:i') }}
                 </p>
                 <p class="card-text">
                     {{ Str::limit(strip_tags($post->post_excerpt ?: $post->post_content), 150) }}
                 </p>
-                <a href="{{ route('posts.show', $post->id) }}" class="btn btn-primary btn-sm">Pročitaj više</a>
-                
-                @if(Auth::check() && Auth::user()->hasEditAccess())
-                <div class="mt-2">
-                    <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i> Izmeni
-                    </a>
-                    <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni?')">
-                            <i class="fas fa-trash"></i> Obriši
-                        </button>
-                    </form>
-                </div>
-                @endif
+                <a href="{{ route('posts.show', $post->id) }}" class="btn btn-primary btn-md">Detaljnije</a>
             </div>
         </div>
     </div>
