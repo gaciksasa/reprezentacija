@@ -1,88 +1,63 @@
 @extends('layouts.app')
 
-@section('title', 'Objave')
+@section('title', 'Vesti')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Objave</h1>
-    <div>
-        @if(Auth::check() && Auth::user()->hasEditAccess())
-        <a href="{{ route('posts.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nova objava
-        </a>
-        @endif
-    </div>
+    <h1>Vesti</h1>
+    @if(Auth::check() && Auth::user()->hasEditAccess())
+    <a href="{{ route('posts.create') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nova vest
+    </a>
+    @endif
 </div>
 
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Naslov</th>
-                        <th>Status</th>
-                        <th>Tip</th>
-                        <th>Datum</th>
-                        <th>Akcije</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($posts as $post)
-                    <tr>
-                        <td>{{ $post->id }}</td>
-                        <td>
-                            <a href="{{ route('posts.show', $post) }}">
-                                {{ Str::limit($post->post_title, 50) }}
-                            </a>
-                        </td>
-                        <td>
-                            @if($post->post_status == 'publish')
-                                <span class="badge bg-success">Objavljeno</span>
-                            @elseif($post->post_status == 'draft')
-                                <span class="badge bg-warning text-dark">Nacrt</span>
-                            @elseif($post->post_status == 'pending')
-                                <span class="badge bg-info">Na čekanju</span>
-                            @else
-                                <span class="badge bg-secondary">{{ $post->post_status }}</span>
-                            @endif
-                        </td>
-                        <td>{{ $post->post_type }}</td>
-                        <td>{{ $post->post_date ? $post->post_date->format('d.m.Y H:i') : '-' }}</td>
-                        <td>
-                            <div class="btn-group">
-                                <a href="{{ route('posts.show', $post) }}" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                @if(Auth::check() && Auth::user()->hasEditAccess())
-                                <a href="{{ route('posts.edit', $post) }}" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-danger" 
-                                        onclick="document.getElementById('delete-post-{{ $post->id }}').submit()">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <form id="delete-post-{{ $post->id }}" action="{{ route('posts.destroy', $post) }}" method="POST" class="d-none">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
-                                @endif
+        @if($posts->count() > 0)
+            <div class="row">
+                @foreach($posts as $post)
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a>
+                                </h5>
+                                <p class="card-text text-muted">
+                                    <small>{{ $post->post_date->format('d.m.Y') }}</small>
+                                </p>
+                                <p class="card-text">
+                                    {{ $post->post_excerpt ?: Str::limit(strip_tags($post->post_content), 150) }}
+                                </p>
                             </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center">Nema objava u bazi podataka</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="d-flex justify-content-center mt-4">
-            {{ $posts->links() }}
-        </div>
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
+                            <div class="card-footer">
+                                <div class="btn-group w-100">
+                                    <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Izmeni
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            onclick="document.getElementById('delete-post-{{ $post->id }}').submit()">
+                                        <i class="fas fa-trash"></i> Obriši
+                                    </button>
+                                    <form id="delete-post-{{ $post->id }}" action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-none">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            
+            <div class="d-flex justify-content-center mt-4">
+                {{ $posts->links() }}
+            </div>
+        @else
+            <p class="text-center text-muted">Nema objavljenih vesti.</p>
+        @endif
     </div>
 </div>
 @endsection

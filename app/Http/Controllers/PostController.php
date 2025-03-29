@@ -48,7 +48,11 @@ class PostController extends Controller
             $slug = $slug . '-' . ($count + 1);
         }
         
-        // Create the post
+        // Get current date/time for all datetime fields
+        $now = now();
+        $nowGmt = $now->copy()->setTimezone('GMT');
+        
+        // Create the post with all required fields
         $post = new Post();
         $post->post_title = $validated['post_title'];
         $post->post_content = $validated['post_content'];
@@ -57,8 +61,22 @@ class PostController extends Controller
         $post->post_type = $validated['post_type'];
         $post->post_name = $slug;
         $post->post_author = Auth::id() ?? 1;
-        $post->post_date = now();
-        $post->post_modified = now();
+        
+        // Set all datetime fields
+        $post->post_date = $now;
+        $post->post_date_gmt = $nowGmt;
+        $post->post_modified = $now;
+        $post->post_modified_gmt = $nowGmt;
+        
+        // Add the other required fields with default values
+        $post->to_ping = '';
+        $post->pinged = '';
+        $post->post_content_filtered = '';
+        $post->post_parent = 0;
+        $post->guid = '';
+        $post->menu_order = 0;
+        $post->comment_count = 0;
+        
         $post->save();
 
         return redirect()->route('posts.index')
@@ -68,24 +86,28 @@ class PostController extends Controller
     /**
      * Display the specified post.
      */
-    public function show(Post $post)
+    public function show($id)
     {
+        $post = Post::findOrFail($id);
         return view('posts.show', compact('post'));
     }
 
     /**
      * Show the form for editing the specified post.
      */
-    public function edit(Post $post)
+    public function edit($id)
     {
+        $post = Post::findOrFail($id);
         return view('posts.edit', compact('post'));
     }
 
     /**
      * Update the specified post in storage.
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, $id)
     {
+        $post = Post::findOrFail($id);
+        
         $validated = $request->validate([
             'post_title' => 'required|string|max:255',
             'post_content' => 'required|string',
@@ -94,13 +116,20 @@ class PostController extends Controller
             'post_type' => 'required|string|in:post,page,attachment',
         ]);
 
+        // Current timestamp for modification dates
+        $now = Carbon::now();
+
         // Update the post with validated data
         $post->post_title = $validated['post_title'];
         $post->post_content = $validated['post_content'];
         $post->post_excerpt = $validated['post_excerpt'] ?? '';
         $post->post_status = $validated['post_status'];
         $post->post_type = $validated['post_type'];
-        $post->post_modified = now();
+        
+        // Update modification dates
+        $post->post_modified = $now->format('Y-m-d H:i:s');
+        $post->post_modified_gmt = $now->setTimezone('GMT')->format('Y-m-d H:i:s');
+        
         $post->save();
 
         return redirect()->route('posts.index')
@@ -110,8 +139,9 @@ class PostController extends Controller
     /**
      * Remove the specified post from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($id)
     {
+        $post = Post::findOrFail($id);
         $post->delete();
         return redirect()->route('posts.index')
             ->with('success', 'Post uspešno obrisan.');
