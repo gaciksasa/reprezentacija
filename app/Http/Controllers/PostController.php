@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('post_date', 'desc')->paginate(18);
+        $posts = Post::with('categories')
+            ->orderBy('post_date', 'desc')
+            ->paginate(20);
         return view('posts.index', compact('posts'));
     }
 
@@ -25,7 +28,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        $categories = Category::orderBy('name')->get();
+        return view('posts.create', compact('categories'));
     }
 
     /**
@@ -40,6 +44,8 @@ class PostController extends Controller
             'post_status' => 'required|string|in:publish,draft,pending,private',
             'post_type' => 'required|string|in:post,page,attachment',
             'featured_image' => 'nullable|image|max:2048', // 2MB max
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
         ]);
 
         // Generate slug from title
@@ -89,6 +95,11 @@ class PostController extends Controller
         $post->comment_count = 0;
         
         $post->save();
+        
+        // Attach categories if any
+        if (isset($validated['categories']) && is_array($validated['categories'])) {
+            $post->categories()->attach($validated['categories']);
+        }
 
         return redirect()->route('posts.index')
             ->with('success', 'Post uspešno kreiran.');
@@ -99,7 +110,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::findOrFail($id);
+        $post = Post::with('categories')->findOrFail($id);
         return view('posts.show', compact('post'));
     }
 
@@ -108,8 +119,11 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        $post = Post::findOrFail($id);
-        return view('posts.edit', compact('post'));
+        $post = Post::with('categories')->findOrFail($id);
+        $categories = Category::orderBy('name')->get();
+        $selectedCategories = $post->categories->pluck('id')->toArray();
+        
+        return view('posts.edit', compact('post', 'categories', 'selectedCategories'));
     }
 
     /**
@@ -126,6 +140,8 @@ class PostController extends Controller
             'post_status' => 'required|string|in:publish,draft,pending,private',
             'post_type' => 'required|string|in:post,page,attachment',
             'featured_image' => 'nullable|image|max:2048', // 2MB max
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
         ]);
 
         // Current timestamp for modification dates
@@ -163,6 +179,13 @@ class PostController extends Controller
         $post->post_modified_gmt = $now->setTimezone('GMT')->format('Y-m-d H:i:s');
         
         $post->save();
+        
+        // Sync categories
+        if (isset($validated['categories'])) {
+            $post->categories()->sync($validated['categories']);
+        } else {
+            $post->categories()->detach();
+        }
 
         return redirect()->route('posts.index')
             ->with('success', 'Post uspešno ažuriran.');
@@ -180,6 +203,7 @@ class PostController extends Controller
             Storage::disk('public')->delete('uploads/' . $post->featured_image);
         }
         
+        // Categories will be automatically detached due to onDelete('cascade') in migration
         $post->delete();
         return redirect()->route('posts.index')
             ->with('success', 'Post uspešno obrisan.');

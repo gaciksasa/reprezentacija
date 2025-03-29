@@ -48,6 +48,12 @@ class Post extends Model
         return $this->belongsTo(User::class, 'post_author');
     }
     
+    // Define relationship with categories
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_post');
+    }
+    
     // Filter posts by status
     public function scopePublished($query)
     {
