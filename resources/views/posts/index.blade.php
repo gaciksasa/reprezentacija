@@ -29,7 +29,7 @@
                     {{ \Carbon\Carbon::parse($post->post_date)->format('d.m.Y H:i') }}
                 </p>
                 <p class="card-text">
-                    {{ Str::limit(strip_tags($post->post_excerpt ?: $post->post_content), 150) }}
+                    {{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 150) }}
                 </p>
                 <a href="{{ route('posts.show', $post->id) }}" class="btn btn-primary btn-md">Detaljnije</a>
             </div>

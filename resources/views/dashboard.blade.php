@@ -15,7 +15,7 @@
             <div class="carousel-inner">
             @foreach($poslednjiPostovi as $index => $post)
                 <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                    <img src="{{ $post->featured_image ? asset('storage/uploads/' . $post->featured_image) : asset('img/no-image.png') }}" class="d-block w-100" alt="{{ $post->post_title }}" style="max-height: 500px; object-fit: cover;">
+                    <img src="{{ $post->featured_image ? asset('storage/uploads/' . $post->featured_image) : asset('img/no-image.png') }}" class="d-block w-100" alt="{{ $post->post_title }}" style="max-height: 400px; object-fit: cover;">
                     <div class="carousel-caption">
                         <h2><a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a></h2>
                         <p class="text-dark">{{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 150) }}</p>
