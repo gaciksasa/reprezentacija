@@ -12,7 +12,75 @@
     @endif
 </div>
 
+@if($utakmice->where('datum', '>', now())->count() > 0)
+<div class="card mb-4">
+    <div class="card-header">
+        <h2 class="card-title mb-0">Predstojeće utakmice</h2>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th class="d-none d-lg-table-cell">Takmičenje</th>
+                        <th>Domaćin</th>
+                        <th>Gost</th>
+                        <th>Akcije</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($utakmice->where('datum', '>', now())->sortBy('datum') as $utakmica)
+                    <tr>
+                        <td>{{ $utakmica->datum->format('d.m.Y') }}</td>
+                        <td class="d-none d-lg-table-cell">
+                            @if($utakmica->takmicenje)
+                                {{ $utakmica->takmicenje->naziv }}
+                            @endif
+                        </td>
+                        <td>
+                            <a href="{{ route('timovi.show', $utakmica->domacin) }}">
+                                {{ $utakmica->domacin->naziv }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ route('timovi.show', $utakmica->gost) }}">
+                                {{ $utakmica->gost->naziv }}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ route('utakmice.show', $utakmica) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
+                                <a href="{{ route('utakmice.edit', $utakmica) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="document.getElementById('delete-utakmica-{{ $utakmica->id }}').submit()">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <form id="delete-utakmica-{{ $utakmica->id }}" action="{{ route('utakmice.destroy', $utakmica) }}" method="POST" class="d-none">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="card">
+    <div class="card-header">
+        <h2 class="card-title mb-0">Prethodne utakmice</h2>
+    </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-striped">
@@ -27,7 +95,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($utakmice as $utakmica)
+                    @foreach($utakmice->where('datum', '<=', now())->sortByDesc('datum') as $utakmica)
                     <tr>
                         <td>{{ $utakmica->datum->format('d.m.Y') }}</td>
                         <td class="d-none d-lg-table-cell">
@@ -75,16 +143,13 @@
                                 <form id="delete-utakmica-{{ $utakmica->id }}" action="{{ route('utakmice.destroy', $utakmica) }}" method="POST" class="d-none">
                                     @csrf
                                     @method('DELETE')
-                                </form>@endif
+                                </form>
+                                @endif
                             </div>
                         </td>
                         
                     </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center">Nema utakmica u bazi podataka</td>
-                    </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
