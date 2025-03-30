@@ -25,6 +25,15 @@
                     @enderror
                 </div>
             </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="vreme" class="form-label">Vreme</label>
+                <input type="time" class="form-control @error('vreme') is-invalid @enderror" 
+                    id="vreme" name="vreme" value="{{ old('vreme') }}">
+                @error('vreme')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
             
             <div class="mb-3">
                 <label for="takmicenje" class="form-label">Takmičenje *</label>

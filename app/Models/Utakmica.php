@@ -13,17 +13,23 @@ class Utakmica extends Model
     
     protected $fillable = [
         'datum', 
+        'vreme',
         'takmicenje_id', 
         'domacin_id', 
         'gost_id',
+        'stadion_id', 
+        'sudija_id',
         'stadion', 
         'sudija',
         'rezultat_domacin', 
         'rezultat_gost',
+        'poluvreme_rezultat_domacin',
+        'poluvreme_rezultat_gost',
         'imao_jedanaesterce',
         'jedanaesterci_domacin',
         'jedanaesterci_gost',
-        'publika'
+        'publika',
+        'sezona'
     ];
     
     protected $casts = [

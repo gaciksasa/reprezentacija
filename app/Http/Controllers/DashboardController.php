@@ -18,120 +18,154 @@ class DashboardController extends Controller
      * Prikaz početne stranice sa statistikom.
      */
     public function index()
-{
-    // Get Serbia as the main team
-    $glavniTim = Tim::glavniTim()->first();
-    
-    if (!$glavniTim) {
-        // Fallback if no main team set
-        $glavniTim = Tim::where('naziv', 'Srbija')->first();
-    }
-    
-    // Include all aliases of the main team
-    $timIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
-    
-    // Poslednje odigrane utakmice glavnog tima
-    $poslednjeUtakmice = Utakmica::with(['domacin', 'gost', 'takmicenje'])
-        ->where(function($query) use ($timIds) {
-            $query->whereIn('domacin_id', $timIds)
-                  ->orWhereIn('gost_id', $timIds);
-        })
-        ->orderBy('datum', 'desc')
-        ->take(5)
-        ->get();
+    {
+        // Get Serbia as the main team
+        $glavniTim = Tim::glavniTim()->first();
         
-    // Ukupan broj timova, igrača i utakmica
-    $brojTimova = Tim::count();
-    $brojIgraca = Igrac::count();
-    $brojUtakmica = Utakmica::count();
-    
-    // Broj utakmica glavnog tima
-    $brojUtakmicaGlavnogTima = Utakmica::where(function($query) use ($timIds) {
-            $query->whereIn('domacin_id', $timIds)
-                  ->orWhereIn('gost_id', $timIds);
-        })->count();
-    
-    // Pobede, remiji i porazi glavnog tima
-    $pobede = 0;
-    $neresene = 0;
-    $porazi = 0;
-    
-    $sveUtakmice = Utakmica::whereIn('domacin_id', $timIds)
-        ->orWhereIn('gost_id', $timIds)
-        ->get();
+        if (!$glavniTim) {
+            // Fallback if no main team set
+            $glavniTim = Tim::where('naziv', 'Srbija')->first();
+        }
         
-    foreach ($sveUtakmice as $utakmica) {
-        if (in_array($utakmica->domacin_id, $timIds)) {
-            // Main team is home
-            if ($utakmica->rezultat_domacin > $utakmica->rezultat_gost) {
-                $pobede++;
-            } elseif ($utakmica->rezultat_domacin < $utakmica->rezultat_gost) {
-                $porazi++;
+        // Include all aliases of the main team
+        $timIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+
+        // Get last played match
+        $poslednjaMec = Utakmica::with(['domacin', 'gost', 'takmicenje'])
+            ->where(function($query) use ($timIds) {
+                $query->whereIn('domacin_id', $timIds)
+                    ->orWhereIn('gost_id', $timIds);
+            })
+            ->where('datum', '<', now())
+            ->orderBy('datum', 'desc')
+            ->first();
+
+        // Get next upcoming match
+        $sledeciMec = Utakmica::with(['domacin', 'gost', 'takmicenje'])
+            ->where(function($query) use ($timIds) {
+                $query->whereIn('domacin_id', $timIds)
+                    ->orWhereIn('gost_id', $timIds);
+            })
+            ->where('datum', '>', now())
+            ->orderBy('datum', 'asc')
+            ->first();
+
+        // Get the match after the next one
+        $nakonSledecegMec = Utakmica::with(['domacin', 'gost', 'takmicenje'])
+            ->where(function($query) use ($timIds) {
+                $query->whereIn('domacin_id', $timIds)
+                    ->orWhereIn('gost_id', $timIds);
+            })
+            ->where('datum', '>', now())
+            ->where('id', '!=', $sledeciMec ? $sledeciMec->id : 0)
+            ->orderBy('datum', 'asc')
+            ->first();
+        
+        // Poslednje odigrane utakmice glavnog tima
+        $poslednjeUtakmice = Utakmica::with(['domacin', 'gost', 'takmicenje'])
+            ->where(function($query) use ($timIds) {
+                $query->whereIn('domacin_id', $timIds)
+                    ->orWhereIn('gost_id', $timIds);
+            })
+            ->orderBy('datum', 'desc')
+            ->take(5)
+            ->get();
+            
+        // Ukupan broj timova, igrača i utakmica
+        $brojTimova = Tim::count();
+        $brojIgraca = Igrac::count();
+        $brojUtakmica = Utakmica::count();
+        
+        // Broj utakmica glavnog tima
+        $brojUtakmicaGlavnogTima = Utakmica::where(function($query) use ($timIds) {
+                $query->whereIn('domacin_id', $timIds)
+                    ->orWhereIn('gost_id', $timIds);
+            })->count();
+        
+        // Pobede, remiji i porazi glavnog tima
+        $pobede = 0;
+        $neresene = 0;
+        $porazi = 0;
+        
+        $sveUtakmice = Utakmica::whereIn('domacin_id', $timIds)
+            ->orWhereIn('gost_id', $timIds)
+            ->get();
+            
+        foreach ($sveUtakmice as $utakmica) {
+            if (in_array($utakmica->domacin_id, $timIds)) {
+                // Main team is home
+                if ($utakmica->rezultat_domacin > $utakmica->rezultat_gost) {
+                    $pobede++;
+                } elseif ($utakmica->rezultat_domacin < $utakmica->rezultat_gost) {
+                    $porazi++;
+                } else {
+                    $neresene++;
+                }
             } else {
-                $neresene++;
-            }
-        } else {
-            // Main team is away
-            if ($utakmica->rezultat_domacin < $utakmica->rezultat_gost) {
-                $pobede++;
-            } elseif ($utakmica->rezultat_domacin > $utakmica->rezultat_gost) {
-                $porazi++;
-            } else {
-                $neresene++;
+                // Main team is away
+                if ($utakmica->rezultat_domacin < $utakmica->rezultat_gost) {
+                    $pobede++;
+                } elseif ($utakmica->rezultat_domacin > $utakmica->rezultat_gost) {
+                    $porazi++;
+                } else {
+                    $neresene++;
+                }
             }
         }
+        
+        // Najbolji strelci glavnog tima
+        $strelci = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
+            DB::raw('COUNT(golovi.id) as broj_golova'))
+            ->join('golovi', 'igraci.id', '=', 'golovi.igrac_id')
+            ->join('timovi', 'igraci.tim_id', '=', 'timovi.id')
+            ->join('utakmice', 'golovi.utakmica_id', '=', 'utakmice.id')
+            ->where('golovi.auto_gol', false)
+            ->where(function($query) {
+                $query->where('golovi.igrac_tip', 'regularni')
+                ->orWhereNull('golovi.igrac_tip'); // For backward compatibility with older records
+            })
+            ->where(function($query) use ($timIds) {
+                $query->whereIn('igraci.tim_id', $timIds);
+            })
+            ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
+            ->orderBy('broj_golova', 'desc')
+            ->take(10)
+            ->get();
+
+        // Igrači sa najviše nastupa
+        $najviseNastupa = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
+            DB::raw('COUNT(sastavi.id) as broj_nastupa'))
+            ->join('sastavi', 'igraci.id', '=', 'sastavi.igrac_id')
+            ->leftJoin('timovi', 'igraci.tim_id', '=', 'timovi.id')
+            ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
+            ->orderBy('broj_nastupa', 'desc')
+            ->take(10)
+            ->get();
+        
+        // Fetch the latest posts for the carousel
+        $poslednjiPostovi = Post::published()
+            ->orderBy('post_date', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('dashboard', compact(
+            'glavniTim',
+            'poslednjeUtakmice', 
+            'brojTimova', 
+            'brojIgraca', 
+            'brojUtakmica',
+            'brojUtakmicaGlavnogTima',
+            'pobede',
+            'neresene',
+            'porazi',
+            'strelci',
+            'najviseNastupa',
+            'poslednjiPostovi',
+            'poslednjaMec',
+            'sledeciMec',
+            'nakonSledecegMec'
+        ));
     }
-    
-    // Najbolji strelci glavnog tima
-    $strelci = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
-        DB::raw('COUNT(golovi.id) as broj_golova'))
-        ->join('golovi', 'igraci.id', '=', 'golovi.igrac_id')
-        ->join('timovi', 'igraci.tim_id', '=', 'timovi.id')
-        ->join('utakmice', 'golovi.utakmica_id', '=', 'utakmice.id')
-        ->where('golovi.auto_gol', false)
-        ->where(function($query) {
-            $query->where('golovi.igrac_tip', 'regularni')
-            ->orWhereNull('golovi.igrac_tip'); // For backward compatibility with older records
-        })
-        ->where(function($query) use ($timIds) {
-            $query->whereIn('igraci.tim_id', $timIds);
-        })
-        ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
-        ->orderBy('broj_golova', 'desc')
-        ->take(10)
-        ->get();
-
-    // Igrači sa najviše nastupa
-    $najviseNastupa = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
-        DB::raw('COUNT(sastavi.id) as broj_nastupa'))
-        ->join('sastavi', 'igraci.id', '=', 'sastavi.igrac_id')
-        ->leftJoin('timovi', 'igraci.tim_id', '=', 'timovi.id')
-        ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
-        ->orderBy('broj_nastupa', 'desc')
-        ->take(10)
-        ->get();
-    
-    // Fetch the latest posts for the carousel
-    $poslednjiPostovi = Post::published()
-        ->orderBy('post_date', 'desc')
-        ->take(5)
-        ->get();
-
-    return view('dashboard', compact(
-        'glavniTim',
-        'poslednjeUtakmice', 
-        'brojTimova', 
-        'brojIgraca', 
-        'brojUtakmica',
-        'brojUtakmicaGlavnogTima',
-        'pobede',
-        'neresene',
-        'porazi',
-        'strelci',
-        'najviseNastupa',
-        'poslednjiPostovi'
-    ));
-}
     
     /**
      * Prikaz statistike utakmica.
