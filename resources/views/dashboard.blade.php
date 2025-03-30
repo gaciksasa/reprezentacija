@@ -149,29 +149,20 @@
 
 @section('styles')
 <style>
-.carousel-item {
-    height: 400px;
-}
-.carousel-caption {
-    background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 10px;
-    padding: 20px;
-}
-
 /* Match cards styling */
 .matches-container {
-    margin-top: 2rem;
+    margin: 2rem 0;
 }
 
 .match-card {
     background-color: #fff;
     border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     height: 100%;
     padding: 1.5rem;
     transition: transform 0.2s;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .match-card:hover {
@@ -183,11 +174,12 @@
 }
 
 .match-title {
-    color: #0047AB;
+    color: #c80036;
     font-size: 1.75rem;
     font-weight: 700;
-    margin: 0;
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
+    font-family: 'Teko', sans-serif;
 }
 
 .match-content {
@@ -197,22 +189,23 @@
 }
 
 .match-competition {
-    color: #D3171B;
+    color: #0C1844;
     font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
 }
 
 .match-venue, .match-date {
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
 }
 
 .match-teams {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 1rem 0;
+    margin: 1.5rem 0;
 }
 
 .team-logo {
@@ -224,13 +217,18 @@
 }
 
 .team-name {
-    font-size: 0.9rem;
-    font-weight: 600;
+    color: #0C1844;
+    font-family: "Teko",sans-serif;
+    font-size: 2rem;
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
 .team-abbr {
-    font-size: 1.1rem;
-    font-weight: 700;
+    color: #0C1844;
+    font-family: "Teko",sans-serif;
+    font-size: 3rem;
+    font-weight: 500;
     text-transform: uppercase;
 }
 
@@ -243,7 +241,8 @@
 .score-result {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #0047AB;
+    color: #0C1844;
+    font-family: 'Teko', sans-serif;
 }
 
 .score-divider {
@@ -258,7 +257,7 @@
     font-size: 0.8rem;
     font-weight: 600;
     padding: 0.2rem 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
 }
 
 .match-vs {
@@ -272,15 +271,17 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin: 2rem 0;
+    margin: 1rem 0;
 }
 
 .match-time-display {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 0.75rem;
     background-color: #f5f5f5;
     border-radius: 4px;
+    margin: 0.5rem auto;
+    display: inline-block;
 }
 
 .match-date-time {
@@ -290,29 +291,56 @@
 }
 
 .match-footer {
-    margin-top: 2rem;
-}
-
-.match-footer .btn {
-    border-radius: 0;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding: 0.75rem 1.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 .btn-outline-primary {
-    border-color: #0047AB;
-    color: #0047AB;
+    border-color: #0C1844;
+    color: #0C1844;
 }
 
 .btn-outline-primary:hover {
-    background-color: #0047AB;
+    background-color: #0C1844;
     color: #fff;
+}
+
+.btn-primary {
+    background-color: #0C1844;
+    border-color: #0C1844;
+}
+
+.btn-primary:hover {
+    background-color: #0C1844;
+    border-color: #0C1844;
 }
 
 /* Countdown styling */
 .countdown-container {
-    margin-top: auto;
+    margin-top: 0;
+}
+
+.countdown-digit {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #c80036;
+    font-family: 'Teko', sans-serif;
+}
+
+.countdown-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #666;
+}
+
+.carousel-item {
+    height: 400px;
+}
+
+.carousel-caption {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 20px;
 }
 
 </style>
@@ -320,57 +348,63 @@
 
 @section('scripts')
 <script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Find all countdown elements
-        const countdownElements = document.querySelectorAll('.countdown');
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all countdown elements
+    const countdownElements = document.querySelectorAll('.countdown');
+    
+    countdownElements.forEach(function(element) {
+        const targetDate = element.getAttribute('data-target-date');
+        if (!targetDate) return;
         
-        countdownElements.forEach(function(element) {
-            const targetDate = element.getAttribute('data-target-date');
-            if (!targetDate) return;
+        // Set the target date
+        const countDownDate = new Date(targetDate).getTime();
+        
+        // Find elements within this countdown
+        const daysElement = element.querySelector('.days');
+        const hoursElement = element.querySelector('.hours');
+        const minutesElement = element.querySelector('.minutes');
+        const secondsElement = element.querySelector('.seconds');
+        
+        if (!daysElement || !hoursElement || !minutesElement || !secondsElement) return;
+        
+        // Set initial countdown values
+        updateCountdown();
+        
+        // Update the countdown every 1 second
+        const countdownTimer = setInterval(updateCountdown, 1000);
+        
+        function updateCountdown() {
+            // Get current date and time
+            const now = new Date().getTime();
             
-            // Set the target date
-            const countDownDate = new Date(targetDate).getTime();
+            // Find the distance between now and the countdown date
+            const distance = countDownDate - now;
             
-            // Find elements within this countdown
-            const daysElement = element.querySelector('.days');
-            const hoursElement = element.querySelector('.hours');
-            const minutesElement = element.querySelector('.minutes');
-            const secondsElement = element.querySelector('.seconds');
+            // If the countdown is over, show zeros and stop the timer
+            if (distance < 0) {
+                clearInterval(countdownTimer);
+                daysElement.innerHTML = "00";
+                hoursElement.innerHTML = "00";
+                minutesElement.innerHTML = "00";
+                secondsElement.innerHTML = "00";
+                return;
+            }
             
-            if (!daysElement || !hoursElement || !minutesElement || !secondsElement) return;
+            // Calculate weeks
+            const weeks = Math.floor(distance / (1000 * 60 * 60 * 24 * 7));
             
-            // Update the countdown every 1 second
-            const countdownTimer = setInterval(function() {
-                // Get current date and time
-                const now = new Date().getTime();
-                
-                // Find the distance between now and the countdown date
-                const distance = countDownDate - now;
-                
-                // If the countdown is over, show zeros and stop the timer
-                if (distance < 0) {
-                    clearInterval(countdownTimer);
-                    daysElement.innerHTML = "00";
-                    hoursElement.innerHTML = "00";
-                    minutesElement.innerHTML = "00";
-                    secondsElement.innerHTML = "00";
-                    return;
-                }
-                
-                // Time calculations for days, hours, minutes and seconds
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                
-                // Display the results with leading zeros
-                daysElement.innerHTML = days < 10 ? "0" + days : days;
-                hoursElement.innerHTML = hours < 10 ? "0" + hours : hours;
-                minutesElement.innerHTML = minutes < 10 ? "0" + minutes : minutes;
-                secondsElement.innerHTML = seconds < 10 ? "0" + seconds : seconds;
-            }, 1000);
-        });
+            // Time calculations for days, hours, minutes and seconds
+            const days = Math.floor((distance % (1000 * 60 * 60 * 24 * 7)) / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            
+            // Display the results with leading zeros
+            daysElement.innerHTML = weeks < 10 ? "0" + weeks : weeks;
+            hoursElement.innerHTML = days < 10 ? "0" + days : days;
+            minutesElement.innerHTML = hours < 10 ? "0" + hours : hours;
+            secondsElement.innerHTML = minutes < 10 ? "0" + minutes : minutes;
+        }
     });
+});
 </script>
 @endsection
