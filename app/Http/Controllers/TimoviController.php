@@ -11,8 +11,6 @@ class TimoviController extends Controller
     /**
      * Prikaz svih timova.
      */
-    // app/Http/Controllers/TimoviController.php
-
     public function index()
     {
         // Get main team and its aliases
@@ -43,11 +41,13 @@ class TimoviController extends Controller
             // Home matches (where our team was home, current team was away)
             $homeMatches = Utakmica::whereIn('domacin_id', $nasTimIds)
                         ->where('gost_id', $tim->id)
+                        ->where('datum', '<', now()) // Filter samo odigrane utakmice
                         ->get();
                         
             // Away matches (where our team was away, current team was home)
             $awayMatches = Utakmica::where('domacin_id', $tim->id)
                         ->whereIn('gost_id', $nasTimIds)
+                        ->where('datum', '<', now()) // Filter samo odigrane utakmice
                         ->get();
             
             // Process home matches

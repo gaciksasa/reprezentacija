@@ -81,11 +81,13 @@
                                 // Za domaće utakmice gde je naš tim (alijas) bio domaćin, a trenutni tim gost
                                 $domaceUtakmice = \App\Models\Utakmica::where('domacin_id', $alijas->id)
                                                 ->where('gost_id', $tim->id)
+                                                ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                                 ->get();
                                 
                                 // Za gostujuće utakmice gde je naš tim (alijas) bio gost, a trenutni tim domaćin
                                 $gostujuceUtakmice = \App\Models\Utakmica::where('domacin_id', $tim->id)
                                                     ->where('gost_id', $alijas->id)
+                                                    ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                                     ->get();
                                 
                                 // Obračunaj pobede/neresene/poraze za domaće utakmice
@@ -145,7 +147,9 @@
                         ];
                         
                         // Utakmice gde je ovaj alijas domaćin
-                        $domaceUtakmice = $tim->domaceUtakmice()->get();
+                        $domaceUtakmice = $tim->domaceUtakmice()
+                            ->where('datum', '<', now()) // Filter samo odigrane utakmice
+                            ->get();
                         
                         foreach ($domaceUtakmice as $utakmica) {
                             $stats['ut']++;
@@ -162,7 +166,9 @@
                         }
                         
                         // Utakmice gde je ovaj alijas gost
-                        $gostujuceUtakmice = $tim->gostujuceUtakmice()->get();
+                        $gostujuceUtakmice = $tim->gostujuceUtakmice()
+                            ->where('datum', '<', now()) // Filter samo odigrane utakmice
+                            ->get();
                         
                         foreach ($gostujuceUtakmice as $utakmica) {
                             $stats['ut']++;
@@ -261,11 +267,13 @@
                             if ($isOurTeam) {
                                 $sveUtakmice = $tim->domaceUtakmice()
                                     ->with(['domacin', 'gost', 'takmicenje'])
+                                    ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                     ->orderBy('datum', 'desc')
                                     ->get()
                                     ->concat(
                                         $tim->gostujuceUtakmice()
                                             ->with(['domacin', 'gost', 'takmicenje'])
+                                            ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                             ->orderBy('datum', 'desc')
                                             ->get()
                                     )
@@ -273,6 +281,7 @@
                             } else {
                                 // Ako je protivnički tim, prikaži sve utakmice protiv našeg tima i svih alijasa
                                 $sveUtakmice = \App\Models\Utakmica::with(['domacin', 'gost', 'takmicenje'])
+                                    ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                     ->where(function($query) use ($nasTimIds, $tim) {
                                         // Naš tim je domaćin, protivnik je gost
                                         $query->whereIn('domacin_id', $nasTimIds)
@@ -280,7 +289,8 @@
                                     })
                                     ->orWhere(function($query) use ($nasTimIds, $tim) {
                                         // Naš tim je gost, protivnik je domaćin
-                                        $query->where('domacin_id', $tim->id)
+                                        $query->where('datum', '<', now()) // Filter mora biti ponovljen zbog orWhere
+                                            ->where('domacin_id', $tim->id)
                                             ->whereIn('gost_id', $nasTimIds);
                                     })
                                     ->orderBy('datum', 'desc')
@@ -317,6 +327,7 @@
                             if ($isOurTeam) {
                                 $domaceUtakmice = $tim->domaceUtakmice()
                                     ->with(['domacin', 'gost', 'takmicenje'])
+                                    ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                     ->orderBy('datum', 'desc')
                                     ->get();
                             } else {
@@ -324,6 +335,7 @@
                                 $domaceUtakmice = \App\Models\Utakmica::with(['domacin', 'gost', 'takmicenje'])
                                     ->where('domacin_id', $tim->id)
                                     ->whereIn('gost_id', $nasTimIds)
+                                    ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                     ->orderBy('datum', 'desc')
                                     ->get();
                             }
@@ -360,6 +372,7 @@
                             if ($isOurTeam) {
                                 $gostujuceUtakmice = $tim->gostujuceUtakmice()
                                     ->with(['domacin', 'gost', 'takmicenje'])
+                                    ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                     ->orderBy('datum', 'desc')
                                     ->get();
                             } else {
@@ -367,6 +380,7 @@
                                 $gostujuceUtakmice = \App\Models\Utakmica::with(['domacin', 'gost', 'takmicenje'])
                                     ->whereIn('domacin_id', $nasTimIds)
                                     ->where('gost_id', $tim->id)
+                                    ->where('datum', '<', now()) // Filter samo odigrane utakmice
                                     ->orderBy('datum', 'desc')
                                     ->get();
                             }
