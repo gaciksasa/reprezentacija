@@ -20,52 +20,48 @@
                 <h2 class="card-title mb-0">{{ $kategorija->name }}</h2>
             </div>
             <div class="card-body">
+                <p class="mb-2"><strong>Slug:</strong> <span class="badge bg-light text-dark">{{ $kategorija->slug }}</span></p>
                 
-                <div class="mb-2">
-                    <span class="text-muted">Slug: </span>
-                    <span class="badge bg-secondary">{{ $kategorija->slug }}</span>
-                </div>
-
                 @if($kategorija->parent)
-                    <div class="mb-2">
-                        <span class="text-muted">Nadređena kategorija: </span>
-                        <a href="{{ route('kategorije.show', $kategorija->parent) }}">{{ $kategorija->parent->name }}</a>
-                    </div>
+                <p class="mb-2"><strong>Nadređena kategorija:</strong> {{ $kategorija->parent->name }}</p>
                 @endif
-
-                <div class="mb-2">
-                    <span class="text-muted">Broj postova: </span>
-                    <span class="badge bg-primary">{{ $kategorija->posts->count() }}</span>
+                
+                <p class="mb-2"><strong>Broj postova:</strong> {{ $kategorija->posts->count() }}</p>
+                
+                @if($kategorija->description)
+                <div class="mt-3">
+                    <p>{{ Str::limit($kategorija->description, 150) }}</p>
                 </div>
+                @endif
             </div>
-            <div class="card-footer d-flex justify-content-between">
-                <a href="{{ route('kategorije.show', $kategorija) }}" class="btn btn-sm btn-info">
-                    <i class="fas fa-eye"></i> Detalji
-                </a>
-                @if(Auth::check() && Auth::user()->hasEditAccess())
+            <div class="card-footer">
                 <div class="btn-group">
-                    <a href="{{ route('kategorije.edit', $kategorija) }}" class="btn btn-sm btn-warning">
+                    <a href="{{ route('kategorije.show', $kategorija->id) }}" class="btn btn-sm btn-info">
+                        <i class="fas fa-eye"></i> Detalji
+                    </a>
+                    @if(Auth::check() && Auth::user()->hasEditAccess())
+                    <a href="{{ route('kategorije.edit', $kategorija->id) }}" class="btn btn-sm btn-warning">
                         <i class="fas fa-edit"></i> Izmeni
                     </a>
                     <button type="button" class="btn btn-sm btn-danger" 
-                            onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-Kategorija-{{ $kategorija->id }}').submit()">
+                            onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-kategorija-{{ $kategorija->id }}').submit()">
                         <i class="fas fa-trash"></i>
                     </button>
-                    <form id="delete-Kategorija-{{ $kategorija->id }}" action="{{ route('kategorije.destroy', $kategorija) }}" method="POST" class="d-none">
+                    <form id="delete-kategorija-{{ $kategorija->id }}" action="{{ route('kategorije.destroy', $kategorija->id) }}" method="POST" class="d-none">
                         @csrf
                         @method('DELETE')
                     </form>
+                    @endif
                 </div>
-                @endif
             </div>
         </div>
     </div>
     @empty
     <div class="col-12">
         <div class="alert alert-info">
-            Nema kategorija u bazi podataka. 
+            Nema evidentiranih kategorija. 
             @if(Auth::check() && Auth::user()->hasEditAccess())
-                <a href="{{ route('kategorije.create') }}" class="alert-link">Kreirajte prvu kategoriju</a>.
+            <a href="{{ route('kategorije.create') }}">Kreirajte prvu kategoriju</a>.
             @endif
         </div>
     </div>

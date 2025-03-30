@@ -1,13 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Izmeni kategoriju')
+@section('title', 'Izmeni kategoriju - ' . $kategorija->name)
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Izmeni kategoriju: {{ $kategorija->name }}</h1>
-    <a href="{{ route('kategorije.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Nazad
-    </a>
+    <div>
+        <a href="{{ route('kategorije.show', $kategorija) }}" class="btn btn-info">
+            <i class="fas fa-eye"></i> Pregledaj
+        </a>
+        <a href="{{ route('kategorije.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Nazad
+        </a>
+    </div>
 </div>
 
 <div class="card">
@@ -17,7 +22,7 @@
             @method('PUT')
             
             <div class="mb-3">
-                <label for="name" class="form-label">Naziv *</label>
+                <label for="name" class="form-label">Naziv kategorije *</label>
                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
                        id="name" name="name" value="{{ old('name', $kategorija->name) }}" required>
                 @error('name')
@@ -26,11 +31,19 @@
             </div>
             
             <div class="mb-3">
+                <label for="description" class="form-label">Opis kategorije</label>
+                <textarea class="form-control @error('description') is-invalid @enderror" 
+                          id="description" name="description" rows="3">{{ old('description', $kategorija->description) }}</textarea>
+                @error('description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="mb-3">
                 <label for="parent_id" class="form-label">Nadređena kategorija</label>
-                <select class="form-select @error('parent_id') is-invalid @enderror" 
-                        id="parent_id" name="parent_id">
-                    <option value="">-- Nema nadređenu kategoriju --</option>
-                    @foreach($parentkategorije as $parentKategorija)
+                <select class="form-select @error('parent_id') is-invalid @enderror" id="parent_id" name="parent_id">
+                    <option value="">-- Bez nadređene kategorije --</option>
+                    @foreach($parentKategorije as $parentKategorija)
                         <option value="{{ $parentKategorija->id }}" 
                                 {{ old('parent_id', $kategorija->parent_id) == $parentKategorija->id ? 'selected' : '' }}>
                             {{ $parentKategorija->name }}
@@ -42,45 +55,10 @@
                 @enderror
             </div>
             
-            <div class="mb-3">
-                <label for="description" class="form-label">Opis</label>
-                <textarea class="form-control @error('description') is-invalid @enderror" 
-                          id="description" name="description" rows="3">{{ old('description', $kategorija->description) }}</textarea>
-                @error('description')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            
-            <div class="mb-3">
-                <label for="slug" class="form-label">Slug</label>
-                <input type="text" class="form-control" id="slug" value="{{ $kategorija->slug }}" disabled readonly>
-                <small class="form-text text-muted">Slug će se automatski generisati iz naziva.</small>
-            </div>
-            
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Sačuvaj izmene</button>
             </div>
         </form>
     </div>
 </div>
-
-@if($kategorija->posts->count() > 0)
-<div class="card mt-4">
-    <div class="card-header">
-        <h5 class="card-title mb-0">Postovi u kategoriji</h5>
-    </div>
-    <div class="card-body">
-        <div class="list-group">
-            @foreach($kategorija->posts as $post)
-                <a href="{{ route('posts.show', $post) }}" class="list-group-item list-group-item-action">
-                    {{ $post->post_title }}
-                    <small class="text-muted d-block">
-                        Objavljeno: {{ $post->post_date->format('d.m.Y H:i') }}
-                    </small>
-                </a>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
 @endsection

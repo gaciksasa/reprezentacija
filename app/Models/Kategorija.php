@@ -39,6 +39,6 @@ class Kategorija extends Model
      */
     public function posts()
     {
-        return $this->belongsToMany(Post::class, 'kategorija_post');
+        return $this->belongsToMany(Post::class, 'kategorija_post', 'kategorija_id', 'post_id');
     }
 }

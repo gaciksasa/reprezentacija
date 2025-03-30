@@ -51,7 +51,7 @@ class Post extends Model
     // Define relationship with kategorije
     public function kategorije()
     {
-        return $this->belongsToMany(Kategorija::class, 'kategorija_post');
+        return $this->belongsToMany(Kategorija::class, 'kategorija_post', 'post_id', 'kategorija_id');
     }
     
     // Filter posts by status

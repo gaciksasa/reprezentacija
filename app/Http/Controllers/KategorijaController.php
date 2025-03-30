@@ -58,17 +58,31 @@ class KategorijaController extends Controller
     /**
      * Display the specified Kategorija.
      */
-    public function show(Kategorija $kategorija)
+    public function show(Kategorija $kategorije)
     {
-        $kategorija->load(['parent', 'posts']);
+        // Promenjeno iz $kategorija u $kategorije da odgovara parametru rute
+        $kategorija = $kategorije; // Preimenovanje varijable za konzistentnost u pogledu
+        
+        // Eager load parent, children and posts with their authors
+        $kategorija->load([
+            'parent',
+            'children',
+            'posts' => function($query) {
+                $query->orderBy('post_date', 'desc');
+            }
+        ]);
+        
         return view('kategorije.show', compact('kategorija'));
     }
 
     /**
      * Show the form for editing the specified Kategorija.
      */
-    public function edit(Kategorija $kategorija)
+    public function edit(Kategorija $kategorije)
     {
+        // Promenjeno iz $kategorija u $kategorije da odgovara parametru rute
+        $kategorija = $kategorije; // Preimenovanje varijable za konzistentnost u pogledu
+        
         $parentKategorije = Kategorija::where('id', '!=', $kategorija->id)
             ->orderBy('name')
             ->get();
@@ -78,8 +92,11 @@ class KategorijaController extends Controller
     /**
      * Update the specified Kategorija in storage.
      */
-    public function update(Request $request, Kategorija $kategorija)
+    public function update(Request $request, Kategorija $kategorije)
     {
+        // Promenjeno iz $kategorija u $kategorije da odgovara parametru rute
+        $kategorija = $kategorije; // Preimenovanje varijable za konzistentnost u pogledu
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -103,7 +120,7 @@ class KategorijaController extends Controller
         }
         
         // Prevent circular references in parent-child relationships
-        if ($validated['parent_id'] == $kategorija->id) {
+        if (isset($validated['parent_id']) && $validated['parent_id'] == $kategorija->id) {
             return back()->withErrors(['parent_id' => 'Kategorija ne može biti sopstveni roditelj.']);
         }
         
@@ -116,8 +133,11 @@ class KategorijaController extends Controller
     /**
      * Remove the specified Kategorija from storage.
      */
-    public function destroy(Kategorija $kategorija)
+    public function destroy(Kategorija $kategorije)
     {
+        // Promenjeno iz $kategorija u $kategorije da odgovara parametru rute
+        $kategorija = $kategorije; // Preimenovanje varijable za konzistentnost u pogledu
+        
         // Check if Kategorija has children
         if ($kategorija->children()->count() > 0) {
             return back()->withErrors(['delete' => 'Ne možete obrisati kategoriju koja ima podkategorije.']);
