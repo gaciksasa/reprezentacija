@@ -1,24 +1,24 @@
 @extends('layouts.app')
 
-@section('title', $category->name)
+@section('title', $kategorija->name)
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Kategorija: {{ $category->name }} ({{ $category->posts->count() }})</h1>
+    <h1>Kategorija: {{ $kategorija->name }} ({{ $kategorija->posts->count() }})</h1>
     <div>
         @if(Auth::check() && Auth::user()->hasEditAccess())
-        <a href="{{ route('categories.edit', $category) }}" class="btn btn-warning">
+        <a href="{{ route('kategorije.edit', $kategorija) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
         </a>
         @endif
-        <a href="{{ route('categories.index') }}" class="btn btn-secondary">
+        <a href="{{ route('kategorije.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Nazad
         </a>
     </div>
 </div>
-@if($category->posts->count() > 0)
+@if($kategorija->posts->count() > 0)
 <div class="row">
-    @foreach($category->posts as $post)
+    @foreach($kategorija->posts as $post)
     <div class="col-md-6 col-lg-4 mb-4">
         <div class="card h-100">
             @if($post->featured_image)

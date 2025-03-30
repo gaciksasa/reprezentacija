@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\Category;
+use App\Models\Kategorija;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +17,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('categories')
+        $posts = Post::with('kategorije')
             ->orderBy('post_date', 'desc')
             ->paginate(20);
         return view('posts.index', compact('posts'));
@@ -28,8 +28,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories = Category::orderBy('name')->get();
-        return view('posts.create', compact('categories'));
+        $kategorije = Kategorija::orderBy('name')->get();
+        return view('posts.create', compact('kategorije'));
     }
 
     /**
@@ -44,8 +44,8 @@ class PostController extends Controller
             'post_status' => 'required|string|in:publish,draft,pending,private',
             'post_type' => 'required|string|in:post,page,attachment',
             'featured_image' => 'nullable|image|max:2048', // 2MB max
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:categories,id',
+            'kategorije' => 'nullable|array',
+            'kategorije.*' => 'exists:kategorije,id',
         ]);
 
         // Generate slug from title
@@ -96,9 +96,9 @@ class PostController extends Controller
         
         $post->save();
         
-        // Attach categories if any
-        if (isset($validated['categories']) && is_array($validated['categories'])) {
-            $post->categories()->attach($validated['categories']);
+        // Attach kategorije if any
+        if (isset($validated['kategorije']) && is_array($validated['kategorije'])) {
+            $post->kategorije()->attach($validated['kategorije']);
         }
 
         return redirect()->route('posts.index')
@@ -110,7 +110,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::with('categories')->findOrFail($id);
+        $post = Post::with('kategorije')->findOrFail($id);
         return view('posts.show', compact('post'));
     }
 
@@ -119,11 +119,11 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        $post = Post::with('categories')->findOrFail($id);
-        $categories = Category::orderBy('name')->get();
-        $selectedCategories = $post->categories->pluck('id')->toArray();
+        $post = Post::with('kategorije')->findOrFail($id);
+        $kategorije = Kategorija::orderBy('name')->get();
+        $selectedkategorije = $post->kategorije->pluck('id')->toArray();
         
-        return view('posts.edit', compact('post', 'categories', 'selectedCategories'));
+        return view('posts.edit', compact('post', 'kategorije', 'selectedkategorije'));
     }
 
     /**
@@ -140,8 +140,8 @@ class PostController extends Controller
             'post_status' => 'required|string|in:publish,draft,pending,private',
             'post_type' => 'required|string|in:post,page,attachment',
             'featured_image' => 'nullable|image|max:2048', // 2MB max
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:categories,id',
+            'kategorije' => 'nullable|array',
+            'kategorije.*' => 'exists:kategorije,id',
         ]);
 
         // Current timestamp for modification dates
@@ -180,11 +180,11 @@ class PostController extends Controller
         
         $post->save();
         
-        // Sync categories
-        if (isset($validated['categories'])) {
-            $post->categories()->sync($validated['categories']);
+        // Sync kategorije
+        if (isset($validated['kategorije'])) {
+            $post->kategorije()->sync($validated['kategorije']);
         } else {
-            $post->categories()->detach();
+            $post->kategorije()->detach();
         }
 
         return redirect()->route('posts.index')
@@ -203,7 +203,7 @@ class PostController extends Controller
             Storage::disk('public')->delete('uploads/' . $post->featured_image);
         }
         
-        // Categories will be automatically detached due to onDelete('cascade') in migration
+        // kategorije will be automatically detached due to onDelete('cascade') in migration
         $post->delete();
         return redirect()->route('posts.index')
             ->with('success', 'Post uspešno obrisan.');

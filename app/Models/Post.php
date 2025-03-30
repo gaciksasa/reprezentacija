@@ -48,10 +48,10 @@ class Post extends Model
         return $this->belongsTo(User::class, 'post_author');
     }
     
-    // Define relationship with categories
-    public function categories()
+    // Define relationship with kategorije
+    public function kategorije()
     {
-        return $this->belongsToMany(Category::class, 'category_post');
+        return $this->belongsToMany(Kategorija::class, 'kategorija_post');
     }
     
     // Filter posts by status

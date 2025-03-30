@@ -102,25 +102,25 @@
                 <label class="form-label">Kategorije</label>
                 <div class="card">
                     <div class="card-body" style="max-height: 200px; overflow-y: auto;">
-                        @if($categories->count() > 0)
-                            @foreach($categories as $category)
+                        @if($kategorije->count() > 0)
+                            @foreach($kategorije as $kategorija)
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" 
-                                           id="category-{{ $category->id }}" 
-                                           name="categories[]" 
-                                           value="{{ $category->id }}"
-                                           {{ in_array($category->id, old('categories', $selectedCategories)) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="category-{{ $category->id }}">
-                                        {{ $category->name }}
+                                           id="kategorija-{{ $kategorija->id }}" 
+                                           name="kategorije[]" 
+                                           value="{{ $kategorija->id }}"
+                                           {{ in_array($kategorija->id, old('kategorije', $selectedkategorije)) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="kategorija-{{ $kategorija->id }}">
+                                        {{ $kategorija->name }}
                                     </label>
                                 </div>
                             @endforeach
                         @else
-                            <p class="text-muted mb-0">Nema dostupnih kategorija. <a href="{{ route('categories.create') }}">Dodajte kategoriju</a>.</p>
+                            <p class="text-muted mb-0">Nema dostupnih kategorija. <a href="{{ route('kategorije.create') }}">Dodajte kategoriju</a>.</p>
                         @endif
                     </div>
                 </div>
-                @error('categories')
+                @error('kategorije')
                     <div class="text-danger mt-1">{{ $message }}</div>
                 @enderror
             </div>

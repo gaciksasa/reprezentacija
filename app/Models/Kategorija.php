@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Kategorija extends Model
 {
     use HasFactory;
+
+    protected $table = 'kategorije';
     
     protected $fillable = [
         'name',
@@ -17,26 +19,26 @@ class Category extends Model
     ];
     
     /**
-     * Get the parent category
+     * Get the parent Kategorija
      */
     public function parent()
     {
-        return $this->belongsTo(Category::class, 'parent_id');
+        return $this->belongsTo(Kategorija::class, 'parent_id');
     }
     
     /**
-     * Get the children categories
+     * Get the children kategorije
      */
     public function children()
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        return $this->hasMany(Kategorija::class, 'parent_id');
     }
     
     /**
-     * Get the posts in this category
+     * Get the posts in this Kategorija
      */
     public function posts()
     {
-        return $this->belongsToMany(Post::class, 'category_post');
+        return $this->belongsToMany(Post::class, 'kategorija_post');
     }
 }

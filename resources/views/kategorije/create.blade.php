@@ -5,14 +5,14 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Nova kategorija</h1>
-    <a href="{{ route('categories.index') }}" class="btn btn-secondary">
+    <a href="{{ route('kategorije.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Nazad
     </a>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('categories.store') }}" method="POST">
+        <form action="{{ route('kategorije.store') }}" method="POST">
             @csrf
             
             <div class="mb-3">
@@ -29,9 +29,9 @@
                 <select class="form-select @error('parent_id') is-invalid @enderror" 
                         id="parent_id" name="parent_id">
                     <option value="">-- Nema nadređenu kategoriju --</option>
-                    @foreach($parentCategories as $parentCategory)
-                        <option value="{{ $parentCategory->id }}" {{ old('parent_id') == $parentCategory->id ? 'selected' : '' }}>
-                            {{ $parentCategory->name }}
+                    @foreach($parentkategorije as $parentKategorija)
+                        <option value="{{ $parentKategorija->id }}" {{ old('parent_id') == $parentKategorija->id ? 'selected' : '' }}>
+                            {{ $parentKategorija->name }}
                         </option>
                     @endforeach
                 </select>

@@ -87,11 +87,11 @@
                 <h5 class="card-title mb-0">Kategorije</h5>
             </div>
             <div class="card-body">
-                @if($post->categories->count() > 0)
+                @if($post->kategorije->count() > 0)
                     <div class="d-flex flex-wrap gap-2">
-                        @foreach($post->categories as $category)
-                            <a href="{{ route('categories.show', $category) }}" class="btn btn-sm btn-outline-primary">
-                                {{ $category->name }}
+                        @foreach($post->kategorije as $kategorija)
+                            <a href="{{ route('kategorije.show', $kategorija) }}" class="btn btn-sm btn-outline-primary">
+                                {{ $kategorija->name }}
                             </a>
                         @endforeach
                     </div>

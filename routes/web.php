@@ -21,7 +21,7 @@ use App\Http\Controllers\TimVarijanteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\KategorijaController;
 
 // Login routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -80,8 +80,8 @@ Route::delete('selektor-mandati/{mandat}', [SelektoriController::class, 'obrisiM
 // CRUD for posts
 Route::resource('posts', PostController::class);
 
-// CRUD for categories
-Route::resource('categories', CategoryController::class);
+// CRUD for kategorije
+Route::resource('kategorije', KategorijaController::class);
 
 // CRUD for opponent coaches
 Route::resource('protivnicki-selektori', ProtivnickiSelektoriController::class)->except(['index', 'show']);

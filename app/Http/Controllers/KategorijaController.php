@@ -2,46 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\Kategorija;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class CategoryController extends Controller
+class KategorijaController extends Controller
 {
     /**
-     * Display a listing of the categories.
+     * Display a listing of the kategorije.
      */
     public function index()
     {
-        $categories = Category::with('parent')->orderBy('name')->get();
-        return view('categories.index', compact('categories'));
+        $kategorije = Kategorija::with('parent')->orderBy('name')->get();
+        return view('kategorije.index', compact('kategorije'));
     }
 
     /**
-     * Show the form for creating a new category.
+     * Show the form for creating a new Kategorija.
      */
     public function create()
     {
-        $parentCategories = Category::orderBy('name')->get();
-        return view('categories.create', compact('parentCategories'));
+        $parentKategorije = Kategorija::orderBy('name')->get();
+        return view('kategorije.create', compact('parentKategorije'));
     }
 
     /**
-     * Store a newly created category in storage.
+     * Store a newly created Kategorija in storage.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:categories,id',
+            'parent_id' => 'nullable|exists:kategorije,id',
         ]);
 
         // Generate slug from name
         $slug = Str::slug($validated['name']);
         
         // Check if the slug already exists
-        $count = Category::where('slug', 'like', $slug . '%')->count();
+        $count = Kategorija::where('slug', 'like', $slug . '%')->count();
         if ($count > 0) {
             $slug = $slug . '-' . ($count + 1);
         }
@@ -49,50 +49,50 @@ class CategoryController extends Controller
         // Add slug to validated data
         $validated['slug'] = $slug;
         
-        Category::create($validated);
+        Kategorija::create($validated);
 
-        return redirect()->route('categories.index')
+        return redirect()->route('kategorije.index')
             ->with('success', 'Kategorija uspešno kreirana.');
     }
 
     /**
-     * Display the specified category.
+     * Display the specified Kategorija.
      */
-    public function show(Category $category)
+    public function show(Kategorija $kategorija)
     {
-        $category->load(['parent', 'posts']);
-        return view('categories.show', compact('category'));
+        $kategorija->load(['parent', 'posts']);
+        return view('kategorije.show', compact('kategorija'));
     }
 
     /**
-     * Show the form for editing the specified category.
+     * Show the form for editing the specified Kategorija.
      */
-    public function edit(Category $category)
+    public function edit(Kategorija $kategorija)
     {
-        $parentCategories = Category::where('id', '!=', $category->id)
+        $parentKategorije = Kategorija::where('id', '!=', $kategorija->id)
             ->orderBy('name')
             ->get();
-        return view('categories.edit', compact('category', 'parentCategories'));
+        return view('kategorije.edit', compact('kategorija', 'parentKategorije'));
     }
 
     /**
-     * Update the specified category in storage.
+     * Update the specified Kategorija in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Kategorija $kategorija)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:categories,id',
+            'parent_id' => 'nullable|exists:kategorije,id',
         ]);
 
         // Generate slug from name only if name changed
-        if ($category->name !== $validated['name']) {
+        if ($kategorija->name !== $validated['name']) {
             $slug = Str::slug($validated['name']);
             
             // Check if the slug already exists
-            $count = Category::where('slug', 'like', $slug . '%')
-                ->where('id', '!=', $category->id)
+            $count = Kategorija::where('slug', 'like', $slug . '%')
+                ->where('id', '!=', $kategorija->id)
                 ->count();
             if ($count > 0) {
                 $slug = $slug . '-' . ($count + 1);
@@ -103,28 +103,28 @@ class CategoryController extends Controller
         }
         
         // Prevent circular references in parent-child relationships
-        if ($validated['parent_id'] == $category->id) {
+        if ($validated['parent_id'] == $kategorija->id) {
             return back()->withErrors(['parent_id' => 'Kategorija ne može biti sopstveni roditelj.']);
         }
         
-        $category->update($validated);
+        $kategorija->update($validated);
 
-        return redirect()->route('categories.index')
+        return redirect()->route('kategorije.index')
             ->with('success', 'Kategorija uspešno ažurirana.');
     }
 
     /**
-     * Remove the specified category from storage.
+     * Remove the specified Kategorija from storage.
      */
-    public function destroy(Category $category)
+    public function destroy(Kategorija $kategorija)
     {
-        // Check if category has children
-        if ($category->children()->count() > 0) {
+        // Check if Kategorija has children
+        if ($kategorija->children()->count() > 0) {
             return back()->withErrors(['delete' => 'Ne možete obrisati kategoriju koja ima podkategorije.']);
         }
         
-        $category->delete();
-        return redirect()->route('categories.index')
+        $kategorija->delete();
+        return redirect()->route('kategorije.index')
             ->with('success', 'Kategorija uspešno obrisana.');
     }
 }
