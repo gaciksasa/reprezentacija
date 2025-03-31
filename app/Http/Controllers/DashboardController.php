@@ -6,6 +6,7 @@ use App\Models\Utakmica;
 use App\Models\Tim;
 use App\Models\Igrac;
 use App\Models\Takmicenje;
+use App\Models\Kategorija;
 use App\Models\Gol;
 use App\Models\Karton;
 use App\Models\Post;
@@ -145,8 +146,28 @@ class DashboardController extends Controller
         // Fetch the latest posts for the carousel
         $poslednjiPostovi = Post::published()
             ->orderBy('post_date', 'desc')
-            ->take(5)
+            ->take(3)
             ->get();
+
+        // Fetch the latest posts for the carousel
+        $poslednjiPostovi = Post::published()
+            ->orderBy('post_date', 'desc')
+            ->take(3)
+            ->get();
+            
+        // Get all active categories with their posts
+        $kategorije = Kategorija::has('posts')
+            ->orderBy('name')
+            ->get();
+            
+        // For each category, fetch the latest posts
+        foreach ($kategorije as $kategorija) {
+            $kategorija->latest_posts = $kategorija->posts()
+                ->published()
+                ->orderBy('post_date', 'desc')
+                ->take(3)
+                ->get();
+        }
 
         return view('dashboard', compact(
             'glavniTim',
@@ -163,7 +184,8 @@ class DashboardController extends Controller
             'poslednjiPostovi',
             'poslednjaMec',
             'sledeciMec',
-            'nakonSledecegMec'
+            'nakonSledecegMec',
+            'kategorije'
         ));
     }
     

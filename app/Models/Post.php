@@ -77,4 +77,5 @@ class Post extends Model
         
         return asset('storage/uploads/' . $this->featured_image);
     }
+
 }
