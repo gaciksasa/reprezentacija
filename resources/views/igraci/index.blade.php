@@ -12,7 +12,7 @@
     @endif
 </div>
 
-<div class="card">
+<div class="igraci card">
     <div class="card-body">
         <!-- Alphabetical Navigation Links -->
         <div class="mb-3 text-center">
@@ -51,7 +51,7 @@
 
         <!-- Players List -->
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th width="40%">Igrač</th>

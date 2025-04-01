@@ -108,16 +108,16 @@
                                                 style="height: 200px; object-fit: cover;">
                                     @endif
                                     <div class="card-body">
-                                        <h5 class="card-title">
+                                        <h3 class="card-title">
                                             <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none">
                                                 {{ $post->post_title }}
                                             </a>
-                                        </h5>
+                                        </h3>
                                         <p class="card-text small text-muted">
-                                            {{ $post->post_date->format('d.m.Y') }}
+                                            {{ \Carbon\Carbon::parse($post->post_date)->format('d.m.Y H:i') }}
                                         </p>
                                         <p class="card-text">
-                                            {{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 100) }}
+                                            {{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 150) }}
                                         </p>
                                     </div>
                                     <div class="card-footer bg-transparent border-0">
@@ -217,7 +217,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table najbolji-strelci table-hover">
                             <tbody>
                                 @foreach($strelci as $index => $strelac)
                                 <tr>
@@ -238,7 +238,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table najvise-nastupa table-hover">
                             <tbody>
                                 @foreach($najviseNastupa as $index => $igrac)
                                 <tr>

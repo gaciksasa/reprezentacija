@@ -13,13 +13,13 @@
 </div>
 
 @if($utakmice->where('datum', '>', now())->count() > 0)
-<div class="card mb-4">
+<div class="utakmice card mb-4">
     <div class="card-header">
         <h2 class="card-title mb-0">Predstojeće utakmice</h2>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Datum</th>
@@ -77,13 +77,13 @@
 </div>
 @endif
 
-<div class="card">
+<div class="utakmice card">
     <div class="card-header">
         <h2 class="card-title mb-0">Prethodne utakmice</h2>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Datum</th>

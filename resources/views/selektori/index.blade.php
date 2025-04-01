@@ -12,10 +12,10 @@
     @endif
 </div>
 
-<div class="card">
+<div class="selektori card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Selektor</th>

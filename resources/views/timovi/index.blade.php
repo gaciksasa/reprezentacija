@@ -12,10 +12,10 @@
     @endif
 </div>
 
-<div class="card">
+<div class="timovi card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Država</th>

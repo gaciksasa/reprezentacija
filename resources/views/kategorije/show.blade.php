@@ -44,7 +44,7 @@
 @endif
 
 @if($kategorija->posts->count() > 0)
-    <div class="row">
+    <div class="posts row">
         @foreach($kategorija->posts as $post)
             <div class="col-md-4 mb-4">
                 <div class="card h-100">

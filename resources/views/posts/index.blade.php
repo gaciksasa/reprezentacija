@@ -17,7 +17,7 @@
     @endif
 </div>
 
-<div class="row">
+<div class="posts row">
     @forelse($posts as $post)
     <div class="col-md-6 col-lg-4 mb-4">
         <div class="card h-100">

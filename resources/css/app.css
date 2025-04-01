@@ -1842,11 +1842,11 @@ progress {
 
 .table {
     --bs-table-bg: transparent;
-    --bs-table-striped-color: #878D97;
+    --bs-table-striped-color: #f5f5f5;
     --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
-    --bs-table-active-color: #878D97;
+    --bs-table-active-color: #f5f5f5;
     --bs-table-active-bg: rgba(0, 0, 0, 0.1);
-    --bs-table-hover-color: #878D97;
+    --bs-table-hover-color: #f5f5f5;
     --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
     width: 100%;
     margin-bottom: 1rem;
@@ -4499,7 +4499,7 @@ textarea.form-control-lg {
     z-index: 1;
     color: #495057;
     text-decoration: none;
-    background-color: #f8f9fa
+    background-color: #efefef;
 }
 
 .list-group-item-action:active {
@@ -12637,7 +12637,22 @@ a:hover, .nav-link:hover {
     color: var(--bs-primary);
 }
 
-.category-news-tabs, .bilansi .card, .statistika .card{
+.category-news-tabs, .bilansi .card, .statistika .card, .posts .card, .timovi, .utakmice, .igraci, .selektori {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.category-news-tabs .card, .bilansi .card, .statistika .card, .posts .card, .posts .card img {
+    transition: transform 0.2s;
+}
+
+.category-news-tabs .card:hover, .bilansi .card:hover, .statistika .card:hover, .posts .card:hover {
+    transform: translateY(-5px);
+}
+
+.category-news-tabs .card {
+    background-color: #f5f5f5;
+}
+
+.posts .card:hover img {
+    transform: scale(1.02);
+}
