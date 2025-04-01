@@ -36,7 +36,7 @@
 @include('partials.upcoming-fixtures')
 
 <!-- Category News Tabs -->
-<section class="category-news-tabs card mb-3">
+<section class="category-news-tabs card mb-4">
     <div class="card-header">
         @if(count($kategorije) > 0)
         <ul class="nav nav-tabs card-header-tabs" id="newsCategories" role="tablist">

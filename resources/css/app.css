@@ -3944,7 +3944,7 @@ textarea.form-control-lg {
 
 .card-header {
     padding: .5rem 0;
-    margin-bottom: 0;
+    margin-bottom: 1rem;
     border-bottom: 5px solid rgb(33, 37, 41);
     background: none;
 }
@@ -12637,7 +12637,7 @@ a:hover, .nav-link:hover {
     color: var(--bs-primary);
 }
 
-.category-news-tabs, .bilansi .card, .statistika .card, .posts .card, .timovi, .utakmice, .igraci, .selektori {
+.category-news-tabs, .bilansi .card, .statistika .card, .posts .card, .timovi .card, .utakmice, .igraci, .igraci .card, .selektori {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 

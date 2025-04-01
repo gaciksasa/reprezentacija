@@ -114,7 +114,7 @@
         </div>
     </nav>
      
-    <div class="container my-4">
+    <div class="container my-5">
     @yield('content')
     </div>
 

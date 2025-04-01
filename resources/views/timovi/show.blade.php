@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="timovi row">
     <div class="col-lg-4 mb-4">
         <div class="card">
             <div class="card-body text-center">

@@ -17,21 +17,21 @@
     </div>
 </div>
 
-<div class="row">
+<div class="igraci row">
     <div class="col-lg-4">
-        <div class="card lg-4 border-0">
+        <div class="card lg-4 mb-4">
             <div class="card-header">
                 <h2 class="card-title mb-0">Osnovni podaci</h2>
             </div>
             <div class="card-body">
                 <div class="row">
                 @if($igrac->fotografija_path)
-                <div class="mb-4 text-center">
-                    <img src="{{ asset('storage/' . $igrac->fotografija_path) }}" alt="{{ $igrac->prezime }} {{ $igrac->ime }}" 
-                         class="img-fluid rounded">
-                </div>
+                    <div class="mb-5 text-center">
+                        <img src="{{ asset('storage/' . $igrac->fotografija_path) }}" alt="{{ $igrac->prezime }} {{ $igrac->ime }}" 
+                            class="img-fluid rounded">
+                    </div>
                 @else
-                    <div class="d-flex justify-content-center align-items-center rounded" style="width: 100%;">
+                    <div class="mb-5 d-flex justify-content-center align-items-center rounded" style="width: 100%;">
                         <i class="fas fa-user fa-5x text-secondary"></i>
                     </div>
                 @endif
