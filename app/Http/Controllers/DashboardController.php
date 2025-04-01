@@ -68,6 +68,7 @@ class DashboardController extends Controller
                 $query->whereIn('domacin_id', $timIds)
                     ->orWhereIn('gost_id', $timIds);
             })
+            ->where('datum', '<', now())
             ->orderBy('datum', 'desc')
             ->take(5)
             ->get();
