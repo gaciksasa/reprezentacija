@@ -1,7 +1,7 @@
-<div class="container matches-container my-4">
+<section class="matches-container my-5">
     <div class="row">
         <!-- Last Match -->
-        <div class="col-lg-4 my-3">
+        <div class="col-lg-4 my-4">
             <div class="match-card h-100">
                 <div class="match-header">
                     <h3 class="match-title text-center">Prethodni meč</h3>
@@ -124,7 +124,7 @@
         </div>
         
         <!-- Following Match -->
-        <div class="col-lg-4 my-3">
+        <div class="col-lg-4 my-4">
             <div class="match-card h-100">
                 <div class="match-header">
                     <h3 class="match-title text-center">Sledeći meč</h3>
@@ -178,4 +178,4 @@
             </div>
         </div>
     </div>
-</div>
+</section>
