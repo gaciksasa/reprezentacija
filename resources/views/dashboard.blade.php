@@ -143,113 +143,118 @@
 </section>
 
 <!-- Bilansi -->
-<div class="row mt-3 mb-3">
-    <div class="col-md-4 mb-2">
-        <div class="card">
-            <div class="card-body text-center p-5">
-                <h2 class="card-title">Bilansi</h2>
-                <p class="display-4">{{ $brojTimova }}</p>
-                <a href="{{ route('timovi.index') }}" class="btn btn-primary">Prikaži sve</a>
+<section class="bilansi">
+    <div class="row mt-3 mb-3">
+        <div class="col-md-4 mb-2">
+            <div class="card">
+                <div class="card-body text-center p-5">
+                    <h2 class="card-title">Bilansi</h2>
+                    <p class="display-4">{{ $brojTimova }}</p>
+                    <a href="{{ route('timovi.index') }}" class="btn btn-primary">Prikaži sve</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-2">
+            <div class="card">
+                <div class="card-body text-center p-5">
+                    <h2 class="card-title">Reprezentativci</h2>
+                    <p class="display-4">{{ $brojIgraca }}</p>
+                    <a href="{{ route('igraci.index') }}" class="btn btn-primary">Prikaži sve</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-2">
+            <div class="card">
+                <div class="card-body text-center p-5">
+                    <h2 class="card-title">Utakmice</h2>
+                    <p class="display-4">{{ $brojUtakmica }}</p>
+                    <a href="{{ route('utakmice.index') }}" class="btn btn-primary">Prikaži sve</a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-2">
-        <div class="card">
-            <div class="card-body text-center p-5">
-                <h2 class="card-title">Reprezentativci</h2>
-                <p class="display-4">{{ $brojIgraca }}</p>
-                <a href="{{ route('igraci.index') }}" class="btn btn-primary">Prikaži sve</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-2">
-        <div class="card">
-            <div class="card-body text-center p-5">
-                <h2 class="card-title">Utakmice</h2>
-                <p class="display-4">{{ $brojUtakmica }}</p>
-                <a href="{{ route('utakmice.index') }}" class="btn btn-primary">Prikaži sve</a>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title mb-0">Poslednje utakmice</h2>
-            </div>
-            <div class="card-body">
-                <div class="list-group border-0">
-                    @foreach($poslednjeUtakmice as $utakmica)
-                    <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action border-0 border-bottom">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ $utakmica->domacin->naziv }}</strong> 
-                                {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }} 
-                                <strong>{{ $utakmica->gost->naziv }}</strong>
+<!-- Statistika -->
+<section class="statistika">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Poslednje utakmice</h2>
+                </div>
+                <div class="card-body">
+                    <div class="list-group border-0">
+                        @foreach($poslednjeUtakmice as $utakmica)
+                        <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action border-0 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ $utakmica->domacin->naziv }}</strong> 
+                                    {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }} 
+                                    <strong>{{ $utakmica->gost->naziv }}</strong>
+                                </div>
+                                <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
                             </div>
-                            <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
-                        </div>
-                        <small class="text-muted">
-                            @if($utakmica->takmicenje)
-                                {{ $utakmica->takmicenje->naziv }}
-                            @endif
-                        </small>
-                    </a>
-                    @endforeach
+                            <small class="text-muted">
+                                @if($utakmica->takmicenje)
+                                    {{ $utakmica->takmicenje->naziv }}
+                                @endif
+                            </small>
+                        </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-            <div class="card-footer">
-                <a href="{{ route('utakmice.index') }}" class="btn btn-primary">Sve utakmice</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 mb-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h2 class="card-title mb-0">Najbolji strelci</h2>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <tbody>
-                            @foreach($strelci as $index => $strelac)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td><a href="{{ route('igraci.show', $strelac->id) }}">{{ $strelac->prezime }} {{ $strelac->ime }}</a></td>
-                                <td class="text-end">{{ $strelac->broj_golova }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="card-footer">
+                    <a href="{{ route('utakmice.index') }}" class="btn btn-primary">Sve utakmice</a>
                 </div>
             </div>
         </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h2 class="card-title mb-0">Najviše nastupa</h2>
+        <div class="col-md-6 mb-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Najbolji strelci</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                @foreach($strelci as $index => $strelac)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td><a href="{{ route('igraci.show', $strelac->id) }}">{{ $strelac->prezime }} {{ $strelac->ime }}</a></td>
+                                    <td class="text-end">{{ $strelac->broj_golova }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <tbody>
-                            @foreach($najviseNastupa as $index => $igrac)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td><a href="{{ route('igraci.show', $igrac->id) }}">{{ $igrac->prezime }} {{ $igrac->ime }}</a></td>
-                                <td class="text-end">{{ $igrac->broj_nastupa }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Najviše nastupa</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                @foreach($najviseNastupa as $index => $igrac)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td><a href="{{ route('igraci.show', $igrac->id) }}">{{ $igrac->prezime }} {{ $igrac->ime }}</a></td>
+                                    <td class="text-end">{{ $igrac->broj_nastupa }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 @endsection
 
 @section('styles')
@@ -261,7 +266,6 @@
 
 .match-card {
     background-color: #fff;
-    border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -358,15 +362,15 @@
 .match-status {
     background-color: #f5f5f5;
     border-radius: 4px;
-    color: #666;
-    font-size: 0.8rem;
-    font-weight: 600;
+    color: #878d97;
+    font-size: 1.25rem;
+    font-weight: 700;
     padding: 0.2rem 0.5rem;
     margin-top: 0.25rem;
 }
 
 .match-vs {
-    color: #666;
+    color: #878d97;
     font-size: 1.2rem;
     font-weight: 600;
     text-transform: lowercase;
@@ -426,7 +430,7 @@
 }
 
 .countdown-digit {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: #c80036;
     font-family: 'Teko', sans-serif;
