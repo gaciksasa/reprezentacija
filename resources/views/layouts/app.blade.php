@@ -41,93 +41,79 @@
     </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary text-light mb-4 py-4">
-        <div class="container">
-            <a class="navbar-brand h2 text-light mb-0" href="{{ route('dashboard') }}">Reprezentacija</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">Početna</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('posts.index') }}">Vesti</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('utakmice.index') }}">Utakmice</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('timovi.index') }}">Bilansi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('igraci.index') }}">Reprezentativci</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('selektori.index') }}">Selektori</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Ostalo
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('takmicenja.index') }}">Takmičenja</a></li>
-                            <li><a class="dropdown-item" href="{{ route('stadioni.index') }}">Stadioni</a></li>
-                            <li><a class="dropdown-item" href="{{ route('sudije.index') }}">Sudije</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ route('statistika') }}">Statistika</a></li>
-                            <li><a class="dropdown-item" href="{{ route('kalendar') }}">Kalendar</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex ms-auto me-2" action="{{ route('pretraga') }}" method="GET">
-                    <input class="form-control me-2" type="search" name="query" placeholder="Pretraga..." aria-label="Pretraga">
-                    <button class="btn btn-outline-light" type="submit">Traži</button>
-                </form>
-                <ul class="navbar-nav">
-                    @if (Auth::check())
+    <div class="container-fluid p-0">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary text-light py-4">
+            <div class="container">
+                <a class="navbar-brand h2 text-light mb-0" href="{{ route('dashboard') }}">Reprezentacija</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('dashboard') }}">Početna</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('posts.index') }}">Vesti</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('utakmice.index') }}">Utakmice</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('timovi.index') }}">Bilansi</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('igraci.index') }}">Reprezentativci</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('selektori.index') }}">Selektori</a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                {{ Auth::user()->name }}
+                                Ostalo
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                @if (Auth::user()->is_admin)
-                                    <li><span class="dropdown-item text-muted">Administrator</span></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                @endif
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">Odjavi se</button>
-                                    </form>
-                                </li>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('takmicenja.index') }}">Takmičenja</a></li>
+                                <li><a class="dropdown-item" href="{{ route('stadioni.index') }}">Stadioni</a></li>
+                                <li><a class="dropdown-item" href="{{ route('sudije.index') }}">Sudije</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ route('statistika') }}">Statistika</a></li>
+                                <li><a class="dropdown-item" href="{{ route('kalendar') }}">Kalendar</a></li>
                             </ul>
                         </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Prijava</a>
-                        </li>
-                    @endif
-                </ul>
+                    </ul>
+                    <form class="d-flex ms-auto me-2" action="{{ route('pretraga') }}" method="GET">
+                        <input class="form-control me-2" type="search" name="query" placeholder="Pretraga..." aria-label="Pretraga">
+                        <button class="btn btn-outline-light" type="submit">Traži</button>
+                    </form>
+                    <ul class="navbar-nav">
+                        @if (Auth::check())
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    {{ Auth::user()->name }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    @if (Auth::user()->is_admin)
+                                        <li><span class="dropdown-item text-muted">Administrator</span></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    @endif
+                                    <li>
+                                        <form action="{{ route('logout') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">Odjavi se</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">Prijava</a>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
-
-    <div class="container mb-4">
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+        </nav>
 
         @yield('content')
     </div>

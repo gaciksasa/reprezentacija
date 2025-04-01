@@ -1,4 +1,4 @@
-<div class="matches-container my-4">
+<div class="container matches-container my-4">
     <div class="row">
         <!-- Last Match -->
         <div class="col-lg-4 my-3">

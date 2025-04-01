@@ -11661,6 +11661,8 @@ a:hover, .nav-link:hover {
     transform: skew(10deg);
     transition: 0.5s;
     border: solid 1px var(--bs-primary);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
 }
 
 .btn.btn-primary span,

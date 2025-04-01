@@ -3,9 +3,10 @@
 @section('title', 'Početna')
 
 @section('content')
+
 <!-- News Carousel -->
-<div class="card mb-4 p-0">
-    <div class="card-body p-0">
+<div class="bg-primary">
+    <div class="container">
         <div id="newsCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 @foreach($poslednjiPostovi as $index => $post)
@@ -35,11 +36,15 @@
     </div>
 </div>
 
+<!-- Include the upcoming fixtures section -->
+@include('partials.upcoming-fixtures')
+
 <!-- Category News Tabs -->
-<div class="card mb-4">
-    <div class="card-body">
-        @if(count($kategorije) > 0)
-            <ul class="nav nav-tabs" id="newsCategories" role="tablist">
+<div class="container bg-white">
+    <div class="card mb-4">
+        <div class="card-header">
+            @if(count($kategorije) > 0)
+            <ul class="nav nav-tabs card-header-tabs" id="newsCategories" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-news" 
                             type="button" role="tab" aria-controls="all-news" aria-selected="true">
@@ -56,100 +61,94 @@
                     </li>
                 @endforeach
             </ul>
-            
-            <div class="tab-content mt-4" id="newsCategoriesContent">
-                <div class="tab-pane fade show active" id="all-news" role="tabpanel" aria-labelledby="all-tab">
-                    <div class="row">
-                        @foreach($poslednjiPostovi as $post)
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-100">
-                                    @if($post->featured_image)
-                                        <img src="{{ asset('storage/uploads/' . $post->featured_image) }}" 
-                                             class="card-img-top" alt="{{ $post->post_title }}" 
-                                             style="height: 200px; object-fit: cover;">
-                                    @endif
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none">
-                                                {{ $post->post_title }}
-                                            </a>
-                                        </h5>
-                                        <p class="card-text small text-muted">
-                                            {{ $post->post_date->format('d.m.Y') }}
-                                            @if($post->kategorije->count() > 0)
-                                                | 
-                                                @foreach($post->kategorije as $kat)
-                                                    <span class="badge bg-secondary">{{ $kat->name }}</span>
-                                                @endforeach
-                                            @endif
-                                        </p>
-                                        <p class="card-text">
-                                            {{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 100) }}
-                                        </p>
-                                    </div>
-                                    <div class="card-footer bg-transparent border-0">
-                                        <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-primary">
-                                            Pročitaj više
+            </div>        
+        <div class="tab-content mt-4" id="newsCategoriesContent">
+            <div class="tab-pane fade show active" id="all-news" role="tabpanel" aria-labelledby="all-tab">
+                <div class="row">
+                    @foreach($poslednjiPostovi as $post)
+                    <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                @if($post->featured_image)
+                                    <img src="{{ asset('storage/uploads/' . $post->featured_image) }}" 
+                                            class="card-img-top" alt="{{ $post->post_title }}" 
+                                            style="height: 200px; object-fit: cover;">
+                                @endif
+                                <div class="card-body">
+                                    <h3 class="card-title">
+                                        <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none">
+                                            {{ $post->post_title }}
                                         </a>
+                                    </h3>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <p class="card-text small text-muted mb-0">
+                                            {{ \Carbon\Carbon::parse($post->post_date)->format('d.m.Y H:i') }}
+                                        </p>
                                     </div>
+                                    <p class="card-text">
+                                        {{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 150) }}
+                                    </p>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-primary">
+                                        Detaljnije
+                                    </a>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
-                
-                @foreach($kategorije as $kategorija)
-                    <div class="tab-pane fade" id="{{ $kategorija->slug }}" role="tabpanel" 
-                         aria-labelledby="{{ $kategorija->slug }}-tab">
-                        <div class="row">
-                            @if($kategorija->latest_posts->count() > 0)
-                                @foreach($kategorija->latest_posts as $post)
-                                    <div class="col-md-4 mb-4">
-                                        <div class="card h-100">
-                                            @if($post->featured_image)
-                                                <img src="{{ asset('storage/uploads/' . $post->featured_image) }}" 
-                                                     class="card-img-top" alt="{{ $post->post_title }}" 
-                                                     style="height: 200px; object-fit: cover;">
-                                            @endif
-                                            <div class="card-body">
-                                                <h5 class="card-title">
-                                                    <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none">
-                                                        {{ $post->post_title }}
-                                                    </a>
-                                                </h5>
-                                                <p class="card-text small text-muted">
-                                                    {{ $post->post_date->format('d.m.Y') }}
-                                                </p>
-                                                <p class="card-text">
-                                                    {{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 100) }}
-                                                </p>
-                                            </div>
-                                            <div class="card-footer bg-transparent border-0">
-                                                <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-primary">
-                                                    Pročitaj više
+            </div>
+            
+            @foreach($kategorije as $kategorija)
+                <div class="tab-pane fade" id="{{ $kategorija->slug }}" role="tabpanel" 
+                        aria-labelledby="{{ $kategorija->slug }}-tab">
+                    <div class="row">
+                        @if($kategorija->latest_posts->count() > 0)
+                            @foreach($kategorija->latest_posts as $post)
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        @if($post->featured_image)
+                                            <img src="{{ asset('storage/uploads/' . $post->featured_image) }}" 
+                                                    class="card-img-top" alt="{{ $post->post_title }}" 
+                                                    style="height: 200px; object-fit: cover;">
+                                        @endif
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none">
+                                                    {{ $post->post_title }}
                                                 </a>
-                                            </div>
+                                            </h5>
+                                            <p class="card-text small text-muted">
+                                                {{ $post->post_date->format('d.m.Y') }}
+                                            </p>
+                                            <p class="card-text">
+                                                {{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 100) }}
+                                            </p>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-0">
+                                            <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-primary">
+                                                Detaljnije
+                                            </a>
                                         </div>
                                     </div>
-                                @endforeach
-                            @else
-                                <div class="col-12">
-                                    <p class="text-center text-muted">Nema vesti u ovoj kategoriji.</p>
                                 </div>
-                            @endif
-                        </div>
+                            @endforeach
+                        @else
+                            <div class="col-12">
+                                <p class="text-center text-muted">Nema vesti u ovoj kategoriji.</p>
+                            </div>
+                        @endif
                     </div>
-                @endforeach
-            </div>
-        @else
-            <p class="text-center text-muted">Trenutno nema vesti razvrstanih po kategorijama.</p>
-        @endif
+                </div>
+            @endforeach
+            @else
+                <p class="text-center text-muted">Trenutno nema vesti razvrstanih po kategorijama.</p>
+            @endif
+        </div>
     </div>
 </div>
 
-<!-- Include the upcoming fixtures section -->
-@include('partials.upcoming-fixtures')
-
+<!-- Bilansi -->
 <div class="row mt-4 mb-3">
     <div class="col-md-4 mb-2">
         <div class="card">
