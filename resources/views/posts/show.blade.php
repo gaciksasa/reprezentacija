@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<div class="posts row">
+<div class="post-details row">
     <div class="col-md-8">
         <div class="card mb-4">
             <div class="card-body">
