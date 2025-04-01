@@ -189,9 +189,9 @@
                         <a href="{{ route('utakmice.show', $utakmica) }}" class="list-group-item list-group-item-action border-0 border-bottom">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>{{ $utakmica->domacin->naziv }}</strong> 
+                                    {{ $utakmica->domacin->naziv }}
                                     {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }} 
-                                    <strong>{{ $utakmica->gost->naziv }}</strong>
+                                    {{ $utakmica->gost->naziv }}
                                 </div>
                                 <small>{{ $utakmica->datum->format('d.m.Y') }}</small>
                             </div>
