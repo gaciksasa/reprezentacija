@@ -1,4 +1,4 @@
-<div class="card mb-4">
+<div class="utakmice card mb-4">
     @if(Auth::check() && Auth::user()->hasEditAccess())
     <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="card-title mb-0">Sastavi</h2>

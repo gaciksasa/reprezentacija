@@ -17,7 +17,7 @@
 </div>
 
 <!-- Informacije o utakmici -->
-<div class="card mb-4">
+<div class="utakmice card mb-4">
     <div class="card-body">
         <div class="row">
             <div class="col-md-6">

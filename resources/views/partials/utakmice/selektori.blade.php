@@ -1,4 +1,4 @@
-<div class="card mb-4">
+<div class="utakmice card mb-4">
     <div class="card-header text-center">
         <h2 class="card-title mb-0">Selektori</h2>
     </div>
