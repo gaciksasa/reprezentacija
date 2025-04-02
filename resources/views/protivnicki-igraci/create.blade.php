@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Dodaj protivničkog igrača</h1>
+    <h2>Dodaj protivničkog igrača</h2>
     <a href="{{ route('protivnicki-igraci.index', ['utakmica_id' => $utakmica->id, 'tim_id' => $tim->id]) }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Nazad
     </a>
@@ -12,41 +12,32 @@
 
 <div class="card mb-4">
     <div class="card-header">
-        <h5 class="card-title mb-0">Detalji utakmice</h5>
+        <h2 class="card-title mb-0">Detalji utakmice</h2>
     </div>
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-md-4 text-md-end">
-                <h5>{{ $utakmica->domacin->naziv }}</h5>
+                <h1>{{ $utakmica->domacin->naziv }}</h1>
             </div>
             <div class="col-md-4 text-center">
                 <div class="display-5">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
                 <div class="text-muted">{{ $utakmica->datum->format('d.m.Y') }}</div>
-                <div>{{ $utakmica->takmicenje->naziv }}</div>
+                <div>
+                @if($utakmica->takmicenje)
+                    {{ $utakmica->takmicenje->naziv }}
+                @endif
+                </div>
             </div>
             <div class="col-md-4">
-                <h5>{{ $utakmica->gost->naziv }}</h5>
+                <h1>{{ $utakmica->gost->naziv }}</h1>
             </div>
         </div>
     </div>
 </div>
 
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="card-title mb-0">Selektor tima: {{ $tim->naziv }}</h5>
-    </div>
-    <div class="card-body">
-        <input type="text" class="form-control @error('selektor') is-invalid @enderror" 
-            id="selektor" name="selektor" value="{{ old('selektor') }}">
-        @error('selektor')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
-
 <div class="card">
     <div class="card-header">
-        <h5 class="card-title mb-0">Novi igrač tima: {{ $tim->naziv }}</h5>
+        <h2 class="card-title mb-0">Novi igrač tima: {{ $tim->naziv }}</h2>
     </div>
     <div class="card-body">
         <form action="{{ route('protivnicki-igraci.store') }}" method="POST">
