@@ -1,5 +1,3 @@
-// resources/views/partials/utakmice/sastavi_lista.blade.php
-<!-- Sastavi -->
 <div class="row py-4 align-items-center">
     <div class="col-5 col-lg-4 text-end">
         @php

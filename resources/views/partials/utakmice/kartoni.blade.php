@@ -1,4 +1,3 @@
-<!-- Kartoni -->
 <div class="card mb-4">
    <div class="card-header text-center">
        <h2 class="card-title mb-0">Kartoni</h2>
@@ -188,4 +187,3 @@
        @endif
    </div>
 </div>
-@endsection
