@@ -59,12 +59,12 @@ class Utakmica extends Model
     
     public function sastavi()
     {
-        return $this->hasMany(Sastav::class);
+        return $this->hasMany(Sastav::class)->orderBy('redosled')->orderByDesc('starter');
     }
 
     public function protivnickiIgraci()
     {
-        return $this->hasMany(ProtivnickiIgrac::class);
+        return $this->hasMany(ProtivnickiIgrac::class)->orderBy('redosled');
     }
     
     public function protivnickeIzmene()

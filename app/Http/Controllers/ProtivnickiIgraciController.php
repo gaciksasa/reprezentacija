@@ -91,6 +91,11 @@ class ProtivnickiIgraciController extends Controller
             'kapiten' => 'boolean',
         ]);
         
+        // Get the next order value (max + 1)
+        $maxOrder = ProtivnickiIgrac::where('utakmica_id', $validated['utakmica_id'])
+            ->where('tim_id', $validated['tim_id'])
+            ->max('redosled') ?? 0;
+        
         // Razdvajanje imena i prezimena (prvo ime, sve ostalo prezime)
         $imePrezime = explode(' ', $validated['ime_prezime'], 2);
         $ime = $imePrezime[0];
@@ -106,6 +111,7 @@ class ProtivnickiIgraciController extends Controller
             'utakmica_id' => $validated['utakmica_id'],
             'tim_id' => $validated['tim_id'],
             'kapiten' => $kapiten,
+            'redosled' => $maxOrder + 1,
             'u_sastavu' => true, // Dodaj da je u sastavu
         ]);
         
@@ -116,7 +122,8 @@ class ProtivnickiIgraciController extends Controller
             ]);
         }
 
-        return redirect()->route('utakmice.show', $validated['utakmica_id'])
+        // Redirect to the sastavi page with the utakmica_id parameter
+        return redirect()->route('sastavi.index', ['utakmica_id' => $validated['utakmica_id']])
             ->with('success', 'Protivnički igrač uspešno dodat.');
     }
 

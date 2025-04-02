@@ -131,9 +131,14 @@ class SastaviController extends Controller
                 ->with('error', 'Igrač je već dodat u sastav.');
         }
 
+        $maxOrder = Sastav::where('utakmica_id', $validated['utakmica_id'])
+            ->where('tim_id', $validated['tim_id'])
+            ->max('redosled') ?? 0;
+
+        $validated['redosled'] = $maxOrder + 1;
+
         Sastav::create($validated);
 
-        // Izmenjeni deo - redirekcija na sastavi umesto na utakmicu
         return redirect()->route('sastavi.index', ['utakmica_id' => $validated['utakmica_id']])
             ->with('success', 'Igrač uspešno dodat.');
     }

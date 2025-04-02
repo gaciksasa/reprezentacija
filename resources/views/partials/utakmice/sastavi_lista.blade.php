@@ -1,8 +1,11 @@
 <div class="row py-4 align-items-center">
     <div class="col-5 col-lg-4 text-end">
         @php
-            $domaciSastav = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)->sortByDesc('starter');
-            $domaciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->domacin_id);
+            $domaciSastav = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)
+                ->sortBy('redosled')
+                ->sortByDesc('starter');
+            $domaciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->domacin_id)
+                ->sortBy('redosled');
             $imaDomacihIgraca = $domaciSastav->count() > 0 || $domaciProtivnickiIgraci->count() > 0;
             
             // Dobavi glavni tim (izabrani tim)
@@ -65,8 +68,11 @@
     <div class="col-2 col-lg-4"></div>
     <div class="col-5 col-lg-4">
         @php
-            $gostujuciSastav = $utakmica->sastavi->where('tim_id', $utakmica->gost_id)->sortByDesc('starter');
-            $gostujuciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->gost_id);
+            $gostujuciSastav = $utakmica->sastavi->where('tim_id', $utakmica->gost_id)
+            ->sortBy('redosled')
+            ->sortByDesc('starter');
+            $gostujuciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->gost_id)
+                ->sortBy('redosled');
             $imaGostujucihIgraca = $gostujuciSastav->count() > 0 || $gostujuciProtivnickiIgraci->count() > 0;
             $gostJeNasTim = in_array($utakmica->gost_id, $glavniTimIds);
         @endphp
