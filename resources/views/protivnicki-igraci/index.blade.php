@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Protivnički igrači</h1>
+    <h2>Protivnički igrači</h2>
     <div>
         <a href="{{ route('protivnicki-igraci.create', ['utakmica_id' => $utakmica->id, 'tim_id' => $tim->id]) }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Dodaj igrača
@@ -17,12 +17,12 @@
 
 <div class="card mb-4">
     <div class="card-header">
-        <h5 class="card-title mb-0">Detalji utakmice</h5>
+        <h2 class="card-title mb-0">Detalji utakmice</h2>
     </div>
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-md-4 text-md-end">
-                <h5>{{ $utakmica->domacin->naziv }}</h5>
+                <h1>{{ $utakmica->domacin->naziv }}</h1>
             </div>
             <div class="col-md-4 text-center">
                 <div class="display-5">{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</div>
@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <h5>{{ $utakmica->gost->naziv }}</h5>
+                <h1>{{ $utakmica->gost->naziv }}</h1>
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h5 class="card-title mb-0">Igrači tima: {{ $tim->naziv }}</h5>
+        <h2 class="card-title mb-0">Igrači tima: {{ $tim->naziv }}</h2>
     </div>
     <div class="card-body">
         @if($protivnickiIgraci->count() > 0)
@@ -68,9 +68,6 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="{{ route('protivnicki-igraci.edit', $igrac) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
                                     <button type="button" class="btn btn-sm btn-danger" 
                                             onclick="document.getElementById('delete-igrac-{{ $igrac->id }}').submit()">
                                         <i class="fas fa-trash"></i>

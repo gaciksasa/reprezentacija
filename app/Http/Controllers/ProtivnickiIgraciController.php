@@ -121,15 +121,6 @@ class ProtivnickiIgraciController extends Controller
     }
 
     /**
-     * Prikaz forme za izmenu protivničkog igrača.
-     */
-    public function edit(ProtivnickiIgrac $protivnickiIgrac)
-    {
-        $protivnickiIgrac->load(['utakmica', 'tim']);
-        return view('protivnicki-igraci.edit', compact('protivnickiIgrac'));
-    }
-
-    /**
      * Ažuriranje protivničkog igrača.
      */
     public function update(Request $request, ProtivnickiIgrac $protivnickiIgrac)
