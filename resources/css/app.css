@@ -12637,7 +12637,7 @@ a:hover, .nav-link:hover {
     color: var(--bs-primary);
 }
 
-.category-news-tabs, .bilansi .card, .statistika .card, .post-details .card, .posts .card, .timovi .card, .utakmice, .igraci, .igraci .card, .selektori {
+.category-news-tabs, .bilansi .card, .statistika .card, .post-details .card, .posts .card, .timovi .card, .utakmice, .igraci .card, .selektori .card {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
