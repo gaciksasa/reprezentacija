@@ -16,7 +16,7 @@ class UtakmiceController extends Controller
    public function index()
    {
        $utakmice = Utakmica::with(['domacin', 'gost'])
-           ->orderBy('datum', 'asc')
+           ->orderBy('datum', 'desc')
            ->paginate(25);
        return view('utakmice.index', compact('utakmice'));
    }

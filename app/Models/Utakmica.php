@@ -121,7 +121,7 @@ class Utakmica extends Model
             }
         }
         
-        return '(' . $domacin_poluvreme . '-' . $gost_poluvreme . ')';
+        return '( ' . $domacin_poluvreme . ' - ' . $gost_poluvreme . ' )';
     }
 
     /**

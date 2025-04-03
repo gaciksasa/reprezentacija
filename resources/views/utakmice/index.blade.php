@@ -96,7 +96,7 @@
                 </thead>
                 <tbody>
                     @foreach($utakmice->where('datum', '<=', now())->sortByDesc('datum') as $utakmica)
-                    <tr>
+                    <tr class="align-middle">
                         <td>{{ $utakmica->datum->format('d.m.Y') }}</td>
                         <td class="d-none d-lg-table-cell">
                             @if($utakmica->takmicenje)
@@ -112,14 +112,12 @@
                             <strong>{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</strong>
                             @if($utakmica->imao_jedanaesterce)
                                 <small class="d-block">
-                                    ({{ $utakmica->jedanaesterci_domacin }}-{{ $utakmica->jedanaesterci_gost }} pen)
+                                    ( {{ $utakmica->jedanaesterci_domacin }} - {{ $utakmica->jedanaesterci_gost }} pen )
                                 </small>
                             @endif
-                            @if($utakmica->poluvreme_rezultat_domacin !== null && $utakmica->poluvreme_rezultat_gost !== null)
-                                <small class="text-muted d-block">
-                                    ({{ $utakmica->poluvreme_rezultat_domacin }} - {{ $utakmica->poluvreme_rezultat_gost }})
-                                </small>
-                            @endif
+                            <!-- <small class="text-muted d-block">
+                                {{ $utakmica->poluvremenskiRezultat }}
+                            </small> -->
                         </td>
                         <td>
                             <a href="{{ route('timovi.show', $utakmica->gost) }}">
