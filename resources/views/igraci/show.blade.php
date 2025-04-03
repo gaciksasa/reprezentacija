@@ -185,54 +185,55 @@
                         @endif
                     </div>
                     
+                    <!-- Tab sa golovima -->
                     <div class="tab-pane fade" id="golovi" role="tabpanel">
                         @if($igrac->golovi->count() > 0)
+                            @php
+                                // Grupisanje golova po utakmici
+                                $grupisaniGolovi = $igrac->golovi->groupBy('utakmica_id');
+                            @endphp
                             <div class="table-responsive">
-                                <table class="table table-sm">
+                                <table class="table table-striped">
                                     <thead>
                                         <tr>
                                             <th>Datum</th>
                                             <th>Utakmica</th>
-                                            <th>Minut</th>
-                                            <th>Tip</th>
+                                            <th>Golova</th>
+                                            <th>Minuti</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($igrac->golovi->sortByDesc('utakmica.datum') as $gol)
-                                        <tr>
-                                            <td>{{ $gol->utakmica ? $gol->utakmica->datum->format('d.m.Y') : '-' }}</td>
-                                            <td>
-                                                @if($gol->utakmica)
-                                                    <a href="{{ route('utakmice.show', $gol->utakmica) }}">
-                                                        @php
-                                                            $domacin = $gol->utakmica->domacin_id ? \App\Models\Tim::find($gol->utakmica->domacin_id) : null;
-                                                            $gost = $gol->utakmica->gost_id ? \App\Models\Tim::find($gol->utakmica->gost_id) : null;
-                                                        @endphp
-                                                        {{ $domacin ? $domacin->naziv : '?' }} 
-                                                        {{ $gol->utakmica->rezultat_domacin }}-{{ $gol->utakmica->rezultat_gost }} 
-                                                        {{ $gost ? $gost->naziv : '?' }}
+                                        @foreach($grupisaniGolovi as $utakmica_id => $goloviUtakmice)
+                                            @php
+                                                $utakmica = $goloviUtakmice->first()->utakmica;
+                                                $minuti = $goloviUtakmice->sortBy('minut')->map(function($gol) {
+                                                    $oznaka = '';
+                                                    if($gol->penal) $oznaka .= ' (p)';
+                                                    if($gol->auto_gol) $oznaka .= ' (ag)';
+                                                    return $gol->minut . "'" . $oznaka;
+                                                })->implode(', ');
+                                                $brojGolova = $goloviUtakmice->count();
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $utakmica->datum->format('d.m.Y') }}</td>
+                                                <td>
+                                                    <a href="{{ route('utakmice.show', $utakmica) }}">
+                                                        {{ $utakmica->domacin->naziv }} {{ $utakmica->rezultat_domacin }}-{{ $utakmica->rezultat_gost }} {{ $utakmica->gost->naziv }}
                                                     </a>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>{{ $gol->minut }}′</td>
-                                            <td>
-                                                @if($gol->auto_gol)
-                                                    <span class="badge bg-warning text-dark">Autogol</span>
-                                                @elseif($gol->penal)
-                                                    <span class="badge bg-info">Penal</span>
-                                                @else
-                                                    <span class="badge bg-success">Iz igre</span>
-                                                @endif
-                                            </td>
-                                        </tr>
+                                                </td>
+                                                <td>
+                                                    @if($brojGolova > 0)
+                                                        <span class="badge bg-success">{{ $brojGolova }}</span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $minuti }}</td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         @else
-                            <p class="text-center text-muted">Nema evidentiranih golova za ovog igrača.</p>
+                            <p class="text-center text-muted py-4">Nema evidentiranih golova za ovog igrača.</p>
                         @endif
                     </div>
                     
