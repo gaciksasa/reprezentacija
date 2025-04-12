@@ -62,17 +62,17 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('utakmice.index') }}">Sve utakmice</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '2020-2029') }}">2020-danas</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '2010-2019') }}">2010-2019</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '2000-2009') }}">2000-2009</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1990-1999') }}">1990-1999</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1980-1989') }}">1980-1989</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1970-1979') }}">1970-1979</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1960-1969') }}">1960-1969</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1950-1959') }}">1950-1959</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1940-1949') }}">1940-1949</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1930-1939') }}">1930-1939</a></li>
-                            <li><a class="dropdown-item" href="{{ route('utakmice.decade', '1920-1929') }}">1920-1929</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '2020-2029') }}">2020-danas</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '2010-2019') }}">2010-2019</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '2000-2009') }}">2000-2009</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1990-1999') }}">1990-1999</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1980-1989') }}">1980-1989</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1970-1979') }}">1970-1979</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1960-1969') }}">1960-1969</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1950-1959') }}">1950-1959</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1940-1949') }}">1940-1949</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1930-1939') }}">1930-1939</a></li>
+                            <li><a class="dropdown-item" href="{{ route('utakmice.dekada', '1920-1929') }}">1920-1929</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">

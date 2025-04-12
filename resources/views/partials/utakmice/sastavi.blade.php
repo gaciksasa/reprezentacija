@@ -1,6 +1,6 @@
 <div class="utakmice card mb-4">
     @if(Auth::check() && Auth::user()->hasEditAccess())
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header text-center">
         <h2 class="card-title mb-0">Sastavi</h2>
         <a href="{{ route('sastavi.index', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-primary">
             <i class="fas fa-users"></i> Upravljaj sastavima
@@ -18,9 +18,6 @@
                 </a>
             </div>
             <div class="col-4 text-center">
-                <div class="text-muted">
-                    {{ $utakmica->poluvremenskiRezultat }}
-                </div>
                 <div class="display-3 fw-bold">
                     {{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}
                     @if($utakmica->imao_jedanaesterce)
@@ -28,6 +25,9 @@
                             ({{ $utakmica->jedanaesterci_domacin }} - {{ $utakmica->jedanaesterci_gost }} pen)
                         </div>
                     @endif
+                </div>
+                <div class="text-muted">
+                    {{ $utakmica->poluvremenskiRezultat }}
                 </div>
             </div>
             <div class="col-4 text-center">

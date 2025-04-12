@@ -5,8 +5,8 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Utakmice
-    @if(isset($decade))
-        u periodu {{ $decade }}
+    @if(isset($dekada))
+        u periodu {{ $dekada }}
     @endif
     </h1>
     @if(Auth::check() && Auth::user()->hasEditAccess())

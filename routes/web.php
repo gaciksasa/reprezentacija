@@ -67,7 +67,7 @@ Route::post('/utakmice', [UtakmiceController::class, 'store'])->name('utakmice.s
 Route::get('/utakmice/{utakmica}/edit', [UtakmiceController::class, 'edit'])->name('utakmice.edit');
 Route::put('/utakmice/{utakmica}', [UtakmiceController::class, 'update'])->name('utakmice.update');
 Route::delete('/utakmice/{utakmica}', [UtakmiceController::class, 'destroy'])->name('utakmice.destroy');
-Route::get('/utakmice/decade/{decade}', [UtakmiceController::class, 'decade'])->name('utakmice.decade');
+Route::get('/utakmice/dekada/{dekada}', [UtakmiceController::class, 'dekada'])->name('utakmice.dekada');
 
 // CRUD for coaches
 Route::get('/selektori/create', [SelektoriController::class, 'create'])->name('selektori.create');

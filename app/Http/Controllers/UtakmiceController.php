@@ -233,12 +233,12 @@ class UtakmiceController extends Controller
    /**
      * Prikaz utakmica za određenu dekadu.
      * 
-     * @param string $decade Format: 'YYYY-YYYY', npr. '1920-1929'
+     * @param string $dekada Format: 'YYYY-YYYY', npr. '1920-1929'
      * @return \Illuminate\View\View
      */
-    public function decade($decade)
+    public function dekada($dekada)
     {
-        list($startYear, $endYear) = explode('-', $decade);
+        list($startYear, $endYear) = explode('-', $dekada);
         
         // Ako je dekada "danas", koristimo trenutnu godinu
         if ($endYear === 'danas') {
@@ -251,6 +251,6 @@ class UtakmiceController extends Controller
             ->orderBy('datum', 'desc')
             ->paginate(25);
             
-        return view('utakmice.index', compact('utakmice', 'decade'));
+        return view('utakmice.index', compact('utakmice', 'dekada'));
     }
 }
