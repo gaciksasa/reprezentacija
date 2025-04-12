@@ -61,7 +61,8 @@ body {
     font-weight: 400;
     line-height: 1.5;
     color: #878d97;
-    background-color: #efefef;
+    background: #efefef url('../../public/img/fss_logo.png') no-repeat bottom left;
+    background-attachment: fixed;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0,0,0,0)
 }

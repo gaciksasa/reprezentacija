@@ -199,7 +199,7 @@
                                             <th>Datum</th>
                                             <th>Utakmica</th>
                                             <th>Golova</th>
-                                            <th>Minuti</th>
+                                            <th>Minut</th>
                                         </tr>
                                     </thead>
                                     <tbody>

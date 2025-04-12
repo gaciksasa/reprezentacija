@@ -4,7 +4,11 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Utakmice</h1>
+    <h1>Utakmice
+    @if(isset($decade))
+        u periodu {{ $decade }}
+    @endif
+    </h1>
     @if(Auth::check() && Auth::user()->hasEditAccess())
     <a href="{{ route('utakmice.create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nova utakmica
