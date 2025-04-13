@@ -218,17 +218,32 @@
             </div>
             <div class="card-body">
                 @php
-                    $utakmice = [];
+                    // Collect all utakmice from all mandates
+                    $allUtakmice = collect();
                     foreach ($selektor->mandati as $mandat) {
-                        $utakmice = array_merge($utakmice, $mandat->utakmice()->toArray());
+                        $mandatUtakmice = $mandat->utakmice();
+                        $allUtakmice = $allUtakmice->concat($mandatUtakmice);
                     }
+                    
                     // Sort by date, newest first
-                    usort($utakmice, function($a, $b) {
-                        return strtotime($b['datum']) - strtotime($a['datum']);
-                    });
+                    $allUtakmice = $allUtakmice->sortByDesc('datum');
+                    
+                    // Manually paginate
+                    $perPage = 20;
+                    $currentPage = request()->query('page', 1);
+                    $currentPageItems = $allUtakmice->forPage($currentPage, $perPage);
+                    
+                    // Create a LengthAwarePaginator
+                    $utakmicePaginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                        $currentPageItems,
+                        $allUtakmice->count(),
+                        $perPage,
+                        $currentPage,
+                        ['path' => request()->url(), 'query' => request()->query()]
+                    );
                 @endphp
                 
-                @if(count($utakmice) > 0)
+                @if($allUtakmice->count() > 0)
                     <div class="table-responsive">
                         <table class="table table-sm">
                             <thead>
@@ -241,34 +256,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach(array_slice($utakmice, 0, 10) as $utakmica)
-                                @php
-                                    $domacin = App\Models\Tim::find($utakmica['domacin_id']);
-                                    $gost = App\Models\Tim::find($utakmica['gost_id']);
-                                    $takmicenje = App\Models\Takmicenje::find($utakmica['takmicenje_id']);
-                                    $datum = new DateTime($utakmica['datum']);
-                                @endphp
+                                @foreach($utakmicePaginator as $utakmica)
                                 <tr>
-                                    <td>{{ $datum->format('d.m.Y') }}</td>
-                                    <td>{{ $domacin->naziv ?? 'Nepoznat' }}</td>
+                                    <td>{{ $utakmica->datum->format('d.m.Y') }}</td>
+                                    <td>{{ $utakmica->domacin->naziv ?? 'Nepoznat' }}</td>
                                     <td class="text-center">
-                                        <a href="{{ route('utakmice.show', $utakmica['id']) }}">
-                                            <strong>{{ $utakmica['rezultat_domacin'] }} - {{ $utakmica['rezultat_gost'] }}</strong>
+                                        <a href="{{ route('utakmice.show', $utakmica->id) }}">
+                                            <strong>{{ $utakmica->rezultat_domacin }} - {{ $utakmica->rezultat_gost }}</strong>
                                         </a>
                                     </td>
-                                    <td>{{ $gost->naziv ?? 'Nepoznat' }}</td>
-                                    <td class="d-none d-lg-table-cell">{{ $takmicenje->naziv ?? 'Nepoznato' }}</td>
+                                    <td>{{ $utakmica->gost->naziv ?? 'Nepoznat' }}</td>
+                                    <td class="d-none d-lg-table-cell">{{ $utakmica->takmicenje->naziv ?? 'Nepoznato' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                     
-                    @if(count($utakmice) > 10)
-                        <div class="text-center mt-3">
-                            <p>Prikazano 10 od {{ count($utakmice) }} utakmica.</p>
-                        </div>
-                    @endif
+                    <!-- Pagination Links -->
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ $utakmicePaginator->links() }}
+                    </div>
                 @else
                     <p class="text-center text-muted">Nema evidentiranih utakmica za ovog selektora.</p>
                 @endif
