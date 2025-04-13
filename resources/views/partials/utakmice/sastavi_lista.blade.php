@@ -22,12 +22,16 @@
                                 <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
                                     <span>
                                         {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
+                                        @if($sastav->kapiten) <small>(C)</small> @endif
                                         <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
                                     </span>
                                 </a>
                                 @if(Auth::check() && Auth::user()->hasEditAccess())
-                                <div class="handle ms-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>                           
-                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-4">
+                                <div class="handle ms-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>  
+                                <a href="{{ route('sastavi.edit', $sastav->id) }}" class="btn btn-sm btn-warning ms-4">
+                                    <i class="fas fa-edit"></i>
+                                </a>                            
+                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
@@ -83,18 +87,22 @@
                         @if($sastav->starter)
                             <div class="d-flex align-items-center">
                                 @if(Auth::check() && Auth::user()->hasEditAccess())
-                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline me-4">
+                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline me-2">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
+                                <a href="{{ route('sastavi.edit', $sastav->id) }}" class="btn btn-sm btn-warning me-4">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <div class="handle me-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
                                 @endif
                                 <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
                                     <span>
                                         {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
+                                        @if($sastav->kapiten) <small>(C)</small> @endif
                                         <small class="text-muted">({{ $sastav->igrac->getBrojNastupaDoDatuma($utakmica->datum) }})</small>
                                     </span>
                                 </a>

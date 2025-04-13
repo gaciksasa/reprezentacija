@@ -12,11 +12,12 @@ class Sastav extends Model
     protected $table = 'sastavi';
     
     protected $fillable = [
-        'utakmica_id', 'tim_id', 'igrac_id', 'starter', 'selektor', 'redosled'
+        'utakmica_id', 'tim_id', 'igrac_id', 'starter', 'kapiten', 'selektor', 'redosled'
     ];
     
     protected $casts = [
         'starter' => 'boolean',
+        'kapiten' => 'boolean',
     ];
     
     // Relacije

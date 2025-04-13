@@ -118,8 +118,17 @@ class SastaviController extends Controller
             'tim_id' => 'required|exists:timovi,id',
             'igrac_id' => 'required|exists:igraci,id',
             'starter' => 'required|boolean',
+            'kapiten' => 'boolean',
             'selektor' => 'nullable|string|max:255',
         ]);
+
+        // Proverite da li je igrač već postavljen kao kapiten
+        if ($request->has('kapiten') && $request->kapiten) {
+            // Ako označimo novog igrača kao kapitena, uklonimo status kapitena od svih drugih igrača u ovom timu na ovoj utakmici
+            Sastav::where('utakmica_id', $validated['utakmica_id'])
+                ->where('tim_id', $validated['tim_id'])
+                ->update(['kapiten' => false]);
+        }
 
         // Provera da li igrač već postoji u sastavu
         $postojeciSastav = Sastav::where('utakmica_id', $validated['utakmica_id'])
@@ -136,6 +145,7 @@ class SastaviController extends Controller
             ->max('redosled') ?? 0;
 
         $validated['redosled'] = $maxOrder + 1;
+        $validated['kapiten'] = $request->has('kapiten') ? true : false;
 
         Sastav::create($validated);
 
@@ -155,25 +165,39 @@ class SastaviController extends Controller
     /**
      * Prikaz forme za izmenu igrača u sastavu.
      */
-    public function edit(Sastav $sastav)
+    public function edit($id)
     {
-        $sastav->load(['utakmica', 'tim', 'igrac']);
+        $sastav = Sastav::with(['utakmica.domacin', 'utakmica.gost', 'utakmica.takmicenje', 'igrac', 'tim'])
+                        ->findOrFail($id);
+        
         return view('sastavi.edit', compact('sastav'));
     }
 
     /**
      * Ažuriranje igrača u sastavu.
      */
-    public function update(Request $request, Sastav $sastav)
+    public function update(Request $request, $id)
     {
+        $sastav = Sastav::findOrFail($id);
+        
         $validated = $request->validate([
             'starter' => 'required|boolean',
+            'kapiten' => 'nullable|boolean',
             'selektor' => 'nullable|string|max:255',
         ]);
 
+        // Ako se označava kao kapiten, ukloni status kapitena od svih drugih igrača
+        if ($request->has('kapiten') && $request->kapiten) {
+            Sastav::where('utakmica_id', $sastav->utakmica_id)
+                ->where('tim_id', $sastav->tim_id)
+                ->where('id', '!=', $sastav->id)
+                ->update(['kapiten' => false]);
+        }
+
+        $validated['kapiten'] = $request->has('kapiten') ? true : false;
         $sastav->update($validated);
 
-        return redirect()->route('sastavi.index', ['utakmica_id' => $sastav->utakmica_id])
+        return redirect()->route('utakmice.show', $sastav->utakmica_id)
             ->with('success', 'Igrač u sastavu uspešno ažuriran.');
     }
 

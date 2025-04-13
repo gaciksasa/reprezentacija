@@ -73,6 +73,15 @@
                         </label>
                     </div>
                 </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="kapiten" name="kapiten" value="1" {{ old('kapiten') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="kapiten">
+                            Kapiten tima
+                        </label>
+                    </div>
+                </div>
                 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">Sačuvaj igrača u sastavu</button>
