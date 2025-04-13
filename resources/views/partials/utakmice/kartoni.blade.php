@@ -65,7 +65,7 @@
                                
                                @if($domacinJeNasTim)
                                    <a href="{{ route('igraci.show', $karton->igrac) }}" class="text-decoration-none">
-                                       <span class="text-danger fw-bold">{{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}</span>
+                                       <span>{{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}</span>
                                    </a>
                                @else
                                    {{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}
@@ -132,7 +132,7 @@
                                
                                @if($gostJeNasTim)
                                    <a href="{{ route('igraci.show', $karton->igrac) }}" class="text-decoration-none">
-                                       <span class="text-danger fw-bold">{{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}</span>
+                                       <span>{{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}</span>
                                    </a>
                                @else
                                    {{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}

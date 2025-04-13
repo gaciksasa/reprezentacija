@@ -31,7 +31,7 @@
                                 <a href="{{ route('sastavi.edit', $sastav->id) }}" class="btn btn-sm btn-warning ms-4">
                                     <i class="fas fa-edit"></i>
                                 </a>                            
-                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline ms-2">
+                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
@@ -87,7 +87,7 @@
                         @if($sastav->starter)
                             <div class="d-flex align-items-center">
                                 @if(Auth::check() && Auth::user()->hasEditAccess())
-                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline me-2">
+                                <form action="{{ route('sastavi.destroy', $sastav->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
