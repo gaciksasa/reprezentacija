@@ -25,6 +25,7 @@
                         <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
                             <span>{{ $selektor->selektor->ime_prezime }}</span>
                         </a>
+                        <span class="text-muted ms-1">({{ $selektor->getBrojUtakmiceZaDatum($utakmica->datum) }})</span>
                         @if($selektor->v_d_status)
                             <span class="badge bg-warning text-dark ms-1">v.d.</span>
                         @endif
@@ -82,6 +83,7 @@
                         <a href="{{ route('selektori.show', $selektor->selektor) }}" class="text-decoration-none">
                             <span>{{ $selektor->selektor->ime_prezime }}</span>
                         </a>
+                        <span class="text-muted ms-1">({{ $selektor->getBrojUtakmiceZaDatum($utakmica->datum) }})</span>
                         @if($selektor->v_d_status)
                             <span class="badge bg-warning text-dark ms-1">v.d.</span>
                         @endif

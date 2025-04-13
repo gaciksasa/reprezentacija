@@ -155,4 +155,29 @@ class SelektorMandat extends Model
             'procenatPobeda' => count($utakmice) > 0 ? round($pobede / count($utakmice) * 100, 2) : 0
         ];
     }
+
+    /**
+     * Get the match number for a specific match during this mandate
+     * 
+     * @param \DateTime $datumUtakmice
+     * @return int
+     */
+    public function getBrojUtakmiceZaDatum($datumUtakmice)
+    {
+        // First get all matches where this team played during the mandate period
+        $query = Utakmica::where(function($q) {
+                $q->where('domacin_id', $this->tim_id)
+                ->orWhere('gost_id', $this->tim_id);
+            })
+            ->where('datum', '>=', $this->pocetak_mandata)
+            ->where('datum', '<=', $datumUtakmice);
+        
+        // If there's an end date to the mandate, restrict to that period
+        if ($this->kraj_mandata && $this->kraj_mandata < $datumUtakmice) {
+            $query->where('datum', '<=', $this->kraj_mandata);
+        }
+        
+        // Order and count
+        return $query->orderBy('datum', 'asc')->count();
+    }
 }
