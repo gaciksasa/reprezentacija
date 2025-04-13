@@ -84,7 +84,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('selektori.index') }}">Selektori</a>
                     </li>
-                    <li class="nav-item dropdown">
+                    <!--<li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             Ostalo
                         </a>
@@ -96,12 +96,12 @@
                             <li><a class="dropdown-item" href="{{ route('statistika') }}">Statistika</a></li>
                             <li><a class="dropdown-item" href="{{ route('kalendar') }}">Kalendar</a></li>
                         </ul>
-                    </li>
+                    </li>-->
                 </ul>
-                <form class="d-flex ms-auto me-2" action="{{ route('pretraga') }}" method="GET">
+                <!--<form class="d-flex ms-auto me-2" action="{{ route('pretraga') }}" method="GET">
                     <input class="form-control me-2" type="search" name="query" placeholder="Pretraga..." aria-label="Pretraga">
                     <button class="btn btn-outline-light" type="submit">Traži</button>
-                </form>
+                </form>-->
                 <ul class="navbar-nav">
                     @if (Auth::check())
                         <li class="nav-item dropdown">

@@ -27,8 +27,8 @@
                             <th class="text-center">G+</th>
                             <th class="text-center">G-</th>
                             <th class="text-center">+/-</th>
-                            <th class="text-center d-none d-lg-table-cell">+/m</th>
-                            <th class="text-center d-none d-lg-table-cell">-/m</th>
+                            <th class="text-center d-none d-lg-table-cell">G+/U</th>
+                            <th class="text-center d-none d-lg-table-cell">G-/U</th>
                         </tr>
                     </thead>
                     <tbody>
