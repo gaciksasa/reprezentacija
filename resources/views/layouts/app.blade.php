@@ -90,8 +90,6 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('takmicenja.index') }}">Takmičenja</a></li>
-                            <li><a class="dropdown-item" href="{{ route('stadioni.index') }}">Stadioni</a></li>
-                            <li><a class="dropdown-item" href="{{ route('sudije.index') }}">Sudije</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ route('statistika') }}">Statistika</a></li>
                             <li><a class="dropdown-item" href="{{ route('kalendar') }}">Kalendar</a></li>

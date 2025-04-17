@@ -5,9 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UtakmiceController;
 use App\Http\Controllers\TimoviController;
 use App\Http\Controllers\IgraciController;
-use App\Http\Controllers\StadioniController;
 use App\Http\Controllers\TakmicenjaController;
-use App\Http\Controllers\SudijeController;
 use App\Http\Controllers\SastaviController;
 use App\Http\Controllers\SelektoriController;
 use App\Http\Controllers\ProtivnickiSelektoriController;
@@ -27,9 +25,11 @@ use App\Http\Controllers\KategorijaController;
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
-// Register routes
-Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
+// Register routes - protected
+Route::middleware('auth')->group(function() {
+    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
+});
 
 // Logout route
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -100,14 +100,8 @@ Route::resource('kategorije', KategorijaController::class)->only(['index', 'show
 // CRUD for opponent coaches - protected
 Route::middleware('auth')->resource('protivnicki-selektori', ProtivnickiSelektoriController::class)->except(['index', 'show']);
 
-// CRUD for stadiums - protected
-Route::middleware('auth')->resource('stadioni', StadioniController::class)->except(['index', 'show']);
-
 // CRUD for competitions - protected
 Route::middleware('auth')->resource('takmicenja', TakmicenjaController::class)->except(['index', 'show']);
-
-// CRUD for referees - protected
-Route::middleware('auth')->resource('sudije', SudijeController::class)->except(['index', 'show']);
 
 // CRUD for lineups - protected
 Route::middleware('auth')->resource('sastavi', SastaviController::class)->except(['index', 'show']);
@@ -163,7 +157,3 @@ Route::get('/selektori', [SelektoriController::class, 'index'])->name('selektori
 Route::get('/selektori/{selektor}', [SelektoriController::class, 'show'])->name('selektori.show');
 Route::get('/takmicenja', [TakmicenjaController::class, 'index'])->name('takmicenja.index');
 Route::get('/takmicenja/{takmicenje}', [TakmicenjaController::class, 'show'])->name('takmicenja.show');
-Route::get('/stadioni', [StadioniController::class, 'index'])->name('stadioni.index');
-Route::get('/stadioni/{stadion}', [StadioniController::class, 'show'])->name('stadioni.show');
-Route::get('/sudije', [SudijeController::class, 'index'])->name('sudije.index');
-Route::get('/sudije/{sudija}', [SudijeController::class, 'show'])->name('sudije.show');
