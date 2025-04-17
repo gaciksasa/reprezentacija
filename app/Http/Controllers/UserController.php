@@ -10,15 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
-        $this->authorizeResource(User::class, 'user', [
-            'except' => ['profile', 'updateProfile'],
-        ]);
-    }
 
     /**
      * Display a listing of users

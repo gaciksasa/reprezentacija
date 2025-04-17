@@ -11,16 +11,6 @@ class TimoviController extends Controller
 {   
 
     /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
-        $this->authorizeResource(Tim::class, 'tim', [
-            'except' => ['index', 'show'],
-        ]);
-    }
-
-    /**
      * Prikaz svih timova.
      */
     public function index()

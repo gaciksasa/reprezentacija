@@ -10,17 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class UtakmiceController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
-        // Skip authorizeResource for specific methods
-        $this->middleware(function ($request, $next) {
-            logger("Current user role: " . (auth()->user() ? auth()->user()->role : 'guest'));
-            return $next($request);
-        });
-    }
 
    /**
     * Prikaz svih utakmica.
