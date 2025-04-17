@@ -1,11 +1,11 @@
 <div class="utakmice card mb-4">
     <div class="card-header text-center">
         <h2 class="card-title mb-0">Golovi</h2>
-        @if(Auth::check() && Auth::user()->hasEditAccess())
+        @can('manageGolovi', $utakmica)
         <a href="{{ route('golovi.create', ['utakmica_id' => $utakmica->id]) }}" class="btn btn-sm btn-primary mt-2">
             <i class="fas fa-plus"></i> Dodaj
         </a>
-        @endif
+        @endcan
     </div>
     <div class="card-body">
         @if($utakmica->golovi->count() > 0)
@@ -57,7 +57,7 @@
                                                 @endif
                                             @endif
                                         </div>
-                                        @if(Auth::check() && Auth::user()->hasEditAccess())
+                                        @can('manage-gol')
                                         <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline ms-2">
                                             @csrf
                                             @method('DELETE')
@@ -65,7 +65,7 @@
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
-                                        @endif
+                                        @endcan
                                     </div>
                                 </li>
                             @endforeach

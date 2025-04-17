@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user', [
+            'except' => ['profile', 'updateProfile'],
+        ]);
+    }
+
+    /**
      * Display a listing of users
      */
     public function index()
@@ -55,12 +65,6 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        // Only admin can edit other users, regular users can only edit themselves
-        if (!Auth::user()->isAdmin() && Auth::id() !== $user->id) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Nemate dozvolu za izmenu ovog korisnika.');
-        }
-
         return view('users.edit', compact('user'));
     }
 
@@ -69,12 +73,6 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // Only admin can edit other users, regular users can only edit themselves
-        if (!Auth::user()->isAdmin() && Auth::id() !== $user->id) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Nemate dozvolu za izmenu ovog korisnika.');
-        }
-
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
@@ -125,12 +123,6 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Prevent admin from deleting themselves
-        if (Auth::id() === $user->id) {
-            return redirect()->route('users.index')
-                ->with('error', 'Ne možete obrisati svoj nalog.');
-        }
-
         $user->delete();
         
         return redirect()->route('users.index')

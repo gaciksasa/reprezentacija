@@ -103,29 +103,29 @@
                     <button class="btn btn-outline-light" type="submit">Traži</button>
                 </form>-->
                 <ul class="navbar-nav">
-                    @if (Auth::check())
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                {{ Auth::user()->name }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                @if (Auth::user()->is_admin)
-                                    <li><span class="dropdown-item text-muted">Administrator</span></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                @endif
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">Odjavi se</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Prijava</a>
-                        </li>
-                    @endif
+                @if (Auth::check())
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            @can('admin')
+                                <li><span class="dropdown-item text-muted">Administrator</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                            @endcan
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">Odjavi se</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">Prijava</a>
+                    </li>
+                @endif
                 </ul>
             </div>
         </div>

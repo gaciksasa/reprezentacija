@@ -5,9 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Tim;
 use App\Models\Utakmica;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TimoviController extends Controller
-{
+{   
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Tim::class, 'tim', [
+            'except' => ['index', 'show'],
+        ]);
+    }
+
     /**
      * Prikaz svih timova.
      */

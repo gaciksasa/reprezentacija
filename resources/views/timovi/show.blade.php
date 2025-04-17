@@ -6,11 +6,11 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>{{ $tim->naziv }}</h1>
     <div>
-        @if(Auth::check() && Auth::user()->hasEditAccess())
+        @can('update', $tim)
         <a href="{{ route('timovi.edit', $tim) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Izmeni
         </a>
-        @endif
+        @endcan
         <a href="{{ route('timovi.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Nazad
         </a>
