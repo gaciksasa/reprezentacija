@@ -124,6 +124,9 @@ class GoloviController extends Controller
         return view('golovi.create', compact('utakmica', 'timovi', 'igraciDomacina', 'igraciGosta'));
     }
 
+    /**
+     * Čuvanje novog gola.
+     */
     public function store(Request $request)
     {
         // Provera da li je protivnički igrač
@@ -170,7 +173,8 @@ class GoloviController extends Controller
         // Ažuriranje rezultata utakmice
         $this->updateUtakmicaRezultat($validated['utakmica_id']);
         
-        return redirect()->route('utakmice.show', $validated['utakmica_id'])
+        // Redirekt nazad na istu stranicu umesto na pregled utakmice
+        return redirect()->route('golovi.create', ['utakmica_id' => $validated['utakmica_id']])
             ->with('success', 'Gol uspešno zabeležen.');
     }
 

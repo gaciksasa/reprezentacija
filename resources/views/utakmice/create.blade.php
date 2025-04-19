@@ -77,6 +77,16 @@
                     @enderror
                 </div>
             </div>
+
+            <div class="mb-3">
+                <label for="protivnik_alijas" class="form-label">Alternativni naziv protivničkog tima</label>
+                <input type="text" class="form-control @error('protivnik_alijas') is-invalid @enderror" 
+                    id="protivnik_alijas" name="protivnik_alijas" value="{{ old('protivnik_alijas') }}">
+                <small class="form-text text-muted">Npr. "Češka" ili "SSSR"</small>
+                @error('protivnik_alijas')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
             
             <div class="mb-3">
                 <label for="stadion" class="form-label">Stadion</label>

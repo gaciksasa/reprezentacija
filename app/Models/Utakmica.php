@@ -29,7 +29,8 @@ class Utakmica extends Model
         'jedanaesterci_domacin',
         'jedanaesterci_gost',
         'publika',
-        'sezona'
+        'sezona',
+        'protivnik_alijas'
     ];
     
     protected $casts = [
@@ -165,5 +166,26 @@ class Utakmica extends Model
         
         return $this->rezultat_domacin . '-' . $this->rezultat_gost . 
             ' (' . $this->jedanaesterci_domacin . '-' . $this->jedanaesterci_gost . ' pen)';
+    }
+
+    /**
+     * Dobija prikazno ime protivnika (bilo domaćin ili gost)
+     */
+    public function getProtivnikPrikaznoImeAttribute()
+    {
+        // Dobija glavne timove i njihove alijase
+        $glavniTim = Tim::glavniTim()->first();
+        $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+        
+        // Provera da li je naš tim domaćin ili gost
+        $nasTimJeDomacin = in_array($this->domacin_id, $nasTimIds);
+        
+        if ($nasTimJeDomacin) {
+            // Protivnik je gost
+            return $this->protivnik_alijas ?: ($this->gost ? $this->gost->naziv : 'Nepoznat tim');
+        } else {
+            // Protivnik je domaćin
+            return $this->protivnik_alijas ?: ($this->domacin ? $this->domacin->naziv : 'Nepoznat tim');
+        }
     }
 }

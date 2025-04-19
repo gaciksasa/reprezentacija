@@ -42,14 +42,15 @@ class UtakmiceController extends Controller
     {
         $validated = $request->validate([
             'datum' => 'required|date',
-            'vreme' => 'nullable|string|max:5', // Format: 20:45
+            'vreme' => 'nullable|string|max:5',
             'takmicenje' => 'required|string|max:255',
             'domacin_id' => 'required|exists:timovi,id',
+            'protivnik_alijas' => 'nullable|string|max:255',
             'gost_id' => 'required|exists:timovi,id|different:domacin_id',
             'stadion' => 'nullable|string|max:255',
             'sudija' => 'nullable|string|max:255',
             'publika' => 'nullable|string|max:255',
-            'imao_jedanaesterce' => 'nullable', // Changed from boolean to nullable
+            'imao_jedanaesterce' => 'nullable',
             'jedanaesterci_domacin' => 'nullable|integer|min:0',
             'jedanaesterci_gost' => 'nullable|integer|min:0',
         ]);
@@ -97,14 +98,15 @@ class UtakmiceController extends Controller
     {
         $validated = $request->validate([
             'datum' => 'required|date',
-            'vreme' => 'nullable|string|max:5', // Format: 20:45
+            'vreme' => 'nullable|string|max:5',
             'takmicenje' => 'required|string|max:255',
             'domacin_id' => 'required|exists:timovi,id',
+            'protivnik_alijas' => 'nullable|string|max:255',
             'gost_id' => 'required|exists:timovi,id|different:domacin_id',
             'stadion' => 'nullable|string|max:255',
             'sudija' => 'nullable|string|max:255',
             'publika' => 'nullable|string|max:255',
-            'imao_jedanaesterce' => 'nullable', // Changed from boolean to nullable
+            'imao_jedanaesterce' => 'nullable',
             'jedanaesterci_domacin' => 'nullable|integer|min:0',
             'jedanaesterci_gost' => 'nullable|integer|min:0',
         ]);

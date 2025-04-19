@@ -30,10 +30,22 @@
                             <span class="badge bg-warning text-dark ms-1">v.d.</span>
                         @endif
                     </div>
+                <!-- Kod za protivničke selektore koji se nalaze u sekciji za domaći tim -->
                 @elseif(!$domacinJeNasTim && $domacinSelektor)
                     <div class="d-flex align-items-center justify-content-end">
                         <div>
-                            <span>{{ $domacinSelektor->ime_prezime }}</span>
+                            @php
+                                // Razdvajamo selektore po zarezima i prikazujemo ih jedan ispod drugog
+                                $selektori = explode(',', $domacinSelektor->ime_prezime);
+                            @endphp
+                            
+                            @foreach($selektori as $index => $selektorIme)
+                                <span>{{ trim($selektorIme) }}</span>
+                                @if($index < count($selektori) - 1)
+                                    <br>
+                                @endif
+                            @endforeach
+                            
                             @if($domacinSelektor->napomena)
                                 <small class="text-muted d-block">{{ $domacinSelektor->napomena }}</small>
                             @endif
@@ -88,10 +100,22 @@
                             <span class="badge bg-warning text-dark ms-1">v.d.</span>
                         @endif
                     </div>
+                <!-- Kod za protivničke selektore koji se nalaze u sekciji za gostujući tim -->
                 @elseif(!$gostJeNasTim && $gostSelektor)
                     <div class="d-flex align-items-center">
                         <div>
-                            <span>{{ $gostSelektor->ime_prezime }}</span>
+                            @php
+                                // Razdvajamo selektore po zarezima i prikazujemo ih jedan ispod drugog
+                                $selektori = explode(',', $gostSelektor->ime_prezime);
+                            @endphp
+                            
+                            @foreach($selektori as $index => $selektorIme)
+                                <span>{{ trim($selektorIme) }}</span>
+                                @if($index < count($selektori) - 1)
+                                    <br>
+                                @endif
+                            @endforeach
+                            
                             @if($gostSelektor->napomena)
                                 <small class="text-muted d-block">{{ $gostSelektor->napomena }}</small>
                             @endif
