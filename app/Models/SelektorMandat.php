@@ -13,13 +13,15 @@ class SelektorMandat extends Model
     
     protected $fillable = [
         'selektor_id', 'tim_id', 'pocetak_mandata', 
-        'kraj_mandata', 'v_d_status', 'napomena'
+        'kraj_mandata', 'v_d_status', 'komisija', 'redosled_u_komisiji', 'glavni_selektor', 'napomena'
     ];
     
     protected $casts = [
         'pocetak_mandata' => 'date',
         'kraj_mandata' => 'date',
         'v_d_status' => 'boolean',
+        'komisija' => 'boolean',
+        'glavni_selektor' => 'boolean',
     ];
     
     /**
@@ -179,5 +181,24 @@ class SelektorMandat extends Model
         
         // Order and count
         return $query->orderBy('datum', 'asc')->count();
+    }
+
+    // Metoda za pronalaženje svih članova iste selektorske komisije
+    public function clanoviKomisije()
+    {
+        if (!$this->komisija) {
+            return collect([$this]);
+        }
+        
+        return SelektorMandat::where('tim_id', $this->tim_id)
+            ->where('komisija', true)
+            ->where('pocetak_mandata', $this->pocetak_mandata)
+            ->where(function($query) {
+                $query->where('kraj_mandata', $this->kraj_mandata)
+                    ->orWhereNull('kraj_mandata');
+            })
+            ->orderBy('redosled_u_komisiji')
+            ->orderBy('glavni_selektor', 'desc')
+            ->get();
     }
 }

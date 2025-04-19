@@ -146,64 +146,48 @@
             <div class="card-body">
                 @if($selektor->mandati->count() > 0)
                     <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Period</th>
-                                    <th>Utakmice</th>
-                                    <th>Učinak</th>
-                                    @if(Auth::check() && Auth::user()->hasEditAccess())
-                                    <th>Akcije</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($selektor->mandati->sortByDesc('pocetak_mandata') as $mandat)
-                                @php
-                                    $statistika = $mandat->statistika;
-                                @endphp
-                                <tr>
-                                    <td>
-                                        {{ $mandat->pocetak_mandata->format('d.m.Y') }} - 
-                                        {{ $mandat->kraj_mandata ? $mandat->kraj_mandata->format('d.m.Y') : 'danas' }}
-                                        
-                                        @if($mandat->v_d_status)
-                                            <span class="badge bg-warning text-dark">v.d.</span>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tim</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                                <th>Utakmice</th>
+                                <th>Učinak</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($selektor->mandati->sortByDesc('pocetak_mandata') as $mandat)
+                            <tr>
+                                <td>{{ $mandat->tim->naziv }}</td>
+                                <td>
+                                    {{ $mandat->pocetak_mandata->format('d.m.Y') }} - 
+                                    {{ $mandat->kraj_mandata ? $mandat->kraj_mandata->format('d.m.Y') : 'danas' }}
+                                </td>
+                                <td>
+                                    @if($mandat->komisija)
+                                        <span class="badge bg-info">Komisija</span>
+                                        @if($mandat->glavni_selektor)
+                                            <span class="badge bg-primary">Glavni</span>
                                         @endif
-                                        
-                                        <div class="small text-muted">{{ $mandat->trajanje }}</div>
-                                    </td>
-                                    <td>{{ $statistika['utakmice'] }}</td>
-                                    <td>
-                                        @if($statistika['utakmice'] > 0)
-                                            {{ $statistika['pobede'] }}-{{ $statistika['remiji'] }}-{{ $statistika['porazi'] }}
-                                            <div class="small text-muted">{{ $statistika['procenatPobeda'] }}% pobeda</div>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    @if(Auth::check() && Auth::user()->hasEditAccess())
-                                    <td>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-warning" 
-                                                    onclick="editMandat({{ $mandat->id }})">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-mandat-{{ $mandat->id }}').submit()">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <form id="delete-mandat-{{ $mandat->id }}" action="{{ route('selektori.obrisiMandat', $mandat) }}" method="POST" class="d-none">
-                                                @csrf
-                                                @method('DELETE')
-                                            </form>
-                                        </div>
-                                    </td>
+                                    @elseif($mandat->v_d_status)
+                                        <span class="badge bg-warning text-dark">v.d.</span>
+                                    @else
+                                        <span class="badge bg-success">Samostalni</span>
                                     @endif
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </td>
+                                <td>{{ $statistika['utakmice'] }}</td>
+                                <td>
+                                    @if($statistika['utakmice'] > 0)
+                                        {{ $statistika['pobede'] }}-{{ $statistika['remiji'] }}-{{ $statistika['porazi'] }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                     </div>
                 @else
                     <p class="text-center text-muted">Nema evidentiranih mandata.</p>
@@ -287,7 +271,7 @@
 
 <!-- Modal za dodavanje novog mandata -->
 <div class="modal fade" id="addMandatModal" tabindex="-1" aria-labelledby="addMandatModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form action="{{ route('selektori.dodajMandat', $selektor) }}" method="POST">
                 @csrf
@@ -327,6 +311,42 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- Polja za selektorsku komisiju -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="komisija" name="komisija" value="1" 
+                                {{ old('komisija') ? 'checked' : '' }} onchange="toggleKomisijaFields()">
+                            <label class="form-check-label" for="komisija">
+                                Selektorska komisija
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="komisija-fields" style="{{ old('komisija') ? '' : 'display: none;' }}">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="glavni_selektor" name="glavni_selektor" value="1" 
+                                    {{ old('glavni_selektor') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="glavni_selektor">
+                                    Glavni selektor u komisiji
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Ostali članovi komisije</label>
+                            <select class="form-select" id="selektori_ids" name="selektori_ids[]" multiple>
+                                @foreach($ostaliSelektori as $drugiSelektor)
+                                    <option value="{{ $drugiSelektor->id }}" 
+                                        {{ in_array($drugiSelektor->id, old('selektori_ids', [])) ? 'selected' : '' }}>
+                                        {{ $drugiSelektor->ime_prezime }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="form-text text-muted">Držite CTRL za višestruki izbor</small>
+                        </div>
+                    </div>
                     
                     <div class="mb-3">
                         <label for="napomena" class="form-label">Napomena</label>
@@ -344,7 +364,7 @@
 
 <!-- Modal za izmenu mandata -->
 <div class="modal fade" id="editMandatModal" tabindex="-1" aria-labelledby="editMandatModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form id="editMandatForm" action="{{ route('selektori.edit', $selektor) }}" method="POST">
                 @csrf
@@ -388,6 +408,40 @@
                         </div>
                     </div>
                     
+                    <!-- Polja za selektorsku komisiju -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="edit_komisija" name="mandati[0][komisija]" value="1" 
+                                onchange="toggleEditKomisijaFields()">
+                            <label class="form-check-label" for="edit_komisija">
+                                Selektorska komisija
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="edit-komisija-fields" style="display: none;">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="edit_glavni_selektor" name="mandati[0][glavni_selektor]" value="1">
+                                <label class="form-check-label" for="edit_glavni_selektor">
+                                    Glavni selektor u komisiji
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Ostali članovi komisije</label>
+                            <select class="form-select" id="edit_selektori_ids" name="mandati[0][selektori_ids][]" multiple>
+                                @foreach($ostaliSelektori as $drugiSelektor)
+                                    <option value="{{ $drugiSelektor->id }}">
+                                        {{ $drugiSelektor->ime_prezime }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="form-text text-muted">Držite CTRL za višestruki izbor</small>
+                        </div>
+                    </div>
+                    
                     <div class="mb-3">
                         <label for="edit_napomena" class="form-label">Napomena</label>
                         <textarea class="form-control" id="edit_napomena" name="mandati[0][napomena]" rows="3"></textarea>
@@ -402,10 +456,123 @@
     </div>
 </div>
 
-@endsection
-
 @section('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Funkcije za prikazivanje/sakrivanje polja za selektorsku komisiju
+        function toggleKomisijaFields() {
+            const isKomisija = document.getElementById('komisija').checked;
+            document.getElementById('komisija-fields').style.display = isKomisija ? 'block' : 'none';
+        }
+        
+        function toggleEditKomisijaFields() {
+            const isKomisija = document.getElementById('edit_komisija').checked;
+            document.getElementById('edit-komisija-fields').style.display = isKomisija ? 'block' : 'none';
+        }
+        
+        // Dodavanje event listenera
+        const komisijaCheckbox = document.getElementById('komisija');
+        if (komisijaCheckbox) {
+            komisijaCheckbox.addEventListener('change', toggleKomisijaFields);
+        }
+        
+        const editKomisijaCheckbox = document.getElementById('edit_komisija');
+        if (editKomisijaCheckbox) {
+            editKomisijaCheckbox.addEventListener('change', toggleEditKomisijaFields);
+        }
+        
+        // Configure date inputs to use dd.mm.yyyy format
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        
+        dateInputs.forEach(function(input) {
+            // Create a text input to replace the date input
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            textInput.name = input.name;
+            textInput.id = input.id;
+            textInput.className = input.className;
+            textInput.placeholder = 'dd.mm.yyyy';
+            textInput.required = input.required;
+            
+            // Copy any existing value, converting from yyyy-mm-dd to dd.mm.yyyy
+            if (input.value) {
+                const dateParts = input.value.split('-');
+                if (dateParts.length === 3) {
+                    textInput.value = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+                }
+            }
+            
+            // Add event listener to format input and convert back to yyyy-mm-dd for form submission
+            textInput.addEventListener('blur', function() {
+                const value = this.value;
+                if (value) {
+                    // Check if the input matches the dd.mm.yyyy format
+                    const dateRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
+                    const match = value.match(dateRegex);
+                    
+                    if (match) {
+                        const day = match[1].padStart(2, '0');
+                        const month = match[2].padStart(2, '0');
+                        const year = match[3];
+                        
+                        // Format for display
+                        this.value = `${day}.${month}.${year}`;
+                        
+                        // Create hidden input for form submission in yyyy-mm-dd format
+                        let hiddenInput = document.getElementById(`${this.id}_hidden`);
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = this.name;
+                            hiddenInput.id = `${this.id}_hidden`;
+                            this.parentNode.appendChild(hiddenInput);
+                            
+                            // Change the name of the text input so it doesn't conflict
+                            this.name = `${this.name}_display`;
+                        }
+                        
+                        hiddenInput.value = `${year}-${month}-${day}`;
+                    }
+                }
+            });
+            
+            // Replace the date input with the text input
+            input.parentNode.replaceChild(textInput, input);
+        });
+        
+        // Intercept form submission to validate date format
+        const forms = document.querySelectorAll('form');
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                const dateInputs = this.querySelectorAll('input[name$="_display"]');
+                let valid = true;
+                
+                dateInputs.forEach(function(input) {
+                    if (input.value) {
+                        const dateRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
+                        if (!dateRegex.test(input.value)) {
+                            valid = false;
+                            input.classList.add('is-invalid');
+                            
+                            // Add error message if not already present
+                            let nextElement = input.nextElementSibling;
+                            if (!nextElement || !nextElement.classList.contains('invalid-feedback')) {
+                                const errorMsg = document.createElement('div');
+                                errorMsg.className = 'invalid-feedback';
+                                errorMsg.textContent = 'Format datuma mora biti dd.mm.yyyy';
+                                input.parentNode.insertBefore(errorMsg, input.nextSibling);
+                            }
+                        }
+                    }
+                });
+                
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+
     // Funkcija za popunjavanje forme za izmenu mandata
     function editMandat(mandatId) {
         // Pronađi podatke o mandatu
@@ -436,7 +603,7 @@
                 krajDatum = `${day}.${month}.${year}`;
             }
             
-            // Create date input fields
+            // Postavi vrednosti u formu
             const pocetakInput = document.getElementById('edit_pocetak_mandata');
             const krajInput = document.getElementById('edit_kraj_mandata');
             
@@ -484,7 +651,29 @@
                 krajInput.value = krajDatum;
             }
             
+            // Postavi checkbox polja
             document.getElementById('edit_v_d_status').checked = Boolean(mandat.v_d_status);
+            document.getElementById('edit_komisija').checked = Boolean(mandat.komisija);
+            document.getElementById('edit_glavni_selektor').checked = Boolean(mandat.glavni_selektor);
+            
+            // Prikaži ili sakrij polja komisije
+            if (mandat.komisija) {
+                document.getElementById('edit-komisija-fields').style.display = 'block';
+                
+                // Ako je komisija, učitaj ostale članove
+                const clanoviKomisije = @json($selektor->mandati)
+                    .filter(m => m.komisija && m.pocetak_mandata === mandat.pocetak_mandata)
+                    .filter(m => m.selektor_id !== {{ $selektor->id }})
+                    .map(m => m.selektor_id);
+                    
+                const selectElement = document.getElementById('edit_selektori_ids');
+                for (let i = 0; i < selectElement.options.length; i++) {
+                    selectElement.options[i].selected = clanoviKomisije.includes(parseInt(selectElement.options[i].value));
+                }
+            } else {
+                document.getElementById('edit-komisija-fields').style.display = 'none';
+            }
+            
             document.getElementById('edit_napomena').value = mandat.napomena || '';
             
             // Ažurirati ime polja forme sa ID-om mandata
@@ -492,7 +681,12 @@
             document.getElementById('edit_pocetak_mandata').name = `mandati[${mandat.id}][pocetak_mandata]`;
             document.getElementById('edit_kraj_mandata').name = `mandati[${mandat.id}][kraj_mandata]`;
             document.getElementById('edit_v_d_status').name = `mandati[${mandat.id}][v_d_status]`;
+            document.getElementById('edit_komisija').name = `mandati[${mandat.id}][komisija]`;
+            document.getElementById('edit_glavni_selektor').name = `mandati[${mandat.id}][glavni_selektor]`;
             document.getElementById('edit_napomena').name = `mandati[${mandat.id}][napomena]`;
+            
+            const selectElement = document.getElementById('edit_selektori_ids');
+            selectElement.name = `mandati[${mandat.id}][selektori_ids][]`;
             
             // Prikaži modal
             const editMandatModal = new bootstrap.Modal(document.getElementById('editMandatModal'));
@@ -533,70 +727,5 @@
             }
         }
     }
-    
-    // Add date format conversion to the "Add Mandate" modal too
-    document.addEventListener('DOMContentLoaded', function() {
-        // Convert all date inputs to use dd.mm.yyyy format
-        const dateInputs = document.querySelectorAll('input[type="date"]');
-        
-        dateInputs.forEach(function(input) {
-            // Create a text input to replace the date input
-            const textInput = document.createElement('input');
-            textInput.type = 'text';
-            textInput.name = input.name;
-            textInput.id = input.id;
-            textInput.className = input.className;
-            textInput.placeholder = 'dd.mm.yyyy';
-            textInput.required = input.required;
-            
-            // Copy any existing value, converting from yyyy-mm-dd to dd.mm.yyyy
-            if (input.value) {
-                const dateParts = input.value.split('-');
-                if (dateParts.length === 3) {
-                    textInput.value = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
-                }
-            }
-            
-            // Add event listener to format input and convert back to yyyy-mm-dd for form submission
-            textInput.addEventListener('blur', function() {
-                convertDateFormat(this);
-            });
-            
-            // Replace the date input with the text input
-            input.parentNode.replaceChild(textInput, input);
-        });
-        
-        // Intercept both form submissions to validate date format
-        const forms = document.querySelectorAll('form');
-        forms.forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                const dateInputs = this.querySelectorAll('input[name$="_display"]');
-                let valid = true;
-                
-                dateInputs.forEach(function(input) {
-                    if (input.value) {
-                        const dateRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
-                        if (!dateRegex.test(input.value)) {
-                            valid = false;
-                            input.classList.add('is-invalid');
-                            
-                            // Add error message if not already present
-                            let nextElement = input.nextElementSibling;
-                            if (!nextElement || !nextElement.classList.contains('invalid-feedback')) {
-                                const errorMsg = document.createElement('div');
-                                errorMsg.className = 'invalid-feedback';
-                                errorMsg.textContent = 'Format datuma mora biti dd.mm.yyyy';
-                                input.parentNode.insertBefore(errorMsg, input.nextSibling);
-                            }
-                        }
-                    }
-                });
-                
-                if (!valid) {
-                    e.preventDefault();
-                }
-            });
-        });
-    });
 </script>
 @endsection

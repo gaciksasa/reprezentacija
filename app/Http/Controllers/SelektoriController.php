@@ -109,18 +109,17 @@ class SelektoriController extends Controller
      */
     public function show(Selektor $selektor)
     {
-        $selektor->load('mandati.tim');
+        $selektor->load(['mandati.tim']);
         
-        $timovi = Tim::where(function($query) {
-            // Glavni tim
-            $query->where('glavni_tim', true)
-                  // ili bilo koji alijas glavnog tima
-                  ->orWhereHas('maticniTim', function($q) {
-                      $q->where('glavni_tim', true);
-                  });
-        })->orderBy('naziv')->get();
+        $timovi = Tim::orderBy('naziv')->get();
         
-        return view('selektori.show', compact('selektor', 'timovi'));
+        // Dohvati sve ostale selektore za komisije
+        $ostaliSelektori = Selektor::where('id', '!=', $selektor->id)
+            ->orderBy('prezime')
+            ->orderBy('ime')
+            ->get();
+        
+        return view('selektori.show', compact('selektor', 'timovi', 'ostaliSelektori'));
     }
 
     /**
@@ -234,27 +233,74 @@ class SelektoriController extends Controller
      * Dodaj novi mandat selektoru.
      */
     public function dodajMandat(Request $request, Selektor $selektor)
-    {
-        $validated = $request->validate([
-            'tim_id' => 'required|exists:timovi,id',
-            'pocetak_mandata' => 'required|date',
-            'kraj_mandata' => 'nullable|date|after_or_equal:pocetak_mandata',
-            'v_d_status' => 'boolean',
-            'napomena' => 'nullable|string',
-        ]);
+{
+    $validated = $request->validate([
+        'tim_id' => 'required|exists:timovi,id',
+        'pocetak_mandata' => 'required|date',
+        'kraj_mandata' => 'nullable|date|after_or_equal:pocetak_mandata',
+        'v_d_status' => 'nullable|boolean',
+        'komisija' => 'nullable|boolean',
+        'glavni_selektor' => 'nullable|boolean',
+        'selektori_ids' => 'array|nullable',
+        'selektori_ids.*' => 'exists:selektori,id',
+        'napomena' => 'nullable|string|max:500',
+    ]);
 
-        SelektorMandat::create([
-            'selektor_id' => $selektor->id,
-            'tim_id' => $validated['tim_id'],
-            'pocetak_mandata' => $validated['pocetak_mandata'],
-            'kraj_mandata' => $validated['kraj_mandata'],
-            'v_d_status' => $request->has('v_d_status'),
-            'napomena' => $validated['napomena'],
-        ]);
+    DB::transaction(function() use ($request, $selektor, $validated) {
+        // Provera da li je komisija
+        $isKomisija = $request->has('komisija') && $request->input('komisija') == '1';
+        $isGlavniSelektor = $request->has('glavni_selektor') && $request->input('glavni_selektor') == '1';
+        
+        if ($isKomisija && $request->has('selektori_ids') && !empty($request->input('selektori_ids'))) {
+            // Ako je komisija, kreiramo više mandata
+            $selektoriIds = $request->input('selektori_ids', []);
+            
+            // Prvo kreiraj mandat za trenutnog selektora
+            SelektorMandat::create([
+                'selektor_id' => $selektor->id,
+                'tim_id' => $validated['tim_id'],
+                'pocetak_mandata' => $validated['pocetak_mandata'],
+                'kraj_mandata' => $validated['kraj_mandata'],
+                'v_d_status' => $request->has('v_d_status'),
+                'komisija' => true,
+                'redosled_u_komisiji' => 0, // Glavni selektor je uvek prvi
+                'glavni_selektor' => $isGlavniSelektor,
+                'napomena' => $validated['napomena']
+            ]);
+            
+            // Zatim kreiraj mandate za ostale selektore u komisiji
+            foreach ($selektoriIds as $index => $selektorId) {
+                SelektorMandat::create([
+                    'selektor_id' => $selektorId,
+                    'tim_id' => $validated['tim_id'],
+                    'pocetak_mandata' => $validated['pocetak_mandata'],
+                    'kraj_mandata' => $validated['kraj_mandata'],
+                    'v_d_status' => $request->has('v_d_status'),
+                    'komisija' => true,
+                    'redosled_u_komisiji' => $index + 1, // +1 jer je glavni selektor već na poziciji 0
+                    'glavni_selektor' => false, // Samo jedan može biti glavni
+                    'napomena' => $validated['napomena']
+                ]);
+            }
+        } else {
+            // Standardni mandat za jednog selektora
+            SelektorMandat::create([
+                'selektor_id' => $selektor->id,
+                'tim_id' => $validated['tim_id'],
+                'pocetak_mandata' => $validated['pocetak_mandata'],
+                'kraj_mandata' => $validated['kraj_mandata'],
+                'v_d_status' => $request->has('v_d_status'),
+                'komisija' => false,
+                'redosled_u_komisiji' => 0,
+                'glavni_selektor' => false,
+                'napomena' => $validated['napomena']
+            ]);
+        }
+    });
 
-        return redirect()->route('selektori.show', $selektor)
-            ->with('success', 'Mandat uspešno dodat.');
-    }
+    return redirect()->route('selektori.show', $selektor)
+        ->with('success', 'Mandat uspešno dodat.');
+}
 
     /**
      * Obrisi mandat selektora.

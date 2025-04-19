@@ -127,38 +127,6 @@ class Utakmica extends Model
         return '( ' . $domacin_poluvreme . ' - ' . $gost_poluvreme . ' )';
     }
 
-    /**
-     * Get the selector for our team in this match
-     */
-    public function nasSelector()
-    {
-        // Get main team ID and its variants
-        $glavniTim = Tim::glavniTim()->first();
-        $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
-        
-        // Check if our team is home or away
-        $nasTimId = null;
-        if (in_array($this->domacin_id, $nasTimIds)) {
-            $nasTimId = $this->domacin_id;
-        } elseif (in_array($this->gost_id, $nasTimIds)) {
-            $nasTimId = $this->gost_id;
-        }
-        
-        if (!$nasTimId) {
-            return null;
-        }
-        
-        // Find selector mandate that covers the match date
-        return SelektorMandat::where('tim_id', $nasTimId)
-            ->where('pocetak_mandata', '<=', $this->datum)
-            ->where(function($query) {
-                $query->whereNull('kraj_mandata')
-                    ->orWhere('kraj_mandata', '>=', $this->datum);
-            })
-            ->with('selektor')
-            ->first();
-    }
-
     // Atribut za formatiranje kompletnog rezultata
     public function getKompletanRezultatAttribute()
     {
@@ -189,5 +157,39 @@ class Utakmica extends Model
             // Protivnik je domaćin
             return $this->protivnik_alijas ?: ($this->domacin ? $this->domacin->naziv : 'Nepoznat tim');
         }
+    }
+
+    /**
+     * Get the selector(s) for our team in this match
+     */
+    public function nasSelector()
+    {
+        // Get main team ID and its variants
+        $glavniTim = Tim::glavniTim()->first();
+        $nasTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
+        
+        // Check if our team is home or away
+        $nasTimId = null;
+        if (in_array($this->domacin_id, $nasTimIds)) {
+            $nasTimId = $this->domacin_id;
+        } elseif (in_array($this->gost_id, $nasTimIds)) {
+            $nasTimId = $this->gost_id;
+        }
+        
+        if (!$nasTimId) {
+            return null;
+        }
+        
+        // Find selector mandate that covers the match date
+        $mandat = SelektorMandat::where('tim_id', $nasTimId)
+            ->where('pocetak_mandata', '<=', $this->datum)
+            ->where(function($query) {
+                $query->whereNull('kraj_mandata')
+                    ->orWhere('kraj_mandata', '>=', $this->datum);
+            })
+            ->with('selektor')
+            ->first();
+            
+        return $mandat;
     }
 }
