@@ -15,7 +15,20 @@ class SelektoriController extends Controller
      */
     public function index()
     {
-        $selektori = Selektor::with('mandati.tim')->orderBy('prezime')->get();
+        // Dohvati sve selektore sa njihovim mandatima
+        $selektori = Selektor::with('mandati')->get();
+        
+        // Sortiraj selektore po datumu početka poslednjeg mandata (najnoviji prvo)
+        $selektori = $selektori->sortByDesc(function($selektor) {
+            // Za selektore bez mandata, stavi ih na kraj liste (null će biti na kraju)
+            if ($selektor->mandati->isEmpty()) {
+                return null;
+            }
+            
+            // Uzmi datum početka najnovijeg mandata
+            return $selektor->mandati->max('pocetak_mandata');
+        });
+        
         return view('selektori.index', compact('selektori'));
     }
 

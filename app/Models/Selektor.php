@@ -128,7 +128,7 @@ class Selektor extends Model
      */
     public function getPrviTimAttribute()
     {
-        $prviMandat = $this->prviMandat;
+        $prviMandat = $this->getPrviMandatAttribute();
         return $prviMandat ? $prviMandat->tim : null;
     }
 }
