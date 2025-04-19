@@ -12,7 +12,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('utakmice.store') }}" method="POST">
+        <form action="{{ route('utakmice.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             <div class="row">
@@ -24,15 +24,15 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
 
-            <div class="col-md-6 mb-3">
-                <label for="vreme" class="form-label">Vreme</label>
-                <input type="time" class="form-control @error('vreme') is-invalid @enderror" 
-                    id="vreme" name="vreme" value="{{ old('vreme') }}">
-                @error('vreme')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <div class="col-md-6 mb-3">
+                    <label for="vreme" class="form-label">Vreme</label>
+                    <input type="time" class="form-control @error('vreme') is-invalid @enderror" 
+                        id="vreme" name="vreme" value="{{ old('vreme') }}">
+                    @error('vreme')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
             
             <div class="mb-3">
@@ -114,6 +114,26 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
+            <div class="mb-3">
+                <label for="featured_img" class="form-label">Slika utakmice</label>
+                <input type="file" class="form-control @error('featured_img') is-invalid @enderror" 
+                       id="featured_img" name="featured_img">
+                <small class="form-text text-muted">Maksimalna veličina: 2MB</small>
+                @error('featured_img')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="tickets_url" class="form-label">Link za kupovinu karata</label>
+                <input type="url" class="form-control @error('tickets_url') is-invalid @enderror" 
+                       id="tickets_url" name="tickets_url" value="{{ old('tickets_url') }}">
+                <small class="form-text text-muted">Unesite potpuni URL (npr. https://www.ticketshop.rs/utakmica/123)</small>
+                @error('tickets_url')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
             
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Sačuvaj utakmicu</button>
@@ -127,7 +147,7 @@
 <script>
     // Configure date inputs to use dd.mm.yyyy format
     document.addEventListener('DOMContentLoaded', function() {
-        // Get date inputs
+                    // Get date inputs
         const dateInputs = document.querySelectorAll('input[type="date"]');
         
         dateInputs.forEach(function(input) {

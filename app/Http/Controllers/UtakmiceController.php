@@ -7,6 +7,7 @@ use App\Models\Tim;
 use App\Models\Takmicenje;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class UtakmiceController extends Controller
 {
@@ -53,6 +54,8 @@ class UtakmiceController extends Controller
             'imao_jedanaesterce' => 'nullable',
             'jedanaesterci_domacin' => 'nullable|integer|min:0',
             'jedanaesterci_gost' => 'nullable|integer|min:0',
+            'featured_img' => 'nullable|image|max:2048', // max 2MB
+            'tickets_url' => 'nullable|url|max:255',
         ]);
 
         // Create or find the competition
@@ -68,13 +71,13 @@ class UtakmiceController extends Controller
             'takmicenje_id' => $takmicenje->id,
             'domacin_id' => $validated['domacin_id'],
             'gost_id' => $validated['gost_id'],
-            'protivnik_alijas' => $validated['protivnik_alijas'] ?? null, 
             'stadion' => $validated['stadion'] ?? null,
             'sudija' => $validated['sudija'] ?? null,
             'publika' => $validated['publika'] ?? null,
             'rezultat_domacin' => 0,
             'rezultat_gost' => 0,
             'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
+            'tickets_url' => $validated['tickets_url'] ?? null,
         ];
 
         // Add penalty shootout data if present
@@ -84,7 +87,13 @@ class UtakmiceController extends Controller
         }
 
         // Use transaction to ensure all related data is saved successfully
-        DB::transaction(function() use ($utakmicaData) {
+        DB::transaction(function() use ($request, $utakmicaData, $validated) {
+            // Handle image upload if provided
+            if ($request->hasFile('featured_img')) {
+                $imagePath = $request->file('featured_img')->store('utakmice', 'public');
+                $utakmicaData['featured_img'] = $imagePath;
+            }
+            
             Utakmica::create($utakmicaData);
         });
 
@@ -110,6 +119,8 @@ class UtakmiceController extends Controller
             'imao_jedanaesterce' => 'nullable',
             'jedanaesterci_domacin' => 'nullable|integer|min:0',
             'jedanaesterci_gost' => 'nullable|integer|min:0',
+            'featured_img' => 'nullable|image|max:2048', // max 2MB
+            'tickets_url' => 'nullable|url|max:255',
         ]);
 
         // Create or find the competition
@@ -125,11 +136,11 @@ class UtakmiceController extends Controller
             'takmicenje_id' => $takmicenje->id,
             'domacin_id' => $validated['domacin_id'],
             'gost_id' => $validated['gost_id'],
-            'protivnik_alijas' => $validated['protivnik_alijas'] ?? null,
             'stadion' => $validated['stadion'] ?? null,
             'sudija' => $validated['sudija'] ?? null,
             'publika' => $validated['publika'] ?? null,
             'imao_jedanaesterce' => $request->has('imao_jedanaesterce'),
+            'tickets_url' => $validated['tickets_url'] ?? null,
         ];
 
         // Add penalty shootout data if present
@@ -139,6 +150,17 @@ class UtakmiceController extends Controller
         } else {
             $utakmicaData['jedanaesterci_domacin'] = null;
             $utakmicaData['jedanaesterci_gost'] = null;
+        }
+
+        // Handle image upload if provided
+        if ($request->hasFile('featured_img')) {
+            // Delete old image if exists
+            if ($utakmica->featured_img) {
+                Storage::disk('public')->delete($utakmica->featured_img);
+            }
+            
+            $imagePath = $request->file('featured_img')->store('utakmice', 'public');
+            $utakmicaData['featured_img'] = $imagePath;
         }
 
         $utakmica->update($utakmicaData);
@@ -190,6 +212,11 @@ class UtakmiceController extends Controller
    public function destroy(Utakmica $utakmica)
    {
        try {
+           // Delete featured image if exists
+           if ($utakmica->featured_img) {
+               Storage::disk('public')->delete($utakmica->featured_img);
+           }
+           
            $utakmica->delete();
            return redirect()->route('utakmice.index')
                ->with('success', 'Utakmica uspešno obrisana.');

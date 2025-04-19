@@ -30,7 +30,9 @@ class Utakmica extends Model
         'jedanaesterci_gost',
         'publika',
         'sezona',
-        'protivnik_alijas'
+        'protivnik_alijas',
+        'featured_img',
+        'tickets_url'
     ];
     
     protected $casts = [

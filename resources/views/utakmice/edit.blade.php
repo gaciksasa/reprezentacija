@@ -12,7 +12,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('utakmice.update', $utakmica) }}" method="POST">
+        <form action="{{ route('utakmice.update', $utakmica) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -25,15 +25,15 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label for="vreme" class="form-label">Vreme</label>
-                <input type="time" class="form-control @error('vreme') is-invalid @enderror" 
-                    id="vreme" name="vreme" value="{{ old('vreme', $utakmica->vreme) }}">
-                @error('vreme')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+            
+                <div class="col-md-6 mb-3">
+                    <label for="vreme" class="form-label">Vreme</label>
+                    <input type="time" class="form-control @error('vreme') is-invalid @enderror" 
+                        id="vreme" name="vreme" value="{{ old('vreme', $utakmica->vreme) }}">
+                    @error('vreme')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
             
             <div class="mb-3">
@@ -147,6 +147,32 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="featured_img" class="form-label">Slika utakmice</label>
+                @if($utakmica->featured_img)
+                    <div class="mb-2">
+                        <img src="{{ asset('storage/' . $utakmica->featured_img) }}" 
+                             alt="Slika utakmice" class="img-thumbnail" style="max-height: 200px;">
+                    </div>
+                @endif
+                <input type="file" class="form-control @error('featured_img') is-invalid @enderror" 
+                       id="featured_img" name="featured_img">
+                <small class="form-text text-muted">Maksimalna veličina: 2MB. Ostavite prazno ako ne želite da promenite sliku.</small>
+                @error('featured_img')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="tickets_url" class="form-label">Link za kupovinu karata</label>
+                <input type="url" class="form-control @error('tickets_url') is-invalid @enderror" 
+                       id="tickets_url" name="tickets_url" value="{{ old('tickets_url', $utakmica->tickets_url) }}">
+                <small class="form-text text-muted">Unesite potpuni URL (npr. https://www.ticketshop.rs/utakmica/123)</small>
+                @error('tickets_url')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             
             <div class="d-grid">
@@ -273,7 +299,7 @@
         });
     });
     
-    // Existing function for toggling penalty fields
+    // Function for toggling penalty fields
     function togglePenaltyFields() {
         const hasShootout = document.getElementById('imao_jedanaesterce').checked;
         document.getElementById('penalty-fields').style.display = hasShootout ? 'flex' : 'none';
