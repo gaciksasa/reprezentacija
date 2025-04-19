@@ -60,7 +60,7 @@ body {
     font-size: 1.125rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #878d97;
+    color: var(--bs-dark);
     background: #efefef url('../../public/img/fss_logo.png') no-repeat bottom left;
     background-attachment: fixed;
     -webkit-text-size-adjust: 100%;

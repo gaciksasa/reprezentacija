@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reprezentacija - @yield('title', 'Fudbalska statistika')</title>
+    <title>fss.co.rs - @yield('title', 'Fudbalska statistika Srbije')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Teko:wght@300..700&display=swap" rel="stylesheet">
@@ -43,7 +43,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary text-light py-4 mb-4">
         <div class="container">
-            <a class="navbar-brand h2 text-light mb-0" href="{{ route('dashboard') }}">Reprezentacija</a>
+            <a class="navbar-brand h2 text-light mb-0" href="{{ route('dashboard') }}">fss.co.rs</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -137,10 +137,10 @@
         <div class="container">
             <div class="row g-4 align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <h2 class="text-white">Reprezentacija</h2>
+                    <h2 class="text-white">fss.co.rs</h2>
                 </div>
                 <div class="col-md-6 text-center text-md-end text-body">
-                    <span>&copy; {{ date('Y') }} Reprezentacija.rs. Sva prava zadržana.</span>
+                    <span>&copy; {{ date('Y') }} fss.co.rs - Sva prava zadržana.</span>
                 </div>
             </div>
         </div>
