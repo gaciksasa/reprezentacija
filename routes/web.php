@@ -20,6 +20,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\KategorijaController;
+use App\Http\Controllers\SelektorKomisijaController;
 
 // Login routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -137,6 +138,14 @@ Route::middleware('auth')->group(function() {
 Route::middleware('auth')->group(function() {
     Route::post('/sastavi/update-order', [SastaviController::class, 'updateOrder'])->name('sastavi.updateOrder');
     Route::post('/protivnicki-igraci/update-order', [ProtivnickiIgraciController::class, 'updateOrder'])->name('protivnicki-igraci.updateOrder');
+});
+
+// Rute za selektorsku komisiju - protected
+Route::middleware('auth')->group(function() {
+    Route::get('/selektor-komisija/create', [SelektorKomisijaController::class, 'create'])->name('selektor-komisija.create');
+    Route::post('/selektor-komisija', [SelektorKomisijaController::class, 'store'])->name('selektor-komisija.store');
+    Route::get('/selektor-komisija/{mandat}/edit', [SelektorKomisijaController::class, 'edit'])->name('selektor-komisija.edit');
+    Route::put('/selektor-komisija/{mandat}', [SelektorKomisijaController::class, 'update'])->name('selektor-komisija.update');
 });
 
 // Public Routes

@@ -6,9 +6,14 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Selektori</h1>
     @if(Auth::check() && Auth::user()->hasEditAccess())
-    <a href="{{ route('selektori.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Novi selektor
-    </a>
+    <div>
+        <a href="{{ route('selektor-komisija.create') }}" class="btn btn-info me-2">
+            <i class="fas fa-users"></i> Nova komisija
+        </a>
+        <a href="{{ route('selektori.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novi selektor
+        </a>
+    </div>
     @endif
 </div>
 
