@@ -1,18 +1,5 @@
 <div class="row py-4 align-items-center">
     <div class="col-5 col-lg-4 text-end">
-        @php
-            $domaciSastav = $utakmica->sastavi->where('tim_id', $utakmica->domacin_id)
-                ->sortBy('redosled')
-                ->sortByDesc('starter');
-            $domaciProtivnickiIgraci = $utakmica->protivnickiIgraci->where('tim_id', $utakmica->domacin_id)
-                ->sortBy('redosled');
-            $imaDomacihIgraca = $domaciSastav->count() > 0 || $domaciProtivnickiIgraci->count() > 0;
-            
-            // Dobavi glavni tim (izabrani tim)
-            $glavniTim = \App\Models\Tim::glavniTim()->first();
-            $glavniTimIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
-            $domacinJeNasTim = in_array($utakmica->domacin_id, $glavniTimIds);
-        @endphp
         @if($imaDomacihIgraca)
             <ul class="list-unstyled" id="domaci-sastav-lista" style="text-align: right">
                 @foreach($domaciSastav as $sastav)
