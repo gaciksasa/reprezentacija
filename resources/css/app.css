@@ -4514,7 +4514,7 @@ textarea.form-control-lg {
     padding: .5rem 1rem;
     color: #212529;
     background-color: #fff;
-    border: 1px solid rgba(0,0,0,.125)
+    border: 0;
 }
 
 .list-group-item:first-child {

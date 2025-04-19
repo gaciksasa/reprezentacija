@@ -47,12 +47,11 @@
        
        @if($utakmica->kartoni->count() > 0 || $utakmica->protivnickiKartoni->count() > 0)
            <div class="row">
-               <div class="col-md-6">
-                   <h3 class="mb-3">{{ $utakmica->domacin->naziv }}</h3>
+                <div class="col-5 col-lg-4">
                    <ul class="list-group">
                        <!-- Regulatni kartoni -->
                        @foreach($domaciKartoni as $karton)
-                       <li class="list-group-item d-flex justify-content-between align-items-center">
+                       <li class="list-group-item d-flex align-items-center justify-content-end">
                            <div>
                                <span class="text-muted">{{ $karton->minut }}' </span>
                                @if($karton->tip == 'zuti')
@@ -114,12 +113,21 @@
                        @endif
                    </ul>
                </div>
-               <div class="col-md-6">
-                   <h3 class="mb-3">{{ $utakmica->gost->naziv }}</h3>
+               <div class="col-2 col-lg-4"></div>
+               <div class="col-5 col-lg-4">
                    <ul class="list-group">
                        <!-- Regulatni kartoni -->
                        @foreach($gostujuciKartoni as $karton)
-                       <li class="list-group-item d-flex justify-content-between align-items-center">
+                       <li class="list-group-item d-flex align-items-center justify-content-start">
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
+                           <form action="{{ route('kartoni.destroy', $karton->id) }}" method="POST" class="d-inline me-2">
+                               @csrf
+                               @method('DELETE')
+                               <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                   <i class="fas fa-times"></i>
+                               </button>
+                           </form>
+                           @endif
                            <div>
                                <span class="text-muted">{{ $karton->minut }}' </span>
                                @if($karton->tip == 'zuti')
@@ -138,15 +146,7 @@
                                    {{ $karton->igrac->prezime }} {{ $karton->igrac->ime }}
                                @endif
                            </div>
-                           @if(Auth::check() && Auth::user()->hasEditAccess())
-                           <form action="{{ route('kartoni.destroy', $karton->id) }}" method="POST" class="d-inline">
-                               @csrf
-                               @method('DELETE')
-                               <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                   <i class="fas fa-times"></i>
-                               </button>
-                           </form>
-                           @endif
+                           
                        </li>
                        @endforeach
                        

@@ -78,7 +78,16 @@
                         <ul class="list-unstyled">
                             @foreach($gostujuceIzmene as $izmena)
                                 <li class="py-1">
-                                    <div class="d-flex">
+                                    <div class="d-flex align-items-center justify-content-start">
+                                        @if(Auth::check() && Auth::user()->hasEditAccess())
+                                        <form action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-inline me-2">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                        @endif
                                         <div>
                                             <span class="text-muted">{{ $izmena->minut }}' </span>
                                             <i class="fas fa-arrow-right text-success"></i> 
@@ -101,15 +110,7 @@
                                                 @endif
                                             </span>
                                         </div>
-                                        @if(Auth::check() && Auth::user()->hasEditAccess())
-                                        <form action="{{ route('izmene.destroy', $izmena->id) }}" method="POST" class="d-inline ms-2">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                        @endif
+                                        
                                     </div>
                                 </li>
                             @endforeach
