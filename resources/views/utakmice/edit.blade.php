@@ -154,11 +154,19 @@
                 @if($utakmica->featured_img)
                     <div class="mb-2">
                         <img src="{{ asset('storage/' . $utakmica->featured_img) }}" 
-                             alt="Slika utakmice" class="img-thumbnail" style="max-height: 200px;">
+                            alt="Slika utakmice" class="img-thumbnail" style="max-height: 200px;">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="delete_featured_img" 
+                                name="delete_featured_img" 
+                                {{ old('delete_featured_img') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="delete_featured_img">
+                                Obriši trenutnu sliku
+                            </label>
+                        </div>
                     </div>
                 @endif
                 <input type="file" class="form-control @error('featured_img') is-invalid @enderror" 
-                       id="featured_img" name="featured_img">
+                    id="featured_img" name="featured_img">
                 <small class="form-text text-muted">Maksimalna veličina: 2MB. Ostavite prazno ako ne želite da promenite sliku.</small>
                 @error('featured_img')
                     <div class="invalid-feedback">{{ $message }}</div>

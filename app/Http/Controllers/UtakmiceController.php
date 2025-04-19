@@ -71,6 +71,7 @@ class UtakmiceController extends Controller
             'takmicenje_id' => $takmicenje->id,
             'domacin_id' => $validated['domacin_id'],
             'gost_id' => $validated['gost_id'],
+            'protivnik_alijas' => $validated['protivnik_alijas'] ?? null,
             'stadion' => $validated['stadion'] ?? null,
             'sudija' => $validated['sudija'] ?? null,
             'publika' => $validated['publika'] ?? null,
@@ -136,6 +137,7 @@ class UtakmiceController extends Controller
             'takmicenje_id' => $takmicenje->id,
             'domacin_id' => $validated['domacin_id'],
             'gost_id' => $validated['gost_id'],
+            'protivnik_alijas' => $validated['protivnik_alijas'] ?? null,
             'stadion' => $validated['stadion'] ?? null,
             'sudija' => $validated['sudija'] ?? null,
             'publika' => $validated['publika'] ?? null,
@@ -150,6 +152,12 @@ class UtakmiceController extends Controller
         } else {
             $utakmicaData['jedanaesterci_domacin'] = null;
             $utakmicaData['jedanaesterci_gost'] = null;
+        }
+
+        // Handle delete featured image if checkbox is checked
+        if ($request->has('delete_featured_img') && $utakmica->featured_img) {
+            Storage::disk('public')->delete($utakmica->featured_img);
+            $utakmicaData['featured_img'] = null;
         }
 
         // Handle image upload if provided

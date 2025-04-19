@@ -117,7 +117,14 @@
                 
                 <div class="match-footer text-center">
                     @if($sledeciMec)
-                    <a href="{{ route('utakmice.show', $sledeciMec->id) }}" class="btn btn-primary">Detaljnije</a>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('utakmice.show', $sledeciMec->id) }}" class="btn btn-primary">Detaljnije</a>
+                            @if($sledeciMec->tickets_url)
+                                <a href="{{ $sledeciMec->tickets_url }}" target="_blank" class="btn btn-secondary">
+                                    <i class="fas fa-ticket-alt me-1"></i> Kupi karte
+                                </a>
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>
@@ -168,8 +175,12 @@
                 
                 <div class="match-footer text-center">
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-secondary" disabled>Rasprodato</button>
                         <a href="{{ route('utakmice.show', $nakonSledecegMec->id) }}" class="btn btn-primary">Detaljnije</a>
+                        @if($nakonSledecegMec->tickets_url)
+                            <a href="{{ $nakonSledecegMec->tickets_url }}" target="_blank" class="btn btn-secondary">
+                                <i class="fas fa-ticket-alt me-1"></i> Kupi karte
+                            </a>
+                        @endif
                     </div>
                 </div>
                 @else
