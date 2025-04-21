@@ -230,77 +230,70 @@ class SelektoriController extends Controller
     }
 
     /**
-     * Dodaj novi mandat selektoru.
+     * Dodavanje novog mandata selektoru
      */
     public function dodajMandat(Request $request, Selektor $selektor)
-{
-    $validated = $request->validate([
-        'tim_id' => 'required|exists:timovi,id',
-        'pocetak_mandata' => 'required|date',
-        'kraj_mandata' => 'nullable|date|after_or_equal:pocetak_mandata',
-        'v_d_status' => 'nullable|boolean',
-        'komisija' => 'nullable|boolean',
-        'glavni_selektor' => 'nullable|boolean',
-        'selektori_ids' => 'array|nullable',
-        'selektori_ids.*' => 'exists:selektori,id',
-        'napomena' => 'nullable|string|max:500',
-    ]);
+    {
+        // Validacija
+        $validated = $request->validate([
+            'tim_id' => 'required|exists:timovi,id',
+            'pocetak_mandata' => 'required|date',
+            'kraj_mandata' => 'nullable|date|after_or_equal:pocetak_mandata',
+            'v_d_status' => 'nullable|boolean',
+            'komisija' => 'nullable|boolean',
+            'glavni_selektor' => 'nullable|boolean',
+            'selektori_ids' => 'nullable|array',
+            'selektori_ids.*' => 'exists:selektori,id',
+            'napomena' => 'nullable|string',
+        ]);
 
-    DB::transaction(function() use ($request, $selektor, $validated) {
-        // Provera da li je komisija
-        $isKomisija = $request->has('komisija') && $request->input('komisija') == '1';
-        $isGlavniSelektor = $request->has('glavni_selektor') && $request->input('glavni_selektor') == '1';
-        
-        if ($isKomisija && $request->has('selektori_ids') && !empty($request->input('selektori_ids'))) {
-            // Ako je komisija, kreiramo više mandata
-            $selektoriIds = $request->input('selektori_ids', []);
-            
-            // Prvo kreiraj mandat za trenutnog selektora
-            SelektorMandat::create([
+        // Ako je komisija, provera da li je glavni selektor
+        $isKomisija = isset($validated['komisija']) && $validated['komisija'];
+        $isGlavniSelektor = isset($validated['glavni_selektor']) && $validated['glavni_selektor'];
+
+        // Koristi transakciju za kreiranje povezanih entiteta
+        DB::transaction(function() use ($validated, $selektor, $isKomisija, $isGlavniSelektor) {
+            // Kreiraj mandat
+            $mandat = SelektorMandat::create([
                 'selektor_id' => $selektor->id,
                 'tim_id' => $validated['tim_id'],
                 'pocetak_mandata' => $validated['pocetak_mandata'],
                 'kraj_mandata' => $validated['kraj_mandata'],
-                'v_d_status' => $request->has('v_d_status'),
-                'komisija' => true,
-                'redosled_u_komisiji' => 0, // Glavni selektor je uvek prvi
+                'v_d_status' => isset($validated['v_d_status']),
+                'komisija' => $isKomisija,
+                'redosled_u_komisiji' => $isGlavniSelektor ? 1 : 2,
                 'glavni_selektor' => $isGlavniSelektor,
-                'napomena' => $validated['napomena']
+                'napomena' => $validated['napomena'] ?? null,
             ]);
-            
-            // Zatim kreiraj mandate za ostale selektore u komisiji
-            foreach ($selektoriIds as $index => $selektorId) {
-                SelektorMandat::create([
-                    'selektor_id' => $selektorId,
-                    'tim_id' => $validated['tim_id'],
-                    'pocetak_mandata' => $validated['pocetak_mandata'],
-                    'kraj_mandata' => $validated['kraj_mandata'],
-                    'v_d_status' => $request->has('v_d_status'),
-                    'komisija' => true,
-                    'redosled_u_komisiji' => $index + 1, // +1 jer je glavni selektor već na poziciji 0
-                    'glavni_selektor' => false, // Samo jedan može biti glavni
-                    'napomena' => $validated['napomena']
-                ]);
-            }
-        } else {
-            // Standardni mandat za jednog selektora
-            SelektorMandat::create([
-                'selektor_id' => $selektor->id,
-                'tim_id' => $validated['tim_id'],
-                'pocetak_mandata' => $validated['pocetak_mandata'],
-                'kraj_mandata' => $validated['kraj_mandata'],
-                'v_d_status' => $request->has('v_d_status'),
-                'komisija' => false,
-                'redosled_u_komisiji' => 0,
-                'glavni_selektor' => false,
-                'napomena' => $validated['napomena']
-            ]);
-        }
-    });
 
-    return redirect()->route('selektori.show', $selektor)
-        ->with('success', 'Mandat uspešno dodat.');
-}
+            // Ako je komisija i imamo selektore za dodati
+            if ($isKomisija && !empty($validated['selektori_ids'])) {
+                $redosled = $isGlavniSelektor ? 2 : 1;
+                
+                foreach ($validated['selektori_ids'] as $selektorId) {
+                    // Preskoci ako je ovaj selektor (već dodan)
+                    if ($selektorId == $selektor->id) {
+                        continue;
+                    }
+                    
+                    SelektorMandat::create([
+                        'selektor_id' => $selektorId,
+                        'tim_id' => $validated['tim_id'],
+                        'pocetak_mandata' => $validated['pocetak_mandata'],
+                        'kraj_mandata' => $validated['kraj_mandata'],
+                        'v_d_status' => isset($validated['v_d_status']),
+                        'komisija' => true,
+                        'redosled_u_komisiji' => $redosled++,
+                        'glavni_selektor' => false,
+                        'napomena' => $validated['napomena'] ?? null,
+                    ]);
+                }
+            }
+        });
+
+        return redirect()->route('selektori.show', $selektor)
+            ->with('success', 'Mandat je uspešno dodat.');
+    }
 
     /**
      * Obrisi mandat selektora.

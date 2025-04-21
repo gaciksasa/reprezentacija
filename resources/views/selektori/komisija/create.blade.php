@@ -16,19 +16,8 @@
             @csrf
             
             <div class="mb-3">
-                <label for="tim_id" class="form-label">Tim *</label>
-                <select class="form-select @error('tim_id') is-invalid @enderror" 
-                        id="tim_id" name="tim_id" required>
-                    <option value="">-- Izaberite tim --</option>
-                    @foreach($timovi as $tim)
-                        <option value="{{ $tim->id }}" {{ old('tim_id') == $tim->id ? 'selected' : '' }}>
-                            {{ $tim->naziv }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('tim_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <strong>Reprezentacija:</strong> {{ $glavniTim->naziv }}
+                <input type="hidden" name="tim_id" value="{{ $glavniTim->id }}">
             </div>
             
             <div class="row">
@@ -55,23 +44,47 @@
             <div class="mb-4">
                 <label for="glavni_selektor_id" class="form-label">Glavni selektor komisije *</label>
                 <select class="form-select @error('glavni_selektor_id') is-invalid @enderror"
-                        id="glavni_selektor_id" name="glavni_selektor_id" required>
+                        id="glavni_selektor_id" name="glavni_selektor_id" required onchange="toggleNoviGlavniSelektor()">
                     <option value="">-- Izaberite glavnog selektora --</option>
                     @foreach($selektori as $selektor)
                         <option value="{{ $selektor->id }}" {{ old('glavni_selektor_id') == $selektor->id ? 'selected' : '' }}>
                             {{ $selektor->prezime }} {{ $selektor->ime }}
                         </option>
                     @endforeach
+                    <option value="novi" {{ old('glavni_selektor_id') == 'novi' ? 'selected' : '' }}>-- Dodaj novog selektora --</option>
                 </select>
                 @error('glavni_selektor_id')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+                
+                <!-- Polja za novog glavnog selektora -->
+                <div id="novi-glavni-selektor" class="mt-3" style="{{ old('glavni_selektor_id') == 'novi' ? '' : 'display: none;' }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="novi_selektor_ime" class="form-label">Ime *</label>
+                            <input type="text" class="form-control @error('novi_selektor.ime') is-invalid @enderror"
+                                  id="novi_selektor_ime" name="novi_selektor[ime]" value="{{ old('novi_selektor.ime') }}">
+                            @error('novi_selektor.ime')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="novi_selektor_prezime" class="form-label">Prezime *</label>
+                            <input type="text" class="form-control @error('novi_selektor.prezime') is-invalid @enderror"
+                                  id="novi_selektor_prezime" name="novi_selektor[prezime]" value="{{ old('novi_selektor.prezime') }}">
+                            @error('novi_selektor.prezime')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="mb-4">
-                <label class="form-label">Ostali članovi komisije *</label>
+                <label class="form-label">Ostali članovi komisije</label>
                 <div class="card">
                     <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                        <h6>Postojeći selektori:</h6>
                         @foreach($selektori as $selektor)
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" 
@@ -88,6 +101,57 @@
                 @error('clanovi_komisije')
                     <div class="text-danger mt-2">{{ $message }}</div>
                 @enderror
+                
+                <div class="mt-3">
+                    <h6>Dodaj nove članove komisije:</h6>
+                    <div id="novi-clanovi-container">
+                        @if(old('novi_clanovi'))
+                            @foreach(old('novi_clanovi') as $index => $noviClan)
+                                <div class="row novi-clan-row mb-2">
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control @error('novi_clanovi.'.$index.'.ime') is-invalid @enderror" 
+                                               name="novi_clanovi[{{ $index }}][ime]" placeholder="Ime" 
+                                               value="{{ $noviClan['ime'] ?? '' }}">
+                                        @error('novi_clanovi.'.$index.'.ime')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control @error('novi_clanovi.'.$index.'.prezime') is-invalid @enderror" 
+                                               name="novi_clanovi[{{ $index }}][prezime]" placeholder="Prezime" 
+                                               value="{{ $noviClan['prezime'] ?? '' }}">
+                                        @error('novi_clanovi.'.$index.'.prezime')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger remove-clan-btn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="row novi-clan-row mb-2">
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="novi_clanovi[0][ime]" placeholder="Ime">
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="novi_clanovi[0][prezime]" placeholder="Prezime">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-danger remove-clan-btn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <button type="button" class="btn btn-secondary mt-2" id="add-clan-btn">
+                        <i class="fas fa-plus"></i> Dodaj novog člana
+                    </button>
+                </div>
             </div>
             
             <div class="mb-3">
@@ -113,8 +177,9 @@
         // Automatski odaberi glavnog selektora u listi članova komisije
         const glavniSelektor = document.getElementById('glavni_selektor_id');
         glavniSelektor.addEventListener('change', function() {
+            toggleNoviGlavniSelektor();
             const selektorId = this.value;
-            if (selektorId) {
+            if (selektorId && selektorId !== 'novi') {
                 const checkboxId = 'clan-' + selektorId;
                 const checkbox = document.getElementById(checkboxId);
                 if (checkbox) {
@@ -123,8 +188,11 @@
             }
         });
         
+        // Inicijalno stanje - proveri da li je potrebno prikazati polja za novog selektora
+        toggleNoviGlavniSelektor();
+        
         // Automatski odaberi trenutno izabranog glavnog selektora
-        if (glavniSelektor.value) {
+        if (glavniSelektor.value && glavniSelektor.value !== 'novi') {
             const checkboxId = 'clan-' + glavniSelektor.value;
             const checkbox = document.getElementById(checkboxId);
             if (checkbox) {
@@ -190,6 +258,56 @@
             // Replace the date input with the text input
             input.parentNode.replaceChild(textInput, input);
         });
+        
+        // Dodavanje i uklanjanje novih članova komisije
+        const container = document.getElementById('novi-clanovi-container');
+        const addBtn = document.getElementById('add-clan-btn');
+        let clanCounter = @if(old('novi_clanovi')) {{ count(old('novi_clanovi')) }} @else 1 @endif;
+        
+        // Funkcija za dodavanje novog reda
+        addBtn.addEventListener('click', function() {
+            const newRow = document.createElement('div');
+            newRow.className = 'row novi-clan-row mb-2';
+            newRow.innerHTML = `
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="novi_clanovi[${clanCounter}][ime]" placeholder="Ime">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="novi_clanovi[${clanCounter}][prezime]" placeholder="Prezime">
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger remove-clan-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newRow);
+            clanCounter++;
+            
+            // Dodaj event listener za novo dugme za uklanjanje
+            newRow.querySelector('.remove-clan-btn').addEventListener('click', function() {
+                newRow.remove();
+            });
+        });
+        
+        // Dodaj event listener za postojeća dugmad za uklanjanje
+        document.querySelectorAll('.remove-clan-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.novi-clan-row').remove();
+            });
+        });
     });
+    
+    // Funkcija za prikazivanje/sakrivanje polja za novog glavnog selektora
+    function toggleNoviGlavniSelektor() {
+        const glavniSelektor = document.getElementById('glavni_selektor_id');
+        const noviSelektorDiv = document.getElementById('novi-glavni-selektor');
+        
+        if (glavniSelektor.value === 'novi') {
+            noviSelektorDiv.style.display = 'block';
+        } else {
+            noviSelektorDiv.style.display = 'none';
+        }
+    }
 </script>
 @endsection

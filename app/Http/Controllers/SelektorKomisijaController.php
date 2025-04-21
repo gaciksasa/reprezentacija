@@ -16,9 +16,15 @@ class SelektorKomisijaController extends Controller
     public function create()
     {
         $selektori = Selektor::orderBy('prezime')->orderBy('ime')->get();
-        $timovi = Tim::orderBy('naziv')->get();
+        // Dobavljanje glavnog tima (Srbija)
+        $glavniTim = Tim::glavniTim()->first();
         
-        return view('selektori.komisija.create', compact('selektori', 'timovi'));
+        if (!$glavniTim) {
+            return redirect()->route('selektori.index')
+                ->with('error', 'Glavni tim nije definisan. Molimo prvo definišite glavni tim.');
+        }
+        
+        return view('selektori.komisija.create', compact('selektori', 'glavniTim'));
     }
     
     /**
@@ -26,22 +32,47 @@ class SelektorKomisijaController extends Controller
      */
     public function store(Request $request)
     {
+        // Dobavljanje glavnog tima (Srbija)
+        $glavniTim = Tim::glavniTim()->first();
+        
+        if (!$glavniTim) {
+            return redirect()->route('selektori.index')
+                ->with('error', 'Glavni tim nije definisan. Molimo prvo definišite glavni tim.');
+        }
+        
         $validated = $request->validate([
-            'tim_id' => 'required|exists:timovi,id',
             'pocetak_mandata' => 'required|date',
             'kraj_mandata' => 'nullable|date|after_or_equal:pocetak_mandata',
             'napomena' => 'nullable|string',
-            'glavni_selektor_id' => 'required|exists:selektori,id',
-            'clanovi_komisije' => 'required|array|min:1',
+            'glavni_selektor_id' => 'required',
+            'novi_selektor' => 'nullable|array',
+            'novi_selektor.ime' => 'required_with:novi_selektor.prezime',
+            'novi_selektor.prezime' => 'required_with:novi_selektor.ime',
+            'clanovi_komisije' => 'nullable|array',
             'clanovi_komisije.*' => 'exists:selektori,id',
+            'novi_clanovi' => 'nullable|array',
+            'novi_clanovi.*.ime' => 'required_with:novi_clanovi.*.prezime',
+            'novi_clanovi.*.prezime' => 'required_with:novi_clanovi.*.ime',
         ]);
-
+        
         // Koristi transakciju da bi se osiguralo da su svi članovi komisije sačuvani
-        DB::transaction(function() use ($validated, $request) {
+        DB::transaction(function() use ($validated, $request, $glavniTim) {
+            // Proveri da li je glavni selektor nov ili postojeći
+            $glavniSelektorId = $validated['glavni_selektor_id'];
+            
+            if ($glavniSelektorId === 'novi') {
+                // Kreiraj novog selektora
+                $noviSelektor = Selektor::create([
+                    'ime' => $validated['novi_selektor']['ime'],
+                    'prezime' => $validated['novi_selektor']['prezime'],
+                ]);
+                $glavniSelektorId = $noviSelektor->id;
+            }
+            
             // Kreiranje mandata za glavnog selektora
             $glavniMandat = SelektorMandat::create([
-                'selektor_id' => $validated['glavni_selektor_id'],
-                'tim_id' => $validated['tim_id'],
+                'selektor_id' => $glavniSelektorId,
+                'tim_id' => $glavniTim->id,
                 'pocetak_mandata' => $validated['pocetak_mandata'],
                 'kraj_mandata' => $validated['kraj_mandata'],
                 'v_d_status' => false,
@@ -51,25 +82,53 @@ class SelektorKomisijaController extends Controller
                 'napomena' => $validated['napomena'],
             ]);
             
-            // Dodavanje ostalih članova komisije
+            // Dodavanje postojećih članova komisije
             $redosled = 2;
-            foreach ($validated['clanovi_komisije'] as $selektorId) {
-                // Preskačemo glavnog selektora jer je već dodan
-                if ($selektorId == $validated['glavni_selektor_id']) {
-                    continue;
+            if (isset($validated['clanovi_komisije'])) {
+                foreach ($validated['clanovi_komisije'] as $selektorId) {
+                    // Preskačemo glavnog selektora jer je već dodan
+                    if ($selektorId == $glavniSelektorId) {
+                        continue;
+                    }
+                    
+                    SelektorMandat::create([
+                        'selektor_id' => $selektorId,
+                        'tim_id' => $glavniTim->id,
+                        'pocetak_mandata' => $validated['pocetak_mandata'],
+                        'kraj_mandata' => $validated['kraj_mandata'],
+                        'v_d_status' => false,
+                        'komisija' => true,
+                        'redosled_u_komisiji' => $redosled++,
+                        'glavni_selektor' => false,
+                        'napomena' => $validated['napomena'],
+                    ]);
                 }
-                
-                SelektorMandat::create([
-                    'selektor_id' => $selektorId,
-                    'tim_id' => $validated['tim_id'],
-                    'pocetak_mandata' => $validated['pocetak_mandata'],
-                    'kraj_mandata' => $validated['kraj_mandata'],
-                    'v_d_status' => false,
-                    'komisija' => true,
-                    'redosled_u_komisiji' => $redosled++,
-                    'glavni_selektor' => false,
-                    'napomena' => $validated['napomena'],
-                ]);
+            }
+            
+            // Dodavanje novih članova komisije
+            if (isset($validated['novi_clanovi'])) {
+                foreach ($validated['novi_clanovi'] as $noviClan) {
+                    if (!empty($noviClan['ime']) && !empty($noviClan['prezime'])) {
+                        // Kreiraj novog selektora
+                        $noviSelektor = Selektor::create([
+                            'ime' => $noviClan['ime'],
+                            'prezime' => $noviClan['prezime'],
+                        ]);
+                        
+                        // Dodaj ga u komisiju
+                        SelektorMandat::create([
+                            'selektor_id' => $noviSelektor->id,
+                            'tim_id' => $glavniTim->id,
+                            'pocetak_mandata' => $validated['pocetak_mandata'],
+                            'kraj_mandata' => $validated['kraj_mandata'],
+                            'v_d_status' => false,
+                            'komisija' => true,
+                            'redosled_u_komisiji' => $redosled++,
+                            'glavni_selektor' => false,
+                            'napomena' => $validated['napomena'],
+                        ]);
+                    }
+                }
             }
         });
         
@@ -123,9 +182,15 @@ class SelektorKomisijaController extends Controller
             'pocetak_mandata' => 'required|date',
             'kraj_mandata' => 'nullable|date|after_or_equal:pocetak_mandata',
             'napomena' => 'nullable|string',
-            'glavni_selektor_id' => 'required|exists:selektori,id',
-            'clanovi_komisije' => 'required|array|min:1',
+            'glavni_selektor_id' => 'required',
+            'novi_selektor' => 'nullable|array',
+            'novi_selektor.ime' => 'required_with:novi_selektor.prezime',
+            'novi_selektor.prezime' => 'required_with:novi_selektor.ime',
+            'clanovi_komisije' => 'nullable|array',
             'clanovi_komisije.*' => 'exists:selektori,id',
+            'novi_clanovi' => 'nullable|array',
+            'novi_clanovi.*.ime' => 'required_with:novi_clanovi.*.prezime',
+            'novi_clanovi.*.prezime' => 'required_with:novi_clanovi.*.ime',
         ]);
         
         // Dobavi sve članove iste komisije
@@ -138,9 +203,21 @@ class SelektorKomisijaController extends Controller
                 $postojeciMandat->delete();
             }
             
+            // Proveri da li je glavni selektor nov ili postojeći
+            $glavniSelektorId = $validated['glavni_selektor_id'];
+            
+            if ($glavniSelektorId === 'novi') {
+                // Kreiraj novog selektora
+                $noviSelektor = Selektor::create([
+                    'ime' => $validated['novi_selektor']['ime'],
+                    'prezime' => $validated['novi_selektor']['prezime'],
+                ]);
+                $glavniSelektorId = $noviSelektor->id;
+            }
+            
             // Zatim kreiramo novi mandat za glavnog selektora
             $glavniMandat = SelektorMandat::create([
-                'selektor_id' => $validated['glavni_selektor_id'],
+                'selektor_id' => $glavniSelektorId,
                 'tim_id' => $validated['tim_id'],
                 'pocetak_mandata' => $validated['pocetak_mandata'],
                 'kraj_mandata' => $validated['kraj_mandata'],
@@ -151,25 +228,53 @@ class SelektorKomisijaController extends Controller
                 'napomena' => $validated['napomena'],
             ]);
             
-            // Dodavanje ostalih članova komisije
+            // Dodavanje postojećih članova komisije
             $redosled = 2;
-            foreach ($validated['clanovi_komisije'] as $selektorId) {
-                // Preskačemo glavnog selektora jer je već dodan
-                if ($selektorId == $validated['glavni_selektor_id']) {
-                    continue;
+            if (isset($validated['clanovi_komisije'])) {
+                foreach ($validated['clanovi_komisije'] as $selektorId) {
+                    // Preskačemo glavnog selektora jer je već dodan
+                    if ($selektorId == $glavniSelektorId) {
+                        continue;
+                    }
+                    
+                    SelektorMandat::create([
+                        'selektor_id' => $selektorId,
+                        'tim_id' => $validated['tim_id'],
+                        'pocetak_mandata' => $validated['pocetak_mandata'],
+                        'kraj_mandata' => $validated['kraj_mandata'],
+                        'v_d_status' => false,
+                        'komisija' => true,
+                        'redosled_u_komisiji' => $redosled++,
+                        'glavni_selektor' => false,
+                        'napomena' => $validated['napomena'],
+                    ]);
                 }
-                
-                SelektorMandat::create([
-                    'selektor_id' => $selektorId,
-                    'tim_id' => $validated['tim_id'],
-                    'pocetak_mandata' => $validated['pocetak_mandata'],
-                    'kraj_mandata' => $validated['kraj_mandata'],
-                    'v_d_status' => false,
-                    'komisija' => true,
-                    'redosled_u_komisiji' => $redosled++,
-                    'glavni_selektor' => false,
-                    'napomena' => $validated['napomena'],
-                ]);
+            }
+            
+            // Dodavanje novih članova komisije
+            if (isset($validated['novi_clanovi'])) {
+                foreach ($validated['novi_clanovi'] as $noviClan) {
+                    if (!empty($noviClan['ime']) && !empty($noviClan['prezime'])) {
+                        // Kreiraj novog selektora
+                        $noviSelektor = Selektor::create([
+                            'ime' => $noviClan['ime'],
+                            'prezime' => $noviClan['prezime'],
+                        ]);
+                        
+                        // Dodaj ga u komisiju
+                        SelektorMandat::create([
+                            'selektor_id' => $noviSelektor->id,
+                            'tim_id' => $validated['tim_id'],
+                            'pocetak_mandata' => $validated['pocetak_mandata'],
+                            'kraj_mandata' => $validated['kraj_mandata'],
+                            'v_d_status' => false,
+                            'komisija' => true,
+                            'redosled_u_komisiji' => $redosled++,
+                            'glavni_selektor' => false,
+                            'napomena' => $validated['napomena'],
+                        ]);
+                    }
+                }
             }
         });
         

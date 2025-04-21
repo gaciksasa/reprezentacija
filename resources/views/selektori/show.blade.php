@@ -154,6 +154,9 @@
                                 <th>Status</th>
                                 <th>Utakmice</th>
                                 <th>Učinak</th>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
+                                <th>Akcije</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -184,6 +187,20 @@
                                         -
                                     @endif
                                 </td>
+                                @if(Auth::check() && Auth::user()->hasEditAccess())
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-mandat-{{ $mandat->id }}').submit()">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <form id="delete-mandat-{{ $mandat->id }}" 
+                                         action="{{ route('selektori.obrisiMandat', $mandat->id) }}" 
+                                         method="POST" class="d-none">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </td>
+                                @endif
                             </tr>
                             @endforeach
                         </tbody>
@@ -316,18 +333,17 @@
                     <div class="mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="komisija" name="komisija" value="1" 
-                                {{ old('komisija') ? 'checked' : '' }} onchange="toggleKomisijaFields()">
+                                onchange="toggleKomisijaFields()">
                             <label class="form-check-label" for="komisija">
                                 Selektorska komisija
                             </label>
                         </div>
                     </div>
 
-                    <div id="komisija-fields" style="{{ old('komisija') ? '' : 'display: none;' }}">
+                    <div id="komisija-fields" style="display: none;">
                         <div class="mb-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="glavni_selektor" name="glavni_selektor" value="1" 
-                                    {{ old('glavni_selektor') ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" id="glavni_selektor" name="glavni_selektor" value="1">
                                 <label class="form-check-label" for="glavni_selektor">
                                     Glavni selektor u komisiji
                                 </label>
@@ -338,9 +354,8 @@
                             <label class="form-label">Ostali članovi komisije</label>
                             <select class="form-select" id="selektori_ids" name="selektori_ids[]" multiple>
                                 @foreach($ostaliSelektori as $drugiSelektor)
-                                    <option value="{{ $drugiSelektor->id }}" 
-                                        {{ in_array($drugiSelektor->id, old('selektori_ids', [])) ? 'selected' : '' }}>
-                                        {{ $drugiSelektor->ime_prezime }}
+                                    <option value="{{ $drugiSelektor->id }}">
+                                        {{ $drugiSelektor->prezime }} {{ $drugiSelektor->ime }}
                                     </option>
                                 @endforeach
                             </select>
@@ -361,124 +376,21 @@
         </div>
     </div>
 </div>
-
-<!-- Modal za izmenu mandata -->
-<div class="modal fade" id="editMandatModal" tabindex="-1" aria-labelledby="editMandatModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form id="editMandatForm" action="{{ route('selektori.edit', $selektor) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <input type="hidden" id="edit_mandat_id" name="edit_mandat_id">
-                
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editMandatModalLabel">Izmeni mandat</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="edit_tim_id" class="form-label">Tim *</label>
-                        <select class="form-select" id="edit_tim_id" name="mandati[0][tim_id]" required>
-                            <option value="">-- Izaberite tim --</option>
-                            @foreach($timovi as $tim)
-                                <option value="{{ $tim->id }}">{{ $tim->naziv }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="edit_pocetak_mandata" class="form-label">Početak mandata *</label>
-                            <input type="date" class="form-control" id="edit_pocetak_mandata" name="mandati[0][pocetak_mandata]" required>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <label for="edit_kraj_mandata" class="form-label">Kraj mandata</label>
-                            <input type="date" class="form-control" id="edit_kraj_mandata" name="mandati[0][kraj_mandata]">
-                            <small class="form-text text-muted">Ostavite prazno ako je aktivan</small>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="edit_v_d_status" name="mandati[0][v_d_status]" value="1">
-                            <label class="form-check-label" for="edit_v_d_status">
-                                Vršilac dužnosti (v.d.)
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Polja za selektorsku komisiju -->
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="edit_komisija" name="mandati[0][komisija]" value="1" 
-                                onchange="toggleEditKomisijaFields()">
-                            <label class="form-check-label" for="edit_komisija">
-                                Selektorska komisija
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="edit-komisija-fields" style="display: none;">
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="edit_glavni_selektor" name="mandati[0][glavni_selektor]" value="1">
-                                <label class="form-check-label" for="edit_glavni_selektor">
-                                    Glavni selektor u komisiji
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Ostali članovi komisije</label>
-                            <select class="form-select" id="edit_selektori_ids" name="mandati[0][selektori_ids][]" multiple>
-                                @foreach($ostaliSelektori as $drugiSelektor)
-                                    <option value="{{ $drugiSelektor->id }}">
-                                        {{ $drugiSelektor->ime_prezime }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <small class="form-text text-muted">Držite CTRL za višestruki izbor</small>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="edit_napomena" class="form-label">Napomena</label>
-                        <textarea class="form-control" id="edit_napomena" name="mandati[0][napomena]" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Odustani</button>
-                    <button type="submit" class="btn btn-primary">Sačuvaj izmene</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@endsection
 
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Funkcije za prikazivanje/sakrivanje polja za selektorsku komisiju
-        function toggleKomisijaFields() {
+        window.toggleKomisijaFields = function() {
             const isKomisija = document.getElementById('komisija').checked;
             document.getElementById('komisija-fields').style.display = isKomisija ? 'block' : 'none';
-        }
-        
-        function toggleEditKomisijaFields() {
-            const isKomisija = document.getElementById('edit_komisija').checked;
-            document.getElementById('edit-komisija-fields').style.display = isKomisija ? 'block' : 'none';
         }
         
         // Dodavanje event listenera
         const komisijaCheckbox = document.getElementById('komisija');
         if (komisijaCheckbox) {
             komisijaCheckbox.addEventListener('change', toggleKomisijaFields);
-        }
-        
-        const editKomisijaCheckbox = document.getElementById('edit_komisija');
-        if (editKomisijaCheckbox) {
-            editKomisijaCheckbox.addEventListener('change', toggleEditKomisijaFields);
         }
         
         // Configure date inputs to use dd.mm.yyyy format
@@ -573,127 +485,6 @@
         });
     });
 
-    // Funkcija za popunjavanje forme za izmenu mandata
-    function editMandat(mandatId) {
-        // Pronađi podatke o mandatu
-        const mandati = @json($selektor->mandati);
-        const mandat = mandati.find(m => m.id === mandatId);
-        
-        if (mandat) {
-            // Popuni formu
-            document.getElementById('edit_mandat_id').value = mandat.id;
-            document.getElementById('edit_tim_id').value = mandat.tim_id;
-            
-            // Format and set dates in the dd.mm.yyyy format
-            let pocetakDatum = '';
-            if (mandat.pocetak_mandata) {
-                const date = new Date(mandat.pocetak_mandata);
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const year = date.getFullYear();
-                pocetakDatum = `${day}.${month}.${year}`;
-            }
-            
-            let krajDatum = '';
-            if (mandat.kraj_mandata) {
-                const date = new Date(mandat.kraj_mandata);
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const year = date.getFullYear();
-                krajDatum = `${day}.${month}.${year}`;
-            }
-            
-            // Postavi vrednosti u formu
-            const pocetakInput = document.getElementById('edit_pocetak_mandata');
-            const krajInput = document.getElementById('edit_kraj_mandata');
-            
-            // Convert the date fields to text fields if they aren't already
-            if (pocetakInput.type === 'date') {
-                // Create a text replacement for pocetak_mandata
-                const pocetakTextInput = document.createElement('input');
-                pocetakTextInput.type = 'text';
-                pocetakTextInput.id = 'edit_pocetak_mandata';
-                pocetakTextInput.className = pocetakInput.className;
-                pocetakTextInput.placeholder = 'dd.mm.yyyy';
-                pocetakTextInput.required = pocetakInput.required;
-                pocetakTextInput.value = pocetakDatum;
-                
-                // Add event listener for format conversion
-                pocetakTextInput.addEventListener('blur', function() {
-                    convertDateFormat(this);
-                });
-                
-                // Replace the date input
-                pocetakInput.parentNode.replaceChild(pocetakTextInput, pocetakInput);
-            } else {
-                // Just update the value if it's already a text input
-                pocetakInput.value = pocetakDatum;
-            }
-            
-            if (krajInput.type === 'date') {
-                // Create a text replacement for kraj_mandata
-                const krajTextInput = document.createElement('input');
-                krajTextInput.type = 'text';
-                krajTextInput.id = 'edit_kraj_mandata';
-                krajTextInput.className = krajInput.className;
-                krajTextInput.placeholder = 'dd.mm.yyyy';
-                krajTextInput.value = krajDatum;
-                
-                // Add event listener for format conversion
-                krajTextInput.addEventListener('blur', function() {
-                    convertDateFormat(this);
-                });
-                
-                // Replace the date input
-                krajInput.parentNode.replaceChild(krajTextInput, krajInput);
-            } else {
-                // Just update the value if it's already a text input
-                krajInput.value = krajDatum;
-            }
-            
-            // Postavi checkbox polja
-            document.getElementById('edit_v_d_status').checked = Boolean(mandat.v_d_status);
-            document.getElementById('edit_komisija').checked = Boolean(mandat.komisija);
-            document.getElementById('edit_glavni_selektor').checked = Boolean(mandat.glavni_selektor);
-            
-            // Prikaži ili sakrij polja komisije
-            if (mandat.komisija) {
-                document.getElementById('edit-komisija-fields').style.display = 'block';
-                
-                // Ako je komisija, učitaj ostale članove
-                const clanoviKomisije = @json($selektor->mandati)
-                    .filter(m => m.komisija && m.pocetak_mandata === mandat.pocetak_mandata)
-                    .filter(m => m.selektor_id !== {{ $selektor->id }})
-                    .map(m => m.selektor_id);
-                    
-                const selectElement = document.getElementById('edit_selektori_ids');
-                for (let i = 0; i < selectElement.options.length; i++) {
-                    selectElement.options[i].selected = clanoviKomisije.includes(parseInt(selectElement.options[i].value));
-                }
-            } else {
-                document.getElementById('edit-komisija-fields').style.display = 'none';
-            }
-            
-            document.getElementById('edit_napomena').value = mandat.napomena || '';
-            
-            // Ažurirati ime polja forme sa ID-om mandata
-            document.getElementById('edit_tim_id').name = `mandati[${mandat.id}][tim_id]`;
-            document.getElementById('edit_pocetak_mandata').name = `mandati[${mandat.id}][pocetak_mandata]`;
-            document.getElementById('edit_kraj_mandata').name = `mandati[${mandat.id}][kraj_mandata]`;
-            document.getElementById('edit_v_d_status').name = `mandati[${mandat.id}][v_d_status]`;
-            document.getElementById('edit_komisija').name = `mandati[${mandat.id}][komisija]`;
-            document.getElementById('edit_glavni_selektor').name = `mandati[${mandat.id}][glavni_selektor]`;
-            document.getElementById('edit_napomena').name = `mandati[${mandat.id}][napomena]`;
-            
-            const selectElement = document.getElementById('edit_selektori_ids');
-            selectElement.name = `mandati[${mandat.id}][selektori_ids][]`;
-            
-            // Prikaži modal
-            const editMandatModal = new bootstrap.Modal(document.getElementById('editMandatModal'));
-            editMandatModal.show();
-        }
-    }
-    
     // Helper function to convert date format
     function convertDateFormat(inputElement) {
         const value = inputElement.value;

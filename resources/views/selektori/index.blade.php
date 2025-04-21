@@ -33,7 +33,87 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($selektori as $selektor)
+                        @php
+                            // Grupišemo selektore po mandatima koji su deo komisije
+                            $komisije = [];
+                            $samostalniSelektori = [];
+                            
+                            foreach($selektori as $selektor) {
+                                // Proveriti da li je u komisiji koja već postoji u nizu
+                                $komisijskiMandat = $selektor->mandati->where('komisija', true)->first();
+                                
+                                if ($komisijskiMandat) {
+                                    $kljuc = $komisijskiMandat->tim_id . '-' . $komisijskiMandat->pocetak_mandata->format('Y-m-d');
+                                    
+                                    if (!isset($komisije[$kljuc])) {
+                                        $komisije[$kljuc] = [
+                                            'tim_id' => $komisijskiMandat->tim_id,
+                                            'tim_naziv' => $komisijskiMandat->tim->naziv,
+                                            'pocetak' => $komisijskiMandat->pocetak_mandata,
+                                            'kraj' => $komisijskiMandat->kraj_mandata,
+                                            'glavni_selektor' => null,
+                                            'clanovi' => [],
+                                            'statistika' => $komisijskiMandat->statistika,
+                                            'mandat_id' => $komisijskiMandat->id
+                                        ];
+                                    }
+                                    
+                                    if ($komisijskiMandat->glavni_selektor) {
+                                        $komisije[$kljuc]['glavni_selektor'] = $selektor;
+                                    } else {
+                                        $komisije[$kljuc]['clanovi'][] = $selektor;
+                                    }
+                                } else {
+                                    $samostalniSelektori[] = $selektor;
+                                }
+                            }
+                        @endphp
+                        
+                        {{-- Prvo prikazujemo komisije --}}
+                        @foreach($komisije as $komisija)
+                        <tr>
+                            <td>
+                                <strong>Selektorska komisija:</strong><br>
+                                @if($komisija['glavni_selektor'])
+                                    <a href="{{ route('selektori.show', $komisija['glavni_selektor']) }}">
+                                        {{ $komisija['glavni_selektor']->prezime }} {{ $komisija['glavni_selektor']->ime }}
+                                    </a>
+                                    <span class="badge bg-primary">Glavni</span><br>
+                                @endif
+                                
+                                @foreach($komisija['clanovi'] as $clan)
+                                    <a href="{{ route('selektori.show', $clan) }}">
+                                        {{ $clan->prezime }} {{ $clan->ime }}
+                                    </a><br>
+                                @endforeach
+                            </td>
+                            <td>
+                                {{ $komisija['pocetak']->format('d.m.Y') }} - 
+                                {{ $komisija['kraj'] ? $komisija['kraj']->format('d.m.Y') : 'danas' }}
+                            </td>
+                            <td>
+                                @if($komisija['statistika']['utakmice'] > 0)
+                                    {{ $komisija['statistika']['utakmice'] }} utakmice<br>
+                                    {{ $komisija['statistika']['pobede'] }}-{{ $komisija['statistika']['remiji'] }}-{{ $komisija['statistika']['porazi'] }}
+                                    ({{ $komisija['statistika']['procenatPobeda'] }}%)
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            @if(Auth::check() && Auth::user()->hasEditAccess())
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ route('selektor-komisija.edit', $komisija['mandat_id']) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            @endif
+                        </tr>
+                        @endforeach
+                        
+                        {{-- Zatim prikazujemo samostalne selektore --}}
+                        @foreach($samostalniSelektori as $selektor)
                         <tr>
                             <td>
                                 <a href="{{ route('selektori.show', $selektor) }}">
@@ -53,8 +133,8 @@
                                     {{ $prviMandat->pocetak_mandata->format('d.m.Y') }} - 
                                     {{ $poslednjiMandat->kraj_mandata ? $poslednjiMandat->kraj_mandata->format('d.m.Y') : 'danas' }}
                                     
-                                    @if($selektor->mandati->count() > 1)
-                                        <span class="badge bg-info">{{ $selektor->mandati->count() }} mandata</span>
+                                    @if($selektor->mandati->where('komisija', false)->count() > 1)
+                                        <span class="badge bg-info">{{ $selektor->mandati->where('komisija', false)->count() }} mandata</span>
                                     @endif
                                 @else
                                     -
@@ -94,11 +174,13 @@
                             </td>
                             @endif
                         </tr>
-                        @empty
+                        @endforeach
+
+                        @if(count($komisije) == 0 && count($samostalniSelektori) == 0)
                         <tr>
                             <td colspan="5" class="text-center">Nema selektora u bazi podataka</td>
                         </tr>
-                        @endforelse
+                        @endif
                     </tbody>
                 </table>
             </div>
