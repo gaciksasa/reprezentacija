@@ -179,10 +179,15 @@
                                         <span class="badge bg-success">Samostalni</span>
                                     @endif
                                 </td>
-                                <td>{{ $statistika['utakmice'] }}</td>
                                 <td>
-                                    @if($statistika['utakmice'] > 0)
-                                        {{ $statistika['pobede'] }}-{{ $statistika['remiji'] }}-{{ $statistika['porazi'] }}
+                                    @php
+                                        $mandatStatistika = $mandat->statistika;
+                                    @endphp
+                                    {{ $mandatStatistika['utakmice'] }}
+                                </td>
+                                <td>
+                                    @if($mandatStatistika['utakmice'] > 0)
+                                        {{ $mandatStatistika['pobede'] }}-{{ $mandatStatistika['remiji'] }}-{{ $mandatStatistika['porazi'] }}
                                     @else
                                         -
                                     @endif
@@ -194,8 +199,8 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     <form id="delete-mandat-{{ $mandat->id }}" 
-                                         action="{{ route('selektori.obrisiMandat', $mandat->id) }}" 
-                                         method="POST" class="d-none">
+                                            action="{{ route('selektori.obrisiMandat', $mandat->id) }}" 
+                                            method="POST" class="d-none">
                                         @csrf
                                         @method('DELETE')
                                     </form>
