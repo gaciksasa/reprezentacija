@@ -7,6 +7,7 @@ use App\Models\SelektorMandat;
 use App\Models\Tim;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB; 
 
 class SelektoriController extends Controller
 {
