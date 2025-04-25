@@ -17,27 +17,25 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Postavi CSRF token za Ajax pozive
-            window.Laravel = {!! json_encode(['csrfToken' => csrf_token()]) !!};
-            
-            // Osiguramo da svaki Ajax zahtev sadrži CSRF token
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            
-            // Initialize TinyMCE for users with editing rights (admin or editor)
-            @if(Auth::check() && Auth::user()->hasEditAccess())
+    // Add TinyMCE configuration
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize TinyMCE for users with editing rights (admin or editor)
+        @if(Auth::check() && Auth::user()->hasEditAccess())
+        if (typeof tinymce !== 'undefined') {
             tinymce.init({
                 selector: 'textarea:not(.no-tinymce)',
                 plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
                 toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
                 height: 500,
+                setup: function(editor) {
+                    editor.on('change', function() {
+                        tinymce.triggerSave();
+                    });
+                }
             });
-            @endif
-        });
+        }
+        @endif
+    });
     </script>
 </head>
 <body>
