@@ -7,6 +7,7 @@ use App\Models\Kategorija;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class PostController extends Controller
@@ -168,8 +169,9 @@ class PostController extends Controller
             Storage::disk('public')->delete('uploads/' . $post->featured_image);
         }
         
-        // kategorije will be automatically detached due to onDelete('cascade') in migration
+        // Delete the post
         $post->delete();
+        
         return redirect()->route('posts.index')
             ->with('success', 'Post uspešno obrisan.');
     }
