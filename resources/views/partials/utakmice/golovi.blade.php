@@ -13,8 +13,11 @@
             <div class="row py-4">
                 <div class="col-5 col-lg-4 text-end">
                     @php
-                        // Domaći golovi
-                        $domaciGolovi = $utakmica->golovi->where('tim_id', $utakmica->domacin_id)->sortBy('minut');
+                        // Domaći golovi (golovi koje je postigao domaći tim + autogolovi gostujućeg tima)
+                        $domaciGolovi = $utakmica->golovi->filter(function($gol) use ($utakmica) {
+                            return ($gol->tim_id == $utakmica->domacin_id && !$gol->auto_gol) || 
+                                   ($gol->tim_id == $utakmica->gost_id && $gol->auto_gol);
+                        })->sortBy('minut');
                     @endphp
                     
                     @if($domaciGolovi->count() > 0)
@@ -79,8 +82,11 @@
                 
                 <div class="col-5 col-lg-4">
                     @php
-                        // Gostujući golovi
-                        $gostujuciGolovi = $utakmica->golovi->where('tim_id', $utakmica->gost_id)->sortBy('minut');
+                        // Gostujući golovi (golovi koje je postigao gostujući tim + autogolovi domaćeg tima)
+                        $gostujuciGolovi = $utakmica->golovi->filter(function($gol) use ($utakmica) {
+                            return ($gol->tim_id == $utakmica->gost_id && !$gol->auto_gol) || 
+                                   ($gol->tim_id == $utakmica->domacin_id && $gol->auto_gol);
+                        })->sortBy('minut');
                     @endphp
                     
                     @if($gostujuciGolovi->count() > 0)
