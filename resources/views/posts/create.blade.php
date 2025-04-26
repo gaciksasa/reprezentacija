@@ -16,6 +16,16 @@
             @csrf
             
             <div class="mb-3">
+                <label for="post_date" class="form-label">Datum objave</label>
+                <input type="datetime-local" class="form-control @error('post_date') is-invalid @enderror" 
+                    id="post_date" name="post_date" value="{{ old('post_date') }}">
+                @error('post_date')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-text text-muted">Ostavite prazno za trenutni datum.</small>
+            </div>
+            
+            <div class="mb-3">
                 <label for="post_title" class="form-label">Naslov *</label>
                 <input type="text" class="form-control @error('post_title') is-invalid @enderror" 
                        id="post_title" name="post_title" value="{{ old('post_title') }}" required>

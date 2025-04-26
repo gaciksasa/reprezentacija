@@ -25,65 +25,76 @@ class PostController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'post_title' => 'required|string|max:255',
-            'post_content' => 'required',
-            'post_excerpt' => 'nullable|string',
-            'post_status' => 'required|in:publish,draft',
-            'kategorije' => 'nullable|array',
-            'featured_image' => 'nullable|image|max:2048',
-        ]);
+{
+    $validated = $request->validate([
+        'post_title' => 'required|string|max:255',
+        'post_content' => 'required',
+        'post_excerpt' => 'nullable|string',
+        'post_status' => 'required|in:publish,draft',
+        'kategorije' => 'nullable|array',
+        'featured_image' => 'nullable|image|max:2048',
+        'post_date' => 'nullable|date', // Add validation for post_date
+    ]);
 
-        $post = new Post();
-        $post->post_title = $validated['post_title'];
-        $post->post_content = $validated['post_content'];
-        $post->post_excerpt = $validated['post_excerpt'] ?? '';
-        $post->post_status = $validated['post_status'];
-        $post->post_author = Auth::id();
-        $post->post_name = Str::slug($validated['post_title']);
-        $post->post_type = 'post';
-        
-        // Set additional required fields with default values
-        $post->to_ping = '';
-        $post->pinged = '';
-        $post->post_content_filtered = '';
-        $post->guid = Str::uuid();
-        $post->menu_order = 0;
-        $post->post_mime_type = '';
-        $post->comment_count = 0;
-        
-        // Set dates
-        $now = now();
+    $post = new Post();
+    $post->post_title = $validated['post_title'];
+    $post->post_content = $validated['post_content'];
+    $post->post_excerpt = $validated['post_excerpt'] ?? '';
+    $post->post_status = $validated['post_status'];
+    $post->post_author = Auth::id();
+    $post->post_name = Str::slug($validated['post_title']);
+    $post->post_type = 'post';
+    
+    // Set additional required fields with default values
+    $post->to_ping = '';
+    $post->pinged = '';
+    $post->post_content_filtered = '';
+    $post->guid = Str::uuid();
+    $post->menu_order = 0;
+    $post->post_mime_type = '';
+    $post->comment_count = 0;
+    
+    // Handle post_date if provided
+    if (!empty($validated['post_date'])) {
+        $postDate = Carbon::parse($validated['post_date']);
+        $post->post_date = $postDate;
+        $post->post_date_gmt = $postDate->copy()->timezone('UTC');
+    } else {
+        // Set dates to current time
+        $now = Carbon::now();
         $post->post_date = $now;
         $post->post_date_gmt = $now->toDateTimeString();
-        $post->post_modified = $now;
-        $post->post_modified_gmt = $now->toDateTimeString();
-        
-        // Handle featured image - keep original filename and store in uploads folder
-        if ($request->hasFile('featured_image')) {
-            $file = $request->file('featured_image');
-            $filename = $file->getClientOriginalName();
-            
-            // Store file in uploads folder
-            $file->storeAs('uploads', $filename, 'public');
-            
-            // Save only the filename to the database
-            $post->featured_image = $filename;
-        } else {
-            $post->featured_image = '';
-        }
-        
-        $post->save();
-        
-        // Attach categories if any
-        if (!empty($validated['kategorije'])) {
-            $post->kategorije()->attach($validated['kategorije']);
-        }
-        
-        return redirect()->route('posts.index')
-            ->with('success', 'Post uspešno kreiran.');
     }
+    
+    // Set modification dates
+    $now = Carbon::now();
+    $post->post_modified = $now;
+    $post->post_modified_gmt = $now->toDateTimeString();
+    
+    // Handle featured image
+    if ($request->hasFile('featured_image')) {
+        $file = $request->file('featured_image');
+        $filename = $file->getClientOriginalName();
+        
+        // Store file in uploads folder
+        $file->storeAs('uploads', $filename, 'public');
+        
+        // Save only the filename to the database
+        $post->featured_image = $filename;
+    } else {
+        $post->featured_image = '';
+    }
+    
+    $post->save();
+    
+    // Attach categories if any
+    if (!empty($validated['kategorije'])) {
+        $post->kategorije()->attach($validated['kategorije']);
+    }
+    
+    return redirect()->route('posts.index')
+        ->with('success', 'Post uspešno kreiran.');
+}
 
     /**
      * Display the specified post.
@@ -101,6 +112,8 @@ class PostController extends Controller
     {
         $post = Post::with('kategorije')->findOrFail($id);
         $kategorije = Kategorija::orderBy('name')->get();
+        
+        // Get the IDs of categories that are already attached to this post
         $selectedkategorije = $post->kategorije->pluck('id')->toArray();
         
         return view('posts.edit', compact('post', 'kategorije', 'selectedkategorije'));
@@ -118,6 +131,7 @@ class PostController extends Controller
             'post_status' => 'required|in:publish,draft',
             'kategorije' => 'nullable|array',
             'featured_image' => 'nullable|image|max:2048',
+            'post_date' => 'nullable|date', // Add validation for post_date
         ]);
 
         $post = Post::findOrFail($id);
@@ -127,13 +141,25 @@ class PostController extends Controller
         $post->post_status = $validated['post_status'];
         $post->post_name = Str::slug($validated['post_title']);
         
-        // Set dates with proper Carbon import
+        // Handle post_date if provided
+        if (!empty($validated['post_date'])) {
+            $postDate = Carbon::parse($validated['post_date']);
+            $post->post_date = $postDate;
+            $post->post_date_gmt = $postDate->copy()->timezone('UTC');
+        }
+        
+        // Set modification dates
         $now = Carbon::now();
         $post->post_modified = $now;
         $post->post_modified_gmt = $now->toDateTimeString();
         
         // Handle featured image
         if ($request->hasFile('featured_image')) {
+            // Delete old image if exists
+            if ($post->featured_image) {
+                Storage::disk('public')->delete('uploads/' . $post->featured_image);
+            }
+            
             $file = $request->file('featured_image');
             $filename = $file->getClientOriginalName();
             

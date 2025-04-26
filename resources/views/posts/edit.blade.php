@@ -15,6 +15,16 @@
         <form action="{{ route('posts.update', $post->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+
+            <div class="mb-3">
+                <label for="post_date" class="form-label">Datum objave</label>
+                <input type="datetime-local" class="form-control @error('post_date') is-invalid @enderror" 
+                    id="post_date" name="post_date" value="{{ old('post_date', $post->post_date ? $post->post_date->format('Y-m-d\TH:i') : '') }}">
+                @error('post_date')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="form-text text-muted">Ostavite prazno da zadržite trenutni datum.</small>
+            </div>
             
             <div class="mb-3">
                 <label for="post_title" class="form-label">Naslov *</label>
@@ -102,22 +112,17 @@
                 <label class="form-label">Kategorije</label>
                 <div class="card">
                     <div class="card-body" style="max-height: 200px; overflow-y: auto;">
-                        @if($kategorije->count() > 0)
-                            @foreach($kategorije as $kategorija)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
-                                           id="kategorija-{{ $kategorija->id }}" 
-                                           name="kategorije[]" 
-                                           value="{{ $kategorija->id }}"
-                                           {{ in_array($kategorija->id, old('kategorije', $selectedkategorije)) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="kategorija-{{ $kategorija->id }}">
-                                        {{ $kategorija->name }}
-                                    </label>
-                                </div>
-                            @endforeach
-                        @else
-                            <p class="text-muted mb-0">Nema dostupnih kategorija. <a href="{{ route('kategorije.create') }}">Dodajte kategoriju</a>.</p>
-                        @endif
+                        @foreach($kategorije as $kategorija)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                    id="kategorija-{{ $kategorija->id }}" name="kategorije[]" 
+                                    value="{{ $kategorija->id }}" 
+                                    {{ in_array($kategorija->id, $selectedkategorije) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="kategorija-{{ $kategorija->id }}">
+                                    {{ $kategorija->name }}
+                                </label>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
                 @error('kategorije')
