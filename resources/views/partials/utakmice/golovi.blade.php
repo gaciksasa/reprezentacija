@@ -57,7 +57,7 @@
                                                 @endif
                                             @endif
                                         </div>
-                                        @can('manage-gol')
+                                        @if(Auth::check() && Auth::user()->hasEditAccess())
                                         <form action="{{ route('golovi.destroy', $gol->id) }}" method="POST" class="d-inline ms-2">
                                             @csrf
                                             @method('DELETE')
@@ -65,7 +65,7 @@
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
-                                        @endcan
+                                        @endif
                                     </div>
                                 </li>
                             @endforeach

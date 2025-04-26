@@ -4,20 +4,17 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Izmeni selektora protivničkog tima</h1>
+    <h2>Izmeni selektora protivničkog tima</h2>
     <a href="{{ route('utakmice.show', $selektor->utakmica) }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Nazad
     </a>
 </div>
 
 <div class="card mb-4">
-    <div class="card-header">
-        <h5 class="card-title mb-0">Detalji utakmice</h5>
-    </div>
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-md-4 text-md-end">
-                <h5>{{ $selektor->utakmica->domacin->naziv }}</h5>
+                <h1>{{ $selektor->utakmica->domacin->naziv }}</h1>
             </div>
             <div class="col-md-4 text-center">
                 <div class="display-5">{{ $selektor->utakmica->rezultat_domacin }} - {{ $selektor->utakmica->rezultat_gost }}</div>
@@ -29,7 +26,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <h5>{{ $selektor->utakmica->gost->naziv }}</h5>
+                <h1>{{ $selektor->utakmica->gost->naziv }}</h1>
             </div>
         </div>
     </div>
