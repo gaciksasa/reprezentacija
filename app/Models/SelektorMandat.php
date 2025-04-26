@@ -166,21 +166,45 @@ class SelektorMandat extends Model
      */
     public function getBrojUtakmiceZaDatum($datumUtakmice)
     {
-        // First get all matches where this team played during the mandate period
-        $query = Utakmica::where(function($q) {
+        // Prvo dobavljamo sve prethodne mandate ovog selektora
+        $prethodniMandati = SelektorMandat::where('selektor_id', $this->selektor_id)
+            ->where('pocetak_mandata', '<', $this->pocetak_mandata)
+            ->get();
+        
+        // Brojimo utakmice iz svih prethodnih mandata
+        $brojPrethodnihUtakmica = 0;
+        foreach ($prethodniMandati as $mandat) {
+            $brojPrethodnihUtakmica += Utakmica::where(function($q) use ($mandat) {
+                    $q->where('domacin_id', $mandat->tim_id)
+                    ->orWhere('gost_id', $mandat->tim_id);
+                })
+                ->where('datum', '>=', $mandat->pocetak_mandata)
+                ->where('datum', '<=', $mandat->kraj_mandata ?? now())
+                ->count();
+        }
+        
+        // Zatim brojimo utakmice u trenutnom mandatu do datog datuma
+        $brojUtakmicaTrenutnogMandata = Utakmica::where(function($q) {
                 $q->where('domacin_id', $this->tim_id)
                 ->orWhere('gost_id', $this->tim_id);
             })
             ->where('datum', '>=', $this->pocetak_mandata)
-            ->where('datum', '<=', $datumUtakmice);
+            ->where('datum', '<=', $datumUtakmice)
+            ->count();
         
-        // If there's an end date to the mandate, restrict to that period
+        // Ako postoji kraj mandata i taj datum je pre datuma utakmice, ograničavamo do kraja mandata
         if ($this->kraj_mandata && $this->kraj_mandata < $datumUtakmice) {
-            $query->where('datum', '<=', $this->kraj_mandata);
+            $brojUtakmicaTrenutnogMandata = Utakmica::where(function($q) {
+                    $q->where('domacin_id', $this->tim_id)
+                    ->orWhere('gost_id', $this->tim_id);
+                })
+                ->where('datum', '>=', $this->pocetak_mandata)
+                ->where('datum', '<=', $this->kraj_mandata)
+                ->count();
         }
         
-        // Order and count
-        return $query->orderBy('datum', 'asc')->count();
+        // Ukupan broj utakmica je zbir prethodnih i trenutnih
+        return $brojPrethodnihUtakmica + $brojUtakmicaTrenutnogMandata;
     }
 
     // Metoda za pronalaženje svih članova iste selektorske komisije

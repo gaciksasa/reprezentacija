@@ -71,7 +71,7 @@
                                @endif
                            </div>
                            @if(Auth::check() && Auth::user()->hasEditAccess())
-                           <form action="{{ route('kartoni.destroy', $karton->id) }}" method="POST" class="d-inline">
+                           <form action="{{ route('kartoni.destroy', $karton->id) }}" method="POST" class="d-inline ms-2">
                                @csrf
                                @method('DELETE')
                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
