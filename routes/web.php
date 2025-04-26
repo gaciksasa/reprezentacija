@@ -90,9 +90,17 @@ Route::middleware('auth')->group(function() {
     Route::delete('selektor-mandati/{mandat}', [SelektoriController::class, 'obrisiMandat'])->name('selektori.obrisiMandat');
 });
 
-// CRUD for posts - protected
-Route::middleware('auth')->resource('posts', PostController::class)->except(['index', 'show']);
-Route::resource('posts', PostController::class)->only(['index', 'show']);
+// CRUD for posts - protected (using slugs for public routes)
+Route::middleware('auth')->group(function() {
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/posts/{post:post_name}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::put('/posts/{post:post_name}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post:post_name}', [PostController::class, 'destroy'])->name('posts.destroy');
+});
+// Public post routes with slugs
+Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('/posts/{post:post_name}', [PostController::class, 'show'])->name('posts.show');
 
 // CRUD for kategorije - protected
 Route::middleware('auth')->resource('kategorije', KategorijaController::class)->except(['index', 'show']);

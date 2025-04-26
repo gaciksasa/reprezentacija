@@ -29,7 +29,7 @@
             </div>
             @endif
             <div class="card-body">
-                <h3 class="card-title"><a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a></h3>
+                <h3 class="card-title"><a href="{{ route('posts.show', ['post' => $post->post_name]) }}">{{ $post->post_title }}</a></h3>
                 
                 <div class="d-flex justify-content-between mb-2">
                     <p class="card-text small text-muted mb-0">
@@ -52,21 +52,20 @@
                 </p>
                 
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                    <a href="{{ route('posts.show', $post->id) }}" class="btn btn-primary btn-sm">Detaljnije</a>
+                    <a href="{{ route('posts.show', ['post' => $post->post_name]) }}" class="btn btn-primary btn-sm">Detaljnije</a>
                     
                     @if(Auth::check() && Auth::user()->hasEditAccess())
                     <div class="btn-group">
-                        <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-sm btn-warning">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-danger" 
-                                onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-post-{{ $post->id }}').submit()">
+                    <a href="{{ route('posts.edit', ['post' => $post->post_name]) }}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{{ route('posts.destroy', ['post' => $post->post_name]) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Da li ste sigurni?')">
                             <i class="fas fa-trash"></i>
                         </button>
-                        <form id="delete-post-{{ $post->id }}" action="{{ route('posts.destroy', $post->id) }}" method="POST" class="d-none">
-                            @csrf
-                            @method('DELETE')
-                        </form>
+                    </form>
                     </div>
                     @endif
                 </div>
