@@ -210,7 +210,7 @@
             </div>
         </div>
 
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6 mb-4">  
             <div class="card mb-4">
                 <div class="card-header">
                     <h2 class="card-title mb-0">Najbolji strelci</h2>
@@ -222,7 +222,7 @@
                                 @foreach($strelci as $index => $strelac)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td><a href="{{ route('igraci.show', $strelac->id) }}">{{ $strelac->prezime }} {{ $strelac->ime }}</a></td>
+                                    <td><a href="{{ route('igraci.show', $strelac->slug) }}">{{ $strelac->prezime }} {{ $strelac->ime }}</a></td>
                                     <td class="text-end">{{ $strelac->broj_golova }}</td>
                                 </tr>
                                 @endforeach
@@ -243,7 +243,7 @@
                                 @foreach($najviseNastupa as $index => $igrac)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td><a href="{{ route('igraci.show', $igrac->id) }}">{{ $igrac->prezime }} {{ $igrac->ime }}</a></td>
+                                    <td><a href="{{ route('igraci.show', $igrac->slug) }}">{{ $igrac->prezime }} {{ $igrac->ime }}</a></td>
                                     <td class="text-end">{{ $igrac->broj_nastupa }}</td>
                                 </tr>
                                 @endforeach

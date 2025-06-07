@@ -63,10 +63,10 @@ Route::middleware('auth')->group(function() {
 Route::middleware('auth')->group(function() {
     Route::get('/igraci/create', [IgraciController::class, 'create'])->name('igraci.create');
     Route::post('/igraci', [IgraciController::class, 'store'])->name('igraci.store');
-    Route::get('/igraci/{igrac}/edit', [IgraciController::class, 'edit'])->name('igraci.edit');
-    Route::put('/igraci/{igrac}', [IgraciController::class, 'update'])->name('igraci.update');
-    Route::delete('/igraci/{igrac}', [IgraciController::class, 'destroy'])->name('igraci.destroy');
-    Route::post('igraci/{igrac}/update-club', [IgraciController::class, 'updateClub'])->name('igraci.updateClub');
+    Route::get('/igraci/{igrac:slug}/edit', [IgraciController::class, 'edit'])->name('igraci.edit');
+    Route::put('/igraci/{igrac:slug}', [IgraciController::class, 'update'])->name('igraci.update');
+    Route::delete('/igraci/{igrac:slug}', [IgraciController::class, 'destroy'])->name('igraci.destroy');
+    Route::post('igraci/{igrac:slug}/update-club', [IgraciController::class, 'updateClub'])->name('igraci.updateClub');
     Route::delete('bivsi-klubovi/{klub}', [IgraciController::class, 'deleteClub'])->name('igraci.deleteClub');
 });
 
@@ -174,3 +174,7 @@ Route::get('/selektori', [SelektoriController::class, 'index'])->name('selektori
 Route::get('/selektori/{selektor}', [SelektoriController::class, 'show'])->name('selektori.show');
 Route::get('/takmicenja', [TakmicenjaController::class, 'index'])->name('takmicenja.index');
 Route::get('/takmicenja/{takmicenje}', [TakmicenjaController::class, 'show'])->name('takmicenja.show');
+
+// Public routes for igraci - using slug
+Route::get('/igraci', [IgraciController::class, 'index'])->name('igraci.index');
+Route::get('/igraci/{igrac:slug}', [IgraciController::class, 'show'])->name('igraci.show');

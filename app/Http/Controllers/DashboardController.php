@@ -216,9 +216,15 @@ class DashboardController extends Controller
             }
         }
         
-        // Najbolji strelci glavnog tima
-        $strelci = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
-            DB::raw('COUNT(golovi.id) as broj_golova'))
+        // Najbolji strelci glavnog tima - AŽURIRANO DA UKLJUČI SLUG
+        $strelci = Igrac::select(
+                'igraci.id', 
+                'igraci.ime', 
+                'igraci.prezime', 
+                'igraci.slug',  // DODAJ SLUG KOLONU
+                'timovi.naziv as tim',
+                DB::raw('COUNT(golovi.id) as broj_golova')
+            )
             ->join('golovi', 'igraci.id', '=', 'golovi.igrac_id')
             ->join('timovi', 'igraci.tim_id', '=', 'timovi.id')
             ->join('utakmice', 'golovi.utakmica_id', '=', 'utakmice.id')
@@ -230,17 +236,25 @@ class DashboardController extends Controller
             ->where(function($query) use ($timIds) {
                 $query->whereIn('igraci.tim_id', $timIds);
             })
-            ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
+            ->whereNotNull('igraci.slug')  // OSIGURAJ DA IGRAČ IMA SLUG
+            ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'igraci.slug', 'timovi.naziv')
             ->orderBy('broj_golova', 'desc')
             ->take(10)
             ->get();
 
-        // Igrači sa najviše nastupa
-        $najviseNastupa = Igrac::select('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv as tim',
-            DB::raw('COUNT(sastavi.id) as broj_nastupa'))
+        // Igrači sa najviše nastupa - AŽURIRANO DA UKLJUČI SLUG
+        $najviseNastupa = Igrac::select(
+                'igraci.id', 
+                'igraci.ime', 
+                'igraci.prezime', 
+                'igraci.slug',  // DODAJ SLUG KOLONU
+                'timovi.naziv as tim',
+                DB::raw('COUNT(sastavi.id) as broj_nastupa')
+            )
             ->join('sastavi', 'igraci.id', '=', 'sastavi.igrac_id')
             ->leftJoin('timovi', 'igraci.tim_id', '=', 'timovi.id')
-            ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'timovi.naziv')
+            ->whereNotNull('igraci.slug')  // OSIGURAJ DA IGRAČ IMA SLUG
+            ->groupBy('igraci.id', 'igraci.ime', 'igraci.prezime', 'igraci.slug', 'timovi.naziv')
             ->orderBy('broj_nastupa', 'desc')
             ->take(10)
             ->get();
@@ -380,7 +394,7 @@ class DashboardController extends Controller
     }
     
     /**
-     * Pretraga.
+     * Pretraga - AŽURIRANO DA KORISTI SLUG ZA IGRAČE
      */
     public function pretraga(Request $request)
     {
@@ -398,10 +412,12 @@ class DashboardController extends Controller
                  ->orWhere('zemlja', 'like', "%{$query}%")
                  ->get();
                  
-        // Pretraga igrača
-        $igraci = Igrac::where('ime', 'like', "%{$query}%")
+        // Pretraga igrača - AŽURIRANO DA UKLJUČI SLUG
+        $igraci = Igrac::select('id', 'ime', 'prezime', 'slug', 'tim_id')
+                 ->where('ime', 'like', "%{$query}%")
                  ->orWhere('prezime', 'like', "%{$query}%")
                  ->orWhere(DB::raw("CONCAT(ime, ' ', prezime)"), 'like', "%{$query}%")
+                 ->whereNotNull('slug')  // OSIGURAJ DA IGRAČ IMA SLUG
                  ->with('tim')
                  ->get();
                  

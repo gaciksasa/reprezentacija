@@ -12,7 +12,7 @@ class Igrac extends Model
     protected $table = 'igraci';
     
     protected $fillable = [
-        'ime', 'prezime', 'pozicija', 'visina',
+        'ime', 'prezime', 'slug', 'pozicija', 'visina',
         'datum_rodjenja', 'mesto_rodjenja', 'datum_smrti', 'mesto_smrti',
         'biografija', 'fotografija_path', 'aktivan'
     ];
@@ -24,6 +24,81 @@ class Igrac extends Model
         'debitovao_za_tim' => 'date',
         'poslednja_utakmica' => 'date',
     ];
+    
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+    
+    /**
+     * Boot method to auto-generate slug on create/update
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($igrac) {
+            if (empty($igrac->slug)) {
+                $igrac->slug = $igrac->generateSlug($igrac->prezime, $igrac->ime);
+            }
+        });
+        
+        static::updating(function ($igrac) {
+            if ($igrac->isDirty('ime') || $igrac->isDirty('prezime')) {
+                $igrac->slug = $igrac->generateSlug($igrac->prezime, $igrac->ime);
+            }
+        });
+    }
+    
+    /**
+     * Generate SEO friendly slug from prezime and ime
+     */
+    public function generateSlug($prezime, $ime)
+    {
+        // Convert to lowercase
+        $text = strtolower($prezime . '-' . $ime);
+        
+        // Replace Serbian special characters with Latin equivalents
+        $replacements = [
+            'ž' => 'z', 'Ž' => 'z',
+            'đ' => 'dj', 'Đ' => 'dj', 
+            'š' => 's', 'Š' => 's',
+            'č' => 'c', 'Č' => 'c',
+            'ć' => 'c', 'Ć' => 'c',
+            'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a',
+            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
+            'ý' => 'y', 'ÿ' => 'y',
+            'ñ' => 'n'
+        ];
+        
+        $text = str_replace(array_keys($replacements), array_values($replacements), $text);
+        
+        // Remove any remaining non-alphanumeric characters except hyphens
+        $text = preg_replace('/[^a-z0-9\-]/', '', $text);
+        
+        // Remove multiple consecutive hyphens
+        $text = preg_replace('/-+/', '-', $text);
+        
+        // Remove leading/trailing hyphens
+        $text = trim($text, '-');
+        
+        // Handle duplicates by adding number suffix
+        $originalSlug = $text;
+        $counter = 1;
+        
+        while (static::where('slug', $text)->where('id', '!=', $this->id ?? 0)->exists()) {
+            $text = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        return $text;
+    }
     
     // Relationships
 
@@ -76,97 +151,19 @@ class Igrac extends Model
         return $this->prezime . ' ' . $this->ime;
     }
     
-    // Dynamic statistics calculation methods
+    /**
+     * Get the broj_nastupa attribute by counting sastavi
+     */
     public function getBrojNastupaAttribute()
     {
-        if (isset($this->attributes['broj_nastupa'])) {
-            return $this->attributes['broj_nastupa'];
-        }
         return $this->sastavi()->count();
     }
     
+    /**
+     * Get the broj_golova attribute by counting golovi
+     */
     public function getBrojGolovaAttribute()
     {
-        if (isset($this->attributes['broj_golova'])) {
-            return $this->attributes['broj_golova'];
-        }
-        return $this->golovi()->where('auto_gol', false)->count();
-    }
-    
-    public function getBrojZutihKartonaAttribute()
-    {
-        return $this->kartoni()->where('tip', 'zuti')->count();
-    }
-    
-    public function getBrojCrvenihKartonaAttribute()
-    {
-        return $this->kartoni()->where('tip', 'crveni')->count();
-    }
-    
-    // Get the player's debut date
-    public function getDebitovaoDatumAttribute()
-    {
-        if (isset($this->attributes['debitovao_za_tim'])) {
-            return $this->attributes['debitovao_za_tim'];
-        }
-        
-        $utakmica = Utakmica::join('sastavi', 'utakmice.id', '=', 'sastavi.utakmica_id')
-            ->where('sastavi.igrac_id', $this->id)
-            ->orderBy('utakmice.datum', 'asc')
-            ->select('utakmice.datum')
-            ->first();
-            
-        return $utakmica ? $utakmica->datum : null;
-    }
-    
-    // Get the player's last match date
-    public function getPoslednjaUtakmicaDatumAttribute()
-    {
-        if (isset($this->attributes['poslednja_utakmica'])) {
-            return $this->attributes['poslednja_utakmica'];
-        }
-        
-        $utakmica = Utakmica::join('sastavi', 'utakmice.id', '=', 'sastavi.utakmica_id')
-            ->where('sastavi.igrac_id', $this->id)
-            ->orderBy('utakmice.datum', 'desc')
-            ->select('utakmice.datum')
-            ->first();
-            
-        return $utakmica ? $utakmica->datum : null;
-    }
-    
-    // Get the player's playing period string
-    public function getPeriodAttribute()
-    {
-        $debitovao = $this->debitovao_datum;
-        $poslednja = $this->poslednja_utakmica_datum;
-        
-        if (!$debitovao) {
-            return '';
-        }
-        
-        $startYear = $debitovao->format('Y');
-        $endYear = $poslednja ? $poslednja->format('Y') : date('Y');
-        
-        return $startYear . '/' . $endYear;
-    }
-
-    /**
-     * Dobavi broj nastupa igrača do zadatog datuma (uključujući taj datum)
-     * 
-     * @param \DateTime|string|null $datum
-     * @return int
-     */
-    public function getBrojNastupaDoDatuma($datum)
-    {
-        if (!$datum) {
-            return $this->broj_nastupa;
-        }
-        
-        return $this->sastavi()
-            ->whereHas('utakmica', function($query) use ($datum) {
-                $query->whereDate('datum', '<=', $datum);
-            })
-            ->count();
+        return $this->golovi()->count();
     }
 }
