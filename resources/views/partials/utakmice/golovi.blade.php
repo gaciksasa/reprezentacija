@@ -44,7 +44,7 @@
                                                 @endif
                                             @else
                                                 @if($gol->igrac)
-                                                    <a href="{{ route('igraci.show', $gol->igrac->id) }}" class="text-decoration-none">
+                                                    <a href="{{ route('igraci.show', $gol->igrac->slug) }}" class="text-decoration-none">
                                                         <span>
                                                             @if($gol->penal)
                                                                 {{ $gol->igrac->prezime }} {{ $gol->igrac->ime }} (p)
@@ -122,7 +122,7 @@
                                                 @endif
                                             @else
                                                 @if($gol->igrac)
-                                                    <a href="{{ route('igraci.show', $gol->igrac->id) }}" class="text-decoration-none">
+                                                    <a href="{{ route('igraci.show', $gol->igrac->slug) }}" class="text-decoration-none">
                                                         <span>
                                                             @if($gol->penal)
                                                                 {{ $gol->igrac->prezime }} {{ $gol->igrac->ime }} (p)
