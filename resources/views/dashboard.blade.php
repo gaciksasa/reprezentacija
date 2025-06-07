@@ -16,7 +16,7 @@
         <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
             <img src="{{ $post->featured_image ? asset('storage/uploads/' . $post->featured_image) : asset('img/no-image.png') }}" class="d-block w-100" alt="{{ $post->post_title }}">
             <div class="carousel-caption">
-                <h2><a href="{{ route('posts.show', $post->id) }}">{{ $post->post_title }}</a></h2>
+                <h2><a href="{{ route('posts.show', $post->post_name) }}">{{ $post->post_title }}</a></h2>
                 <p class="text-dark">{{ Str::limit(html_entity_decode(strip_tags($post->post_excerpt ?: $post->post_content)), 150) }}</p>
             </div>
         </div>
@@ -70,7 +70,7 @@
                             @endif
                             <div class="card-body">
                                 <h3 class="card-title">
-                                    <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none">
+                                    <a href="{{ route('posts.show', $post->post_name) }}" class="text-decoration-none">
                                         {{ $post->post_title }}
                                     </a>
                                 </h3>
@@ -84,7 +84,7 @@
                                 </p>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('posts.show', $post->post_name) }}" class="btn btn-sm btn-primary">
                                     Detaljnije
                                 </a>
                             </div>
@@ -109,7 +109,7 @@
                                     @endif
                                     <div class="card-body">
                                         <h3 class="card-title">
-                                            <a href="{{ route('posts.show', $post->id) }}" class="text-decoration-none">
+                                            <a href="{{ route('posts.show', $post->post_name) }}" class="text-decoration-none">
                                                 {{ $post->post_title }}
                                             </a>
                                         </h3>
@@ -121,7 +121,7 @@
                                         </p>
                                     </div>
                                     <div class="card-footer bg-transparent border-0">
-                                        <a href="{{ route('posts.show', $post->id) }}" class="btn btn-sm btn-primary">
+                                        <a href="{{ route('posts.show', $post->post_name) }}" class="btn btn-sm btn-primary">
                                             Detaljnije
                                         </a>
                                     </div>
