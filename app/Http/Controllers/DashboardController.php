@@ -12,6 +12,7 @@ use App\Models\Karton;
 use App\Models\Post;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -31,45 +32,145 @@ class DashboardController extends Controller
         // Include all aliases of the main team
         $timIds = $glavniTim ? $glavniTim->getSviIdTimova() : [];
 
-        // Get last played match
+        // Trenutno vreme
+        $sada = Carbon::now();
+
+        // Poslednja odigrana utakmica
+        // Utakmica se smatra odigranom 3 sata nakon planiranog početka
         $poslednjaMec = Utakmica::with(['domacin', 'gost', 'takmicenje'])
             ->where(function($query) use ($timIds) {
                 $query->whereIn('domacin_id', $timIds)
-                    ->orWhereIn('gost_id', $timIds);
+                      ->orWhereIn('gost_id', $timIds);
             })
-            ->where('datum', '<', now())
+            ->where(function($query) use ($sada) {
+                // Utakmica je odigrana ako je:
+                // 1. Datum je u prošlosti, ili
+                // 2. Datum je danas ali je prošlo 3 sata od planiranog početka
+                $query->whereDate('datum', '<', $sada->toDateString())
+                      ->orWhere(function($q) use ($sada) {
+                          $q->whereDate('datum', '=', $sada->toDateString())
+                            ->where(function($timeQuery) use ($sada) {
+                                // Ako postoji vreme, proveri da li je prošlo 3 sata od početka
+                                $timeQuery->whereNotNull('vreme')
+                                         ->whereRaw("DATE_ADD(CONCAT(datum, ' ', vreme), INTERVAL 3 HOUR) <= ?", [
+                                             $sada->format('Y-m-d H:i:s')
+                                         ]);
+                            })
+                            ->orWhere(function($noTimeQuery) use ($sada) {
+                                // Ako nema vreme, pretpostavi 19:00 + 3 sata = 22:00
+                                $noTimeQuery->whereNull('vreme')
+                                           ->whereRaw("DATE_ADD(CONCAT(datum, ' 19:00:00'), INTERVAL 3 HOUR) <= ?", [
+                                               $sada->format('Y-m-d H:i:s')
+                                           ]);
+                            });
+                      });
+            })
             ->orderBy('datum', 'desc')
+            ->orderBy('vreme', 'desc')
             ->first();
 
-        // Get next upcoming match
+        // Sledeća utakmica
+        // Utakmica se smatra predstojećom dok ne prođe 3 sata od planiranog početka
         $sledeciMec = Utakmica::with(['domacin', 'gost', 'takmicenje'])
             ->where(function($query) use ($timIds) {
                 $query->whereIn('domacin_id', $timIds)
-                    ->orWhereIn('gost_id', $timIds);
+                      ->orWhereIn('gost_id', $timIds);
             })
-            ->where('datum', '>', now())
+            ->where(function($query) use ($sada) {
+                // Utakmica je predstojeća ako je:
+                // 1. Datum je u budućnosti, ili
+                // 2. Datum je danas ali nije prošlo 3 sata od planiranog početka
+                $query->whereDate('datum', '>', $sada->toDateString())
+                      ->orWhere(function($q) use ($sada) {
+                          $q->whereDate('datum', '=', $sada->toDateString())
+                            ->where(function($timeQuery) use ($sada) {
+                                // Ako postoji vreme, proveri da li nije prošlo 3 sata
+                                $timeQuery->whereNotNull('vreme')
+                                         ->whereRaw("DATE_ADD(CONCAT(datum, ' ', vreme), INTERVAL 3 HOUR) > ?", [
+                                             $sada->format('Y-m-d H:i:s')
+                                         ]);
+                            })
+                            ->orWhere(function($noTimeQuery) use ($sada) {
+                                // Ako nema vreme, pretpostavi 19:00 + 3 sata = 22:00
+                                $noTimeQuery->whereNull('vreme')
+                                           ->whereRaw("DATE_ADD(CONCAT(datum, ' 19:00:00'), INTERVAL 3 HOUR) > ?", [
+                                               $sada->format('Y-m-d H:i:s')
+                                           ]);
+                            });
+                      });
+            })
             ->orderBy('datum', 'asc')
+            ->orderBy('vreme', 'asc')
             ->first();
 
-        // Get the match after the next one
-        $nakonSledecegMec = Utakmica::with(['domacin', 'gost', 'takmicenje'])
-            ->where(function($query) use ($timIds) {
-                $query->whereIn('domacin_id', $timIds)
-                    ->orWhereIn('gost_id', $timIds);
-            })
-            ->where('datum', '>', now())
-            ->where('id', '!=', $sledeciMec ? $sledeciMec->id : 0)
-            ->orderBy('datum', 'asc')
-            ->first();
+        // Utakmica nakon sledeće (koristi istu logiku kao sledeća utakmica)
+        if ($sledeciMec) {
+            $nakonSledecegMec = Utakmica::with(['domacin', 'gost', 'takmicenje'])
+                ->where(function($query) use ($timIds) {
+                    $query->whereIn('domacin_id', $timIds)
+                          ->orWhereIn('gost_id', $timIds);
+                })
+                ->where(function($query) use ($sada) {
+                    // Ista logika kao za sledeći meč
+                    $query->whereDate('datum', '>', $sada->toDateString())
+                          ->orWhere(function($q) use ($sada) {
+                              $q->whereDate('datum', '=', $sada->toDateString())
+                                ->where(function($timeQuery) use ($sada) {
+                                    $timeQuery->whereNotNull('vreme')
+                                             ->whereRaw("DATE_ADD(CONCAT(datum, ' ', vreme), INTERVAL 3 HOUR) > ?", [
+                                                 $sada->format('Y-m-d H:i:s')
+                                             ]);
+                                })
+                                ->orWhere(function($noTimeQuery) use ($sada) {
+                                    $noTimeQuery->whereNull('vreme')
+                                               ->whereRaw("DATE_ADD(CONCAT(datum, ' 19:00:00'), INTERVAL 3 HOUR) > ?", [
+                                                   $sada->format('Y-m-d H:i:s')
+                                               ]);
+                                });
+                          });
+                })
+                ->where(function($query) use ($sledeciMec) {
+                    // Mora biti nakon sledeće utakmice
+                    $query->where('datum', '>', $sledeciMec->datum)
+                          ->orWhere(function($q) use ($sledeciMec) {
+                              $q->where('datum', '=', $sledeciMec->datum)
+                                ->where('vreme', '>', $sledeciMec->vreme ?? '00:00');
+                          });
+                })
+                ->orderBy('datum', 'asc')
+                ->orderBy('vreme', 'asc')
+                ->first();
+        } else {
+            $nakonSledecegMec = null;
+        }
         
-        // Poslednje odigrane utakmice glavnog tima
+        // Poslednje odigrane utakmice glavnog tima (koristi novu logiku)
         $poslednjeUtakmice = Utakmica::with(['domacin', 'gost', 'takmicenje'])
             ->where(function($query) use ($timIds) {
                 $query->whereIn('domacin_id', $timIds)
-                    ->orWhereIn('gost_id', $timIds);
+                      ->orWhereIn('gost_id', $timIds);
             })
-            ->where('datum', '<', now())
+            ->where(function($query) use ($sada) {
+                // Ista logika kao za poslednju utakmicu
+                $query->whereDate('datum', '<', $sada->toDateString())
+                      ->orWhere(function($q) use ($sada) {
+                          $q->whereDate('datum', '=', $sada->toDateString())
+                            ->where(function($timeQuery) use ($sada) {
+                                $timeQuery->whereNotNull('vreme')
+                                         ->whereRaw("DATE_ADD(CONCAT(datum, ' ', vreme), INTERVAL 3 HOUR) <= ?", [
+                                             $sada->format('Y-m-d H:i:s')
+                                         ]);
+                            })
+                            ->orWhere(function($noTimeQuery) use ($sada) {
+                                $noTimeQuery->whereNull('vreme')
+                                           ->whereRaw("DATE_ADD(CONCAT(datum, ' 19:00:00'), INTERVAL 3 HOUR) <= ?", [
+                                               $sada->format('Y-m-d H:i:s')
+                                           ]);
+                            });
+                      });
+            })
             ->orderBy('datum', 'desc')
+            ->orderBy('vreme', 'desc')
             ->take(5)
             ->get();
             
@@ -144,12 +245,6 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
         
-        // Fetch the latest posts for the carousel
-        $poslednjiPostovi = Post::published()
-            ->orderBy('post_date', 'desc')
-            ->take(3)
-            ->get();
-
         // Fetch the latest posts for the carousel
         $poslednjiPostovi = Post::published()
             ->orderBy('post_date', 'desc')
