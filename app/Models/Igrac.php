@@ -4,166 +4,342 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Igrac extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'igraci';
     
     protected $fillable = [
-        'ime', 'prezime', 'slug', 'pozicija', 'visina',
-        'datum_rodjenja', 'mesto_rodjenja', 'datum_smrti', 'mesto_smrti',
-        'biografija', 'fotografija_path', 'aktivan'
+        'ime',
+        'prezime', 
+        'tim_id',
+        'pozicija',
+        'visina',
+        'fotografija_path',
+        'biografija',
+        'datum_rodjenja',
+        'mesto_rodjenja',
+        'aktivan',
+        'datum_smrti',
+        'mesto_smrti',
+        'slug'
     ];
-    
+
     protected $casts = [
         'datum_rodjenja' => 'date',
         'datum_smrti' => 'date',
         'aktivan' => 'boolean',
-        'debitovao_za_tim' => 'date',
-        'poslednja_utakmica' => 'date',
     ];
-    
-    /**
-     * Get the route key for the model.
-     */
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
-    
-    /**
-     * Boot method to auto-generate slug on create/update
-     */
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($igrac) {
-            if (empty($igrac->slug)) {
-                $igrac->slug = $igrac->generateSlug($igrac->prezime, $igrac->ime);
-            }
-        });
-        
-        static::updating(function ($igrac) {
-            if ($igrac->isDirty('ime') || $igrac->isDirty('prezime')) {
-                $igrac->slug = $igrac->generateSlug($igrac->prezime, $igrac->ime);
-            }
-        });
-    }
-    
-    /**
-     * Generate SEO friendly slug from prezime and ime
-     */
-    public function generateSlug($prezime, $ime)
-    {
-        // Convert to lowercase
-        $text = strtolower($prezime . '-' . $ime);
-        
-        // Replace Serbian special characters with Latin equivalents
-        $replacements = [
-            'ž' => 'z', 'Ž' => 'z',
-            'đ' => 'dj', 'Đ' => 'dj', 
-            'š' => 's', 'Š' => 's',
-            'č' => 'c', 'Č' => 'c',
-            'ć' => 'c', 'Ć' => 'c',
-            'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a',
-            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
-            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
-            'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o',
-            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
-            'ý' => 'y', 'ÿ' => 'y',
-            'ñ' => 'n'
-        ];
-        
-        $text = str_replace(array_keys($replacements), array_values($replacements), $text);
-        
-        // Remove any remaining non-alphanumeric characters except hyphens
-        $text = preg_replace('/[^a-z0-9\-]/', '', $text);
-        
-        // Remove multiple consecutive hyphens
-        $text = preg_replace('/-+/', '-', $text);
-        
-        // Remove leading/trailing hyphens
-        $text = trim($text, '-');
-        
-        // Handle duplicates by adding number suffix
-        $originalSlug = $text;
-        $counter = 1;
-        
-        while (static::where('slug', $text)->where('id', '!=', $this->id ?? 0)->exists()) {
-            $text = $originalSlug . '-' . $counter;
-            $counter++;
-        }
-        
-        return $text;
-    }
-    
-    // Relationships
 
+    // Relacija sa timom
     public function tim()
     {
-        return Tim::glavniTim()->first();
+        return $this->belongsTo(Tim::class, 'tim_id');
     }
 
-    public function bivsiKlubovi()
+    // Relacija sa utakmicama kroz sastavi tabelu
+    public function utakmice()
     {
-        return $this->hasMany(BivsiKlub::class);
+        return $this->belongsToMany(Utakmica::class, 'sastavi', 'igrac_id', 'utakmica_id')
+                    ->withPivot(['starter', 'kapiten', 'selektor', 'redosled'])
+                    ->withTimestamps();
     }
-    
+
+    // Relacija sa sastavima
     public function sastavi()
     {
-        return $this->hasMany(Sastav::class);
+        return $this->hasMany(Sastav::class, 'igrac_id');
     }
-    
+
+    // Relacija sa golovima
     public function golovi()
     {
-        return $this->hasMany(Gol::class)->where(function($query) {
-            $query->where('igrac_tip', 'regularni')
-                  ->orWhereNull('igrac_tip');
-        });
+        return $this->hasMany(Gol::class, 'igrac_id');
     }
-    
-    public function izmeneIzlazne()
+
+    // Relacija sa kartonima
+    public function kartoni()
     {
-        return $this->hasMany(Izmena::class, 'igrac_out_id');
+        return $this->hasMany(Karton::class, 'igrac_id');
     }
-    
-    public function izmeneUlazne()
+
+    // Relacija sa izmenama (ulazio)
+    public function izmeneIn()
     {
         return $this->hasMany(Izmena::class, 'igrac_in_id');
     }
-    
-    public function kartoni()
+
+    // Relacija sa izmenama (izlazio)
+    public function izmeneOut()
     {
-        return $this->hasMany(Karton::class);
+        return $this->hasMany(Izmena::class, 'igrac_out_id');
     }
-    
-    // Attributes
-    public function getImePrezimeAttribute()
+
+    // Relacija sa bivšim klubovima
+    public function bivsiKlubovi()
     {
-        return $this->ime . ' ' . $this->prezime;
+        return $this->hasMany(BivsiKlub::class, 'igrac_id');
     }
-    
-    public function getPrezimeImeAttribute()
+
+    // Relacija sa klubovima
+    public function klubovi()
     {
-        return $this->prezime . ' ' . $this->ime;
+        return $this->hasMany(IgracKlub::class, 'igrac_id');
     }
-    
+
     /**
-     * Get the broj_nastupa attribute by counting sastavi
+     * Vraća broj nastupa igrača do određenog datuma (uključujući taj datum)
+     *
+     * @param string|Carbon $datum
+     * @return int
      */
-    public function getBrojNastupaAttribute()
+    public function getBrojNastupaDoDatuma($datum)
+    {
+        // Konvertuj datum u Carbon instancu ako nije već
+        if (!$datum instanceof Carbon) {
+            $datum = Carbon::parse($datum);
+        }
+
+        return $this->sastavi()
+                    ->whereHas('utakmica', function ($query) use ($datum) {
+                        $query->where('datum', '<=', $datum->format('Y-m-d'));
+                    })
+                    ->count();
+    }
+
+    /**
+     * Vraća ukupan broj nastupa igrača
+     *
+     * @return int
+     */
+    public function getUkupanBrojNastupa()
     {
         return $this->sastavi()->count();
     }
-    
+
     /**
-     * Get the broj_golova attribute by counting golovi
+     * Vraća broj nastupa kao starter
+     *
+     * @return int
      */
-    public function getBrojGolovaAttribute()
+    public function getBrojNastupaKaoStarter()
+    {
+        return $this->sastavi()->where('starter', true)->count();
+    }
+
+    /**
+     * Vraća broj nastupa kao kapiten
+     *
+     * @return int
+     */
+    public function getBrojNastupaKaoKapiten()
+    {
+        return $this->sastavi()->where('kapiten', true)->count();
+    }
+
+    /**
+     * Vraća broj nastupa igrača u određenoj godini
+     *
+     * @param int $godina
+     * @return int
+     */
+    public function getBrojNastupaUGodini($godina)
+    {
+        return $this->sastavi()
+                    ->whereHas('utakmica', function ($query) use ($godina) {
+                        $query->whereYear('datum', $godina);
+                    })
+                    ->count();
+    }
+
+    /**
+     * Vraća nastupe u određenom periodu
+     *
+     * @param string|Carbon $odDatuma
+     * @param string|Carbon $doDatuma
+     * @return int
+     */
+    public function getBrojNastupaUPeriodu($odDatuma, $doDatuma)
+    {
+        if (!$odDatuma instanceof Carbon) {
+            $odDatuma = Carbon::parse($odDatuma);
+        }
+        
+        if (!$doDatuma instanceof Carbon) {
+            $doDatuma = Carbon::parse($doDatuma);
+        }
+
+        return $this->sastavi()
+                    ->whereHas('utakmica', function ($query) use ($odDatuma, $doDatuma) {
+                        $query->whereBetween('datum', [
+                            $odDatuma->format('Y-m-d'), 
+                            $doDatuma->format('Y-m-d')
+                        ]);
+                    })
+                    ->count();
+    }
+
+    /**
+     * Vraća poslednju utakmicu u kojoj je igrac nastupao
+     *
+     * @return Utakmica|null
+     */
+    public function getPoslednjaUtakmica()
+    {
+        return $this->utakmice()
+                    ->orderByDesc('datum')
+                    ->first();
+    }
+
+    /**
+     * Vraća prvu utakmicu u kojoj je igrac nastupao
+     *
+     * @return Utakmica|null
+     */
+    public function getPrvaUtakmica()
+    {
+        return $this->utakmice()
+                    ->orderBy('datum')
+                    ->first();
+    }
+
+    /**
+     * Vraća ukupan broj golova igrača
+     *
+     * @return int
+     */
+    public function getUkupanBrojGolova()
     {
         return $this->golovi()->count();
+    }
+
+    /**
+     * Vraća broj golova do određenog datuma
+     *
+     * @param string|Carbon $datum
+     * @return int
+     */
+    public function getBrojGolovaDoDatuma($datum)
+    {
+        if (!$datum instanceof Carbon) {
+            $datum = Carbon::parse($datum);
+        }
+
+        return $this->golovi()
+                    ->whereHas('utakmica', function ($query) use ($datum) {
+                        $query->where('datum', '<=', $datum->format('Y-m-d'));
+                    })
+                    ->count();
+    }
+
+    /**
+     * Vraća ukupan broj žutih kartona
+     *
+     * @return int
+     */
+    public function getUkupanBrojZutihKartona()
+    {
+        return $this->kartoni()->where('tip', 'zuti')->count();
+    }
+
+    /**
+     * Vraća ukupan broj crvenih kartona
+     *
+     * @return int
+     */
+    public function getUkupanBrojCrvenihKartona()
+    {
+        return $this->kartoni()->where('tip', 'crveni')->count();
+    }
+
+    /**
+     * Vraća godine u kojima je igrac nastupao
+     *
+     * @return array
+     */
+    public function getGodineNastupa()
+    {
+        return $this->sastavi()
+                    ->join('utakmice', 'sastavi.utakmica_id', '=', 'utakmice.id')
+                    ->selectRaw('YEAR(utakmice.datum) as godina')
+                    ->distinct()
+                    ->orderBy('godina')
+                    ->pluck('godina')
+                    ->toArray();
+    }
+
+    /**
+     * Vraća puno ime igrača
+     *
+     * @return string
+     */
+    public function getPunoIme()
+    {
+        return $this->ime . ' ' . $this->prezime;
+    }
+
+    /**
+     * Vraća da li je igrac bio kapiten u određenoj utakmici
+     *
+     * @param int $utakmicaId
+     * @return bool
+     */
+    public function jeKapitenUUtakmici($utakmicaId)
+    {
+        return $this->sastavi()
+                    ->where('utakmica_id', $utakmicaId)
+                    ->where('kapiten', true)
+                    ->exists();
+    }
+
+    /**
+     * Vraća da li je igrac bio starter u određenoj utakmici
+     *
+     * @param int $utakmicaId
+     * @return bool
+     */
+    public function jeStarterUUtakmici($utakmicaId)
+    {
+        return $this->sastavi()
+                    ->where('utakmica_id', $utakmicaId)
+                    ->where('starter', true)
+                    ->exists();
+    }
+
+    /**
+     * Scope za aktivne igrače
+     */
+    public function scopeAktivni($query)
+    {
+        return $query->where('aktivan', true);
+    }
+
+    /**
+     * Scope za igrače koji su nastupali (imaju bar jedan nastup)
+     */
+    public function scopeSaNastupima($query)
+    {
+        return $query->has('sastavi');
+    }
+
+    /**
+     * Scope za igrače sa golovima
+     */
+    public function scopeSaGolovima($query)
+    {
+        return $query->has('golovi');
+    }
+
+    /**
+     * Scope za kapitene (oni koji su bar jednom bili kapiteni)
+     */
+    public function scopeKapiteni($query)
+    {
+        return $query->whereHas('sastavi', function ($q) {
+            $q->where('kapiten', true);
+        });
     }
 }

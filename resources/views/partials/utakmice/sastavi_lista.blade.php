@@ -86,7 +86,7 @@
                                 </a>
                                 <div class="handle me-4" style="cursor: move; opacity: 0.5;"><i class="fas fa-grip-vertical"></i></div>
                                 @endif
-                                <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
+                                <a href="{{ route('igraci.show', $sastav->igrac->slug) }}" class="text-decoration-none">
                                     <span>
                                         {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                         @if($sastav->kapiten) <small>(C)</small> @endif
