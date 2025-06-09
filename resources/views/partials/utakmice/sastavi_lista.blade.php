@@ -6,7 +6,7 @@
                     <li class="py-1 sortable-item" data-id="{{ $sastav->id }}">
                         @if($sastav->starter)
                             <div class="d-flex align-items-center" style="justify-content: flex-end;">
-                                <a href="{{ route('igraci.show', $sastav->igrac->id) }}" class="text-decoration-none">
+                                <a href="{{ route('igraci.show', $sastav->igrac->slug) }}" class="text-decoration-none">
                                     <span>
                                         {{ $sastav->igrac->prezime }} {{ $sastav->igrac->ime }}
                                         @if($sastav->kapiten) <small>(C)</small> @endif
