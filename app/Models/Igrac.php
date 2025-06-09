@@ -57,7 +57,9 @@ class Igrac extends Model
     // Relacija sa golovima
     public function golovi()
     {
-        return $this->hasMany(Gol::class, 'igrac_id');
+        return $this->hasMany(Gol::class, 'igrac_id')
+                    ->where('igrac_tip', 'regularni')
+                    ->where('auto_gol', false);
     }
 
     // Relacija sa kartonima
@@ -88,6 +90,70 @@ class Igrac extends Model
     public function klubovi()
     {
         return $this->hasMany(IgracKlub::class, 'igrac_id');
+    }
+
+    /**
+     * Accessor za broj nastupa
+     */
+    public function getBrojNastupaAttribute()
+    {
+        return $this->sastavi()->count();
+    }
+
+    /**
+     * Accessor za broj golova (samo regularni golovi, ne autogoale)
+     */
+    public function getBrojGolovaAttribute()
+    {
+        return $this->golovi()->count();
+    }
+
+    /**
+     * Accessor za broj žutih kartona
+     */
+    public function getBrojZutihKartonaAttribute()
+    {
+        return $this->kartoni()->where('tip', 'zuti')->count();
+    }
+
+    /**
+     * Accessor za broj crvenih kartona
+     */
+    public function getBrojCrvenihKartonaAttribute()
+    {
+        return $this->kartoni()->where('tip', 'crveni')->count();
+    }
+
+    /**
+     * Accessor za ime i prezime
+     */
+    public function getImePrezimeAttribute()
+    {
+        return $this->ime . ' ' . $this->prezime;
+    }
+
+    /**
+     * Accessor za datum debija (prva utakmica)
+     */
+    public function getDebitovaoZaTimAttribute()
+    {
+        $prvaSastav = $this->sastavi()->join('utakmice', 'sastavi.utakmica_id', '=', 'utakmice.id')
+                          ->orderBy('utakmice.datum', 'asc')
+                          ->first();
+        
+        return $prvaSastav ? $prvaSastav->datum : null;
+    }
+
+    /**
+     * Accessor za datum poslednje utakmice
+     */
+    public function getPoslednjaUtakmicaAttribute()
+    {
+        $poslednjaSastav = $this->sastavi()->join('utakmice', 'sastavi.utakmica_id', '=', 'utakmice.id')
+                               ->orderBy('utakmice.datum', 'desc')
+                               ->first();
+        
+        return $poslednjaSastav ? $poslednjaSastav->datum : null;
     }
 
     /**
