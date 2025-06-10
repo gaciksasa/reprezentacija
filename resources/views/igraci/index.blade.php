@@ -70,7 +70,6 @@
                         
                         @forelse($igraci as $igrac)
                             @php
-                                
                                 // Format the playing period
                                 $period = '';
                                 if($igrac->debitovao_za_tim) {
@@ -90,7 +89,7 @@
                             
                             <tr>
                                 <td>
-                                    <a href="{{ route('igraci.show', $igrac) }}" class="text-decoration-none">
+                                    <a href="{{ route('igraci.show', $igrac->slug ?? $igrac->id) }}" class="text-decoration-none">
                                         <span class="text-player">{{ $igrac->prezime }} {{ $igrac->ime }}</span>
                                     </a>
                                 </td>
@@ -102,17 +101,17 @@
                                 @if(Auth::check() && Auth::user()->hasEditAccess())
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{{ route('igraci.show', $igrac) }}" class="btn btn-sm btn-info">
+                                        <a href="{{ route('igraci.show', $igrac->slug ?? $igrac->id) }}" class="btn btn-sm btn-info">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('igraci.edit', $igrac) }}" class="btn btn-sm btn-warning">
+                                        <a href="{{ route('igraci.edit', $igrac->slug ?? $igrac->id) }}" class="btn btn-sm btn-warning">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <button type="button" class="btn btn-sm btn-danger" 
                                                 onclick="if(confirm('Da li ste sigurni?')) document.getElementById('delete-igrac-{{ $igrac->id }}').submit()">
                                             <i class="fas fa-trash"></i>
                                         </button>
-                                        <form id="delete-igrac-{{ $igrac->id }}" action="{{ route('igraci.destroy', $igrac) }}" method="POST" class="d-none">
+                                        <form id="delete-igrac-{{ $igrac->id }}" action="{{ route('igraci.destroy', $igrac->slug ?? $igrac->id) }}" method="POST" class="d-none">
                                             @csrf
                                             @method('DELETE')
                                         </form>

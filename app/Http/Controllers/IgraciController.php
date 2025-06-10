@@ -7,6 +7,7 @@ use App\Models\Tim;
 use App\Models\BivsiKlub;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class IgraciController extends Controller
 {
@@ -132,6 +133,17 @@ class IgraciController extends Controller
         }
         $validated['tim_id'] = $glavniTim->id;
 
+        // Generate slug before creating the player
+        $baseSlug = Str::slug($validated['prezime'] . '-' . $validated['ime']);
+        $slug = $baseSlug;
+        $counter = 1;
+        
+        while (Igrac::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        $validated['slug'] = $slug;
+
         // Handle file upload if there's a photo
         if ($request->hasFile('fotografija')) {
             $file = $request->file('fotografija');
@@ -211,7 +223,18 @@ class IgraciController extends Controller
         // Set the aktivan field to true if checked, false otherwise
         $validated['aktivan'] = $request->has('aktivan');
 
-        // Ne menjamo tim_id pri ažuriranju
+        // Update slug only if name or surname changed and there's no existing slug
+        if (($igrac->ime !== $validated['ime'] || $igrac->prezime !== $validated['prezime']) && empty($igrac->slug)) {
+            $baseSlug = Str::slug($validated['prezime'] . '-' . $validated['ime']);
+            $slug = $baseSlug;
+            $counter = 1;
+            
+            while (Igrac::where('slug', $slug)->where('id', '!=', $igrac->id)->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+            $validated['slug'] = $slug;
+        }
 
         // Handle file upload if there's a new photo
         if ($request->hasFile('fotografija')) {
