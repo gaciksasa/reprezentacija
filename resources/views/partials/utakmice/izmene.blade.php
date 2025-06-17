@@ -35,8 +35,9 @@
                                             <span class="text-muted">{{ $izmena->minut }}' </span>
                                             <i class="fas fa-arrow-right text-success"></i> 
                                             @if(get_class($izmena) === 'App\Models\Izmena')
-                                                <a href="{{ route('igraci.show', $izmena->igracIn->id) }}" class="text-decoration-none">
-                                                    {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
+                                                <a href="{{ route('igraci.show', $izmena->igracIn->slug) }}" class="text-decoration-none">
+                                                    {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }} 
+                                                    <span><small class="text-muted">({{ $izmena->igracIn->getBrojNastupaDoDatuma($utakmica->datum) }})</small></span>
                                                 </a>
                                             @else
                                                 {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
@@ -45,7 +46,7 @@
                                             <span class="text-muted ps-4">
                                                 <i class="fas fa-arrow-left text-danger"></i> 
                                                 @if(get_class($izmena) === 'App\Models\Izmena')
-                                                    <a href="{{ route('igraci.show', $izmena->igracOut->id) }}" class="text-decoration-none">
+                                                    <a href="{{ route('igraci.show', $izmena->igracOut->slug) }}" class="text-decoration-none">
                                                         {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
                                                     </a>
                                                 @else
@@ -92,17 +93,18 @@
                                             <span class="text-muted">{{ $izmena->minut }}' </span>
                                             <i class="fas fa-arrow-right text-success"></i> 
                                             @if(get_class($izmena) === 'App\Models\Izmena')
-                                                <a href="{{ route('igraci.show', $izmena->igracIn->id) }}" class="text-decoration-none">
-                                                    {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
+                                                <a href="{{ route('igraci.show', $izmena->igracIn->slug) }}" class="text-decoration-none">
+                                                    {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }} 
+                                                    <span><small class="text-muted">({{ $izmena->igracIn->getBrojNastupaDoDatuma($utakmica->datum) }})</small></span>
                                                 </a>
-                                            @else
+                                                    @else
                                                 {{ $izmena->igracIn->prezime }} {{ $izmena->igracIn->ime }}
                                             @endif
                                             <br>
                                             <span class="text-muted ps-4">
                                                 <i class="fas fa-arrow-left text-danger"></i> 
                                                 @if(get_class($izmena) === 'App\Models\Izmena')
-                                                    <a href="{{ route('igraci.show', $izmena->igracOut->id) }}" class="text-decoration-none">
+                                                    <a href="{{ route('igraci.show', $izmena->igracOut->slug) }}" class="text-decoration-none">
                                                         {{ $izmena->igracOut->prezime }} {{ $izmena->igracOut->ime }}
                                                     </a>
                                                 @else
