@@ -19,46 +19,57 @@
                             ->first();
                     }
                     
-                    // Ako je domaćin naš tim i imamo selektor mandat
+                    // Ako je domaćin naš tim - pronađi selektor mandat za tu utakmicu
                     $domacinSelektorMandat = null;
                     $domacinSelektoriNaUtakmici = collect();
-                    if ($domacinJeNasTim && isset($selektor) && $selektor) {
-                        $domacinSelektorMandat = $selektor;
-                        // Proverimo da li je komisija i dohvatimo sve članove
-                        if ($domacinSelektorMandat->komisija) {
-                            $domacinSelektoriNaUtakmici = $domacinSelektorMandat->clanoviKomisije();
-                        } else {
-                            $domacinSelektoriNaUtakmici = collect([$domacinSelektorMandat]);
+                    if ($domacinJeNasTim) {
+                        // Pronađi selektor mandat koji je bio aktivan na datum utakmice
+                        $domacinSelektorMandat = \App\Models\SelektorMandat::whereHas('tim', function($query) use ($nasTimIds) {
+                            $query->whereIn('id', $nasTimIds);
+                        })
+                        ->where('pocetak_mandata', '<=', $utakmica->datum)
+                        ->where(function($query) use ($utakmica) {
+                            $query->whereNull('kraj_mandata')
+                                  ->orWhere('kraj_mandata', '>=', $utakmica->datum);
+                        })
+                        ->with('selektor')
+                        ->first();
+                        
+                        if ($domacinSelektorMandat) {
+                            // Ako je komisija, dohvati sve članove komisije
+                            if ($domacinSelektorMandat->komisija) {
+                                $clanoviKomisijeCollection = $domacinSelektorMandat->clanoviKomisije();
+                                // Učitaj selektor relacije za sve članove
+                                $clanoviKomisijeCollection->load('selektor');
+                                // Izdvoj selektore iz mandata
+                                $domacinSelektoriNaUtakmici = $clanoviKomisijeCollection->map(function($mandat) {
+                                    return $mandat->selektor;
+                                });
+                            } else {
+                                // Ako nije komisija, samo dodaj jednog selektora
+                                $domacinSelektoriNaUtakmici = collect([$domacinSelektorMandat->selektor]);
+                            }
                         }
                     }
                 @endphp
                 
-                @if($domacinJeNasTim && $domacinSelektorMandat)
+                @if($domacinJeNasTim && $domacinSelektorMandat && $domacinSelektoriNaUtakmici->count() > 0)
                     <div class="d-flex align-items-center justify-content-end">
                         <div>
-                            @if($domacinSelektoriNaUtakmici->count() > 1)
-                                <div><small class="text-muted">Selektorska komisija:</small></div>
-                            @endif
-                            
-                            @foreach($domacinSelektoriNaUtakmici as $mandat)
-                                <div class="mb-1">
-                                    <a href="{{ route('selektori.show', $mandat->selektor) }}" class="text-decoration-none">
-                                        <span>{{ $mandat->selektor->ime_prezime }}</span>
-                                    </a>
-                                    <span class="text-muted ms-1">({{ $mandat->getBrojUtakmiceZaDatum($utakmica->datum) }})</span>
-                                    
-                                    @if($mandat->glavni_selektor)
-                                        <span class="badge bg-primary ms-1">glavni</span>
-                                    @endif
-                                    
-                                    @if($mandat->v_d_status)
-                                        <span class="badge bg-warning text-dark ms-1">v.d.</span>
-                                    @endif
-                                </div>
+                            @foreach($domacinSelektoriNaUtakmici as $index => $selektor_obj)
+                                <a href="{{ route('selektori.show', $selektor_obj) }}">
+                                    {{ $selektor_obj->prezime }} {{ $selektor_obj->ime }}
+                                </a>
+                                @if($index < $domacinSelektoriNaUtakmici->count() - 1)
+                                    <br>
+                                @endif
                             @endforeach
+                            
+                            @if($domacinSelektorMandat->v_d_status)
+                                <small class="text-muted d-block">(v.d.)</small>
+                            @endif
                         </div>
                     </div>
-                <!-- Kod za protivničke selektore koji se nalaze u sekciji za domaći tim -->
                 @elseif(!$domacinJeNasTim && $domacinSelektor)
                     <div class="d-flex align-items-center justify-content-end">
                         <div>
@@ -117,46 +128,57 @@
                             ->first();
                     }
                     
-                    // Ako je gost naš tim i imamo selektor mandat
+                    // Ako je gost naš tim - pronađi selektor mandat za tu utakmicu
                     $gostSelektorMandat = null;
                     $gostSelektoriNaUtakmici = collect();
-                    if ($gostJeNasTim && isset($selektor) && $selektor) {
-                        $gostSelektorMandat = $selektor;
-                        // Proverimo da li je komisija i dohvatimo sve članove
-                        if ($gostSelektorMandat->komisija) {
-                            $gostSelektoriNaUtakmici = $gostSelektorMandat->clanoviKomisije();
-                        } else {
-                            $gostSelektoriNaUtakmici = collect([$gostSelektorMandat]);
+                    if ($gostJeNasTim) {
+                        // Pronađi selektor mandat koji je bio aktivan na datum utakmice
+                        $gostSelektorMandat = \App\Models\SelektorMandat::whereHas('tim', function($query) use ($nasTimIds) {
+                            $query->whereIn('id', $nasTimIds);
+                        })
+                        ->where('pocetak_mandata', '<=', $utakmica->datum)
+                        ->where(function($query) use ($utakmica) {
+                            $query->whereNull('kraj_mandata')
+                                  ->orWhere('kraj_mandata', '>=', $utakmica->datum);
+                        })
+                        ->with('selektor')
+                        ->first();
+                        
+                        if ($gostSelektorMandat) {
+                            // Ako je komisija, dohvati sve članove komisije
+                            if ($gostSelektorMandat->komisija) {
+                                $clanoviKomisijeCollection = $gostSelektorMandat->clanoviKomisije();
+                                // Učitaj selektor relacije za sve članove
+                                $clanoviKomisijeCollection->load('selektor');
+                                // Izdvoj selektore iz mandata
+                                $gostSelektoriNaUtakmici = $clanoviKomisijeCollection->map(function($mandat) {
+                                    return $mandat->selektor;
+                                });
+                            } else {
+                                // Ako nije komisija, samo dodaj jednog selektora
+                                $gostSelektoriNaUtakmici = collect([$gostSelektorMandat->selektor]);
+                            }
                         }
                     }
                 @endphp
                 
-                @if($gostJeNasTim && $gostSelektorMandat)
+                @if($gostJeNasTim && $gostSelektorMandat && $gostSelektoriNaUtakmici->count() > 0)
                     <div class="d-flex align-items-center">
                         <div>
-                            @if($gostSelektoriNaUtakmici->count() > 1)
-                                <div><small class="text-muted">Selektorska komisija:</small></div>
-                            @endif
-                            
-                            @foreach($gostSelektoriNaUtakmici as $mandat)
-                                <div class="mb-1">
-                                    <a href="{{ route('selektori.show', $mandat->selektor) }}" class="text-decoration-none">
-                                        <span>{{ $mandat->selektor->ime_prezime }}</span>
-                                    </a>
-                                    <span class="text-muted ms-1">({{ $mandat->getBrojUtakmiceZaDatum($utakmica->datum) }})</span>
-                                    
-                                    @if($mandat->glavni_selektor)
-                                        <span class="badge bg-primary ms-1">glavni</span>
-                                    @endif
-                                    
-                                    @if($mandat->v_d_status)
-                                        <span class="badge bg-warning text-dark ms-1">v.d.</span>
-                                    @endif
-                                </div>
+                            @foreach($gostSelektoriNaUtakmici as $index => $selektor_obj)
+                                <a href="{{ route('selektori.show', $selektor_obj) }}">
+                                    {{ $selektor_obj->prezime }} {{ $selektor_obj->ime }}
+                                </a>
+                                @if($index < $gostSelektoriNaUtakmici->count() - 1)
+                                    <br>
+                                @endif
                             @endforeach
+                            
+                            @if($gostSelektorMandat->v_d_status)
+                                <small class="text-muted d-block">(v.d.)</small>
+                            @endif
                         </div>
                     </div>
-                <!-- Kod za protivničke selektore koji se nalaze u sekciji za gostujući tim -->
                 @elseif(!$gostJeNasTim && $gostSelektor)
                     <div class="d-flex align-items-center">
                         <div>
